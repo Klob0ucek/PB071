@@ -127,8 +127,6 @@ bool encode(void)
 
 bool decode(void)
 {
-    printf("Input five characters: ");
-
     uint64_t input = 0;
     int c;
     int counter = 0;

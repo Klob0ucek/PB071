@@ -31,11 +31,24 @@ uint64_t load_chars(int amount) {
 }
 
 void print_chars(uint64_t out, int amount) {
+    uint64_t mask = 1;
+    mask <<= ((8 * amount) - 1);
+
+    int character;
+    int character_mask;
+
     for (int i = 0; i < amount; i++) {
-        putchar(out);
-        out >>= 8;
+        character = 0;
+        character_mask = 0x80;
+        for (int j = 0; j < 8; j++) {
+            if (mask & out) {
+                character |= character_mask;
+            }
+            mask >>= 1;
+            character_mask >>= 1;
+        }
+        putchar(character);
     }
-    printf("\n");
 }
 
 uint64_t input32to40(uint64_t input){
@@ -95,7 +108,6 @@ int parity(int bit, uint64_t num) {
 
 bool encode(void)
 {
-    printf("Input four characters: ");
     uint64_t input = load_chars(4);
     uint64_t out = input32to40(input);
     out = reverse(out);
@@ -110,13 +122,28 @@ bool encode(void)
 
     out = reverse(out);
     print_chars(out, 5);
-    return false;
+    return true;
 }
 
 bool decode(void)
 {
     printf("Input five characters: ");
-    uint64_t input = load_chars(5);
+
+    uint64_t input = 0;
+    int c;
+    int counter = 0;
+
+    while ((c = getchar()) != EOF) {
+        input<<= 8;
+        input |= c;
+        counter++;
+    }
+
+    if (counter % 5 != 0) {
+        fprintf(stderr, "Wrong code word\n");
+        return false;
+    }
+
     uint64_t mask = 0x80000000;
     uint64_t plus_mask = 0x10000000000;
     int skip = 1;
@@ -137,7 +164,7 @@ bool decode(void)
         mask = mask >> 1;
     }
     print_chars(result, 4);
-    return false;
+    return true;
 }
 
 /*************************************

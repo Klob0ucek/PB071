@@ -14,20 +14,26 @@
     return;
 }*/
 
-uint64_t load_chars(int amount) {
+bool load_chars(int amount, uint64_t *result) {
     uint64_t num = 0;
     int c;
 
-    while ((c = getchar()) != EOF && amount > 0) {
+    while (amount > 0 && (c = getchar()) != EOF) {
         num <<= 8;
         amount--;
         num |= c;
     }
-    while (amount > 0) {
-        num <<= 8;
-        amount--;
+    if (c == EOF) {
+        while (amount > 0) {
+            num <<= 8;
+            amount--;
+        }
+        *result = num;
+        return false;
     }
-    return num;
+
+    *result = num;
+    return true;
 }
 
 void print_chars(uint64_t out, int amount) {
@@ -106,22 +112,32 @@ int parity(int bit, uint64_t num) {
     return count_ones % 2;
 }
 
-bool encode(void)
-{
-    uint64_t input = load_chars(4);
-    uint64_t out = input32to40(input);
-    out = reverse(out);
-
+uint64_t fill_parity(uint64_t num) {
     for (int i = 1; i < 40; i = i << 1) {
-        if (parity(i, out)) {
+        if (parity(i, num)) {
             uint64_t parity_bit = 1;
             parity_bit <<= i;
-            out |= parity_bit;
+            num |= parity_bit;
         }
     }
+    return num;
+}
 
-    out = reverse(out);
-    print_chars(out, 5);
+bool encode(void)
+{
+    uint64_t num = 0;
+    while (load_chars(4, &num) == true) {
+        num = input32to40(num);
+        num = reverse(num);
+        num = fill_parity(num);
+        num = reverse(num);
+        print_chars(num, 5);
+    }
+    num = input32to40(num);
+    num = reverse(num);
+    num = fill_parity(num);
+    num = reverse(num);
+    print_chars(num, 5);
     return true;
 }
 

@@ -147,7 +147,7 @@ TEST(mine_decode_test_one)
             0xfd, 0x81, 0xc1, 0xdb, 0xab, 0x00, 0x00, 0x00
     };
     INPUT_BYTES(input);
-    CHECK(app_main("-e") == EXIT_SUCCESS);
+    CHECK(app_main("-d") == EXIT_SUCCESS);
     CHECK_FILE(stderr, "");
     CHECK_BINARY_FILE(stdout, output);
 }
@@ -161,7 +161,7 @@ TEST(mine_decode_test_two)
             0xfd, 0x81, 0xc1, 0xdb
     };
     INPUT_BYTES(input);
-    CHECK(app_main("-e") == EXIT_SUCCESS);
+    CHECK(app_main("-d") == EXIT_SUCCESS);
     CHECK_FILE(stderr, "Wrong code word\n");
     CHECK_BINARY_FILE(stdout, output);
 }
@@ -175,8 +175,8 @@ TEST(mine_decode_test_three)
             0x61, 0x68, 0x6f, 0x6a
     };
     INPUT_BYTES(input);
-    CHECK(app_main("-e") == EXIT_SUCCESS);
-    CHECK_FILE(stderr, "Wrong code word\n");
+    CHECK(app_main("-d") == EXIT_SUCCESS);
+    CHECK_FILE(stderr, "");
     CHECK_BINARY_FILE(stdout, output);
 }
 
@@ -189,7 +189,8 @@ TEST(mine_decode_test_four)
             0x10, 0x40, 0xc1, 0x02
     };
     INPUT_BYTES(input);
-    CHECK(app_main("-e") == EXIT_SUCCESS);
-    CHECK_FILE(stderr, "Wrong code word\n");
+    CHECK(app_main("-d") == EXIT_SUCCESS);
+    CHECK_FILE(stderr, "");
     CHECK_BINARY_FILE(stdout, output);
 }
+

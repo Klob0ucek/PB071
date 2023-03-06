@@ -161,7 +161,7 @@ TEST(mine_decode_test_two)
             0xfd, 0x81, 0xc1, 0xdb
     };
     INPUT_BYTES(input);
-    CHECK(app_main("-d") == EXIT_SUCCESS);
+    CHECK(app_main("-d") == EXIT_FAILURE);
     CHECK_FILE(stderr, "Wrong code word\n");
     CHECK_BINARY_FILE(stdout, output);
 }

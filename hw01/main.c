@@ -123,6 +123,29 @@ uint64_t fill_parity(uint64_t num) {
     return num;
 }
 
+uint64_t input40to32(uint64_t num) {
+    uint64_t mask = 0x80000000;
+    uint64_t plus_mask = 0x10000000000;
+    int skip = 1;
+    uint64_t result = 0;
+
+    for (int i = 0; i < 40; i++){
+        plus_mask = plus_mask >> 1 ;
+        if (i == 0 || i == 39) {
+            continue;
+        }
+        if (i == skip) {
+            skip = skip << 1;
+            continue;
+        }
+        if (plus_mask & num) {
+            result |= mask;
+        }
+        mask = mask >> 1;
+    }
+    return result;
+}
+
 bool encode(void) {
     uint64_t num = 0;
     while (load_chars(4, &num) == true) {
@@ -142,15 +165,28 @@ bool encode(void) {
     return true;
 }
 
-bool decode(void)
-{
-    uint64_t input = 0;
-    int c;
+bool decode(void) {
+    uint64_t num = 0;
+    bool error;
+    while (true) {
+        error = load_chars(5, &num);
+        if (num == 0 && !error) { break; }
+        if (!error) {
+            fprintf(stderr, "Wrong code word\n");
+            return false;
+        }
+        num = input40to32(num);
+        print_chars(num, 4);
+    }
+    return true;
+}
+
+    /*int c;
     int counter = 0;
 
     while ((c = getchar()) != EOF) {
-        input<<= 8;
-        input |= c;
+        num<<= 8;
+        num |= c;
         counter++;
     }
 
@@ -179,8 +215,7 @@ bool decode(void)
         mask = mask >> 1;
     }
     print_chars(result, 4);
-    return true;
-}
+    return true;*/
 
 /*************************************
  * DO NOT MODIFY THE FUNCTION BELLOW *

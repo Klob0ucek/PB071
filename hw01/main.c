@@ -123,8 +123,7 @@ uint64_t fill_parity(uint64_t num) {
     return num;
 }
 
-bool encode(void)
-{
+bool encode(void) {
     uint64_t num = 0;
     while (load_chars(4, &num) == true) {
         num = input32to40(num);
@@ -133,11 +132,13 @@ bool encode(void)
         num = reverse(num);
         print_chars(num, 5);
     }
-    num = input32to40(num);
-    num = reverse(num);
-    num = fill_parity(num);
-    num = reverse(num);
-    print_chars(num, 5);
+    if (num != 0) {
+        num = input32to40(num);
+        num = reverse(num);
+        num = fill_parity(num);
+        num = reverse(num);
+        print_chars(num, 5);
+    }
     return true;
 }
 

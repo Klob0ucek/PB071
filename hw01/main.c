@@ -31,7 +31,6 @@ bool load_chars(int amount, uint64_t *result) {
         *result = num;
         return false;
     }
-
     *result = num;
     return true;
 }
@@ -99,16 +98,13 @@ int parity(int bit, uint64_t num) {
     uint64_t mask = 1;
     mask = mask << 1;
     for (int i = 1; i < 40; i++) {
-//        printf("%d : ", i); print_bin(mask);
         if (bit & i) {
             if (num & mask) {
                 count_ones += 1;
-//                printf("%d : %d, %lld\n", bit, i, mask);
             }
         }
         mask = mask << 1;
     }
-//    printf("%d : %d\n", bit, count_ones);
     return count_ones % 2;
 }
 
@@ -180,42 +176,6 @@ bool decode(void) {
     }
     return true;
 }
-
-    /*int c;
-    int counter = 0;
-
-    while ((c = getchar()) != EOF) {
-        num<<= 8;
-        num |= c;
-        counter++;
-    }
-
-    if (counter % 5 != 0) {
-        fprintf(stderr, "Wrong code word\n");
-        return false;
-    }
-
-    uint64_t mask = 0x80000000;
-    uint64_t plus_mask = 0x10000000000;
-    int skip = 1;
-    unsigned int result = 0;
-
-    for (int i = 0; i < 40; i++){
-        plus_mask = plus_mask >> 1 ;
-        if (i == 0 || i == 39) {
-            continue;
-        }
-        if (i == skip) {
-            skip = skip << 1;
-            continue;
-        }
-        if (plus_mask & input) {
-            result += mask;
-        }
-        mask = mask >> 1;
-    }
-    print_chars(result, 4);
-    return true;*/
 
 /*************************************
  * DO NOT MODIFY THE FUNCTION BELLOW *

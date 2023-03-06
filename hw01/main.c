@@ -1,20 +1,11 @@
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
-#include <stdint.h>
 
-/*void print_bin(uint64_t num) {
-    uint64_t mask = 0x8000000000;
-    for (int i = 0; i < 40; i ++) {
-        printf(num & mask ? "1" : "0");
-        mask = mask >> 1;
-    }
-    printf("\n");
-    return;
-}*/
-
-bool load_chars(int amount, uint64_t *result) {
+bool load_chars(int amount, uint64_t *result)
+{
     uint64_t num = 0;
     int c;
 
@@ -35,7 +26,8 @@ bool load_chars(int amount, uint64_t *result) {
     return true;
 }
 
-void print_chars(uint64_t out, int amount) {
+void print_chars(uint64_t out, int amount)
+{
     uint64_t mask = 1;
     mask <<= ((8 * amount) - 1);
 
@@ -56,14 +48,15 @@ void print_chars(uint64_t out, int amount) {
     }
 }
 
-uint64_t input32to40(uint64_t input){
+uint64_t input32to40(uint64_t input)
+{
     uint64_t mask = 0x80000000;
     uint64_t plus_mask = 0x10000000000;
     int skip = 1;
     uint64_t out = 0;
 
     for (int i = 0; i < 40; i++) {
-        plus_mask = plus_mask >> 1 ;
+        plus_mask = plus_mask >> 1;
         if (i == 0 || i == 39) {
             continue;
         } else if (i == skip) {
@@ -79,7 +72,8 @@ uint64_t input32to40(uint64_t input){
     return out;
 }
 
-uint64_t reverse(uint64_t num) {
+uint64_t reverse(uint64_t num)
+{
     uint64_t mask = 0x1;
     uint64_t plus_mask = 0x10000000000;
     uint64_t result = 0;
@@ -87,13 +81,15 @@ uint64_t reverse(uint64_t num) {
         if (num & mask) {
             result += plus_mask;
         }
-        mask = mask << 1; plus_mask = plus_mask >> 1;
+        mask = mask << 1;
+        plus_mask = plus_mask >> 1;
     }
     result = result >> 1;
     return result;
 }
 
-int parity(int bit, uint64_t num) {
+int parity(int bit, uint64_t num)
+{
     int count_ones = 0;
     uint64_t mask = 1;
     mask = mask << 1;
@@ -108,7 +104,8 @@ int parity(int bit, uint64_t num) {
     return count_ones % 2;
 }
 
-uint64_t fill_parity(uint64_t num) {
+uint64_t fill_parity(uint64_t num)
+{
     for (int i = 1; i < 40; i = i << 1) {
         if (parity(i, num)) {
             uint64_t parity_bit = 1;
@@ -119,14 +116,15 @@ uint64_t fill_parity(uint64_t num) {
     return num;
 }
 
-uint64_t input40to32(uint64_t num) {
+uint64_t input40to32(uint64_t num)
+{
     uint64_t mask = 0x80000000;
     uint64_t plus_mask = 0x10000000000;
     int skip = 1;
     uint64_t result = 0;
 
-    for (int i = 0; i < 40; i++){
-        plus_mask = plus_mask >> 1 ;
+    for (int i = 0; i < 40; i++) {
+        plus_mask = plus_mask >> 1;
         if (i == 0 || i == 39) {
             continue;
         }
@@ -142,7 +140,8 @@ uint64_t input40to32(uint64_t num) {
     return result;
 }
 
-bool encode(void) {
+bool encode(void)
+{
     uint64_t num = 0;
     while (load_chars(4, &num) == true) {
         num = input32to40(num);
@@ -161,12 +160,15 @@ bool encode(void) {
     return true;
 }
 
-bool decode(void) {
+bool decode(void)
+{
     uint64_t num = 0;
     bool error;
     while (true) {
         error = load_chars(5, &num);
-        if (num == 0 && !error) { break; }
+        if (num == 0 && !error) {
+            break;
+        }
         if (!error) {
             fprintf(stderr, "Wrong code word\n");
             return false;

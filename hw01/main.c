@@ -59,15 +59,15 @@ uint64_t input32to40(uint64_t input)
         plus_mask = plus_mask >> 1;
         if (i == 0 || i == 39) {
             continue;
-        } else if (i == skip) {
+        }
+        if (i == skip) {
             skip = skip << 1;
             continue;
-        } else {
-            if (mask & input) {
-                out = out + plus_mask;
-            }
-            mask = mask >> 1;
         }
+        if (mask & input) {
+            out = out + plus_mask;
+        }
+        mask = mask >> 1;
     }
     return out;
 }

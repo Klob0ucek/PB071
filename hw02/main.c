@@ -5,9 +5,18 @@
 bool load_card(int *card);
 void load_player(int player[7]);
 bool load_table(int player1[7], int player2[7]);
-bool load_instance(void);
+bool load_instance(int player1[7], int player2[7]);
 void validate_game(int player1[7],int player2[7]);
 void merge_arrays(int const player1[7], int const player2[7], int table[9]);
+
+int evaluate_game(int player1[7],int player2[7]);
+
+int four_of_kind_win(int player1[7], int player2[7]);
+int check_four_of_kind(int player[7]);
+
+/*
+int check_flush(int *player);
+int flush_win(int player1[7], int player2[7]);*/
 
 /* Parse the number of players at the table for the bonus extension.
  * IMPORTANT: Do not modify this function! */
@@ -34,8 +43,11 @@ int main(int argc, char **argv)
 
     bool next_game;
     while (true) {
-        next_game = load_instance();
-        printf("aaa\n");
+        int player1[7];
+        int player2[7];
+        next_game = load_instance(player1, player2);
+        evaluate_game(player1, player2);
+
 
         if (!next_game) {
             break;
@@ -43,6 +55,89 @@ int main(int argc, char **argv)
     }
     return 0;
 }
+
+int evaluate_game(int player1[7],int player2[7]) {
+    int win = four_of_kind_win(player1, player2);
+    if (win) {
+        printf("Winner is Player%d", win);
+        return win;
+    }
+
+}
+
+int four_of_kind_win(int player1[7], int player2[7]) {
+    int p1w = check_four_of_kind(player1);
+    int p2w = check_four_of_kind(player2);
+    if (p1w == p2w) {
+        return 0;
+    }
+    return (p1w > p2w) ? 1 : 2;
+}
+
+int check_four_of_kind(int *player) {
+    int kind_counter, card_kind;
+    for (int i = 0; i < 4; ++i) {
+        kind_counter = 1;
+        card_kind = player[i] / 10;
+        for (int j = 0; j < 7; ++j) {
+            if (i == j) {
+                continue;
+            }
+            if (card_kind == (player[j] / 10)) {
+                kind_counter += 1;
+            }
+            if (kind_counter == 4) {
+                return player[i];
+            }
+        }
+    }
+    return 0;
+}
+
+/*
+int flush_win(int player1[7], int player2[7]) {
+    int p1w = check_flush(player1);
+    int p2w = check_flush(player2);
+    if (p1w) {
+        return 1;
+    }
+    if (p2w) {
+        return 2;
+    }
+    return 0;
+}
+
+int check_flush(int *player) {
+    int color_counter, card_color;
+    for (int i = 0; i < 3; ++i) {
+        color_counter = 1;
+        card_color = player[i] % 10;
+        for (int j = 0; j < 7; ++j) {
+            if (i == j) {
+                continue;
+            }
+            if (card_color == (player[j] % 10)) {
+                color_counter += 1;
+            }
+            if (color_counter == 5) {
+                return player[i];
+            }
+        }
+    }
+    return 0;
+}*/
+
+
+
+bool load_instance(int player1[7], int player2[7]) {
+    bool next_instance;
+    load_player(player1);
+    load_player(player2);
+    next_instance = load_table(player1, player2);
+    validate_game(player1, player2);
+    return next_instance;
+}
+
 
 void validate_game(int player1[7],int player2[7]){
     int table[9];
@@ -64,17 +159,6 @@ void merge_arrays(int const player1[7], int const player2[7], int table[9]) {
     for (int i = 0; i < 2; i++) {
         table[7 + i] = player2[i];
     }
-}
-
-bool load_instance(void) {
-    bool next_instance;
-    int player1[7];
-    int player2[7];
-    load_player(player1);
-    load_player(player2);
-    next_instance = load_table(player1, player2);
-    validate_game(player1, player2);
-    return next_instance;
 }
 
 /**
@@ -220,6 +304,7 @@ bool load_card(int *card) {
     }
     return true;
 }
+
 
 /* my notation:
  * hearts, diamonds, spades, clubs = 1, 2, 3, 4

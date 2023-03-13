@@ -8,7 +8,6 @@ bool load_table(int player1[7], int player2[7]);
 bool load_instance(void);
 void validate_game(int player1[7],int player2[7]);
 void merge_arrays(int const player1[7], int const player2[7], int table[9]);
-bool all_unique(int const table[9]);
 
 /* Parse the number of players at the table for the bonus extension.
  * IMPORTANT: Do not modify this function! */
@@ -48,35 +47,21 @@ int main(int argc, char **argv)
 void validate_game(int player1[7],int player2[7]){
     int table[9];
     merge_arrays(player1, player2, table);
-    if (!all_unique(table)) {
-        fprintf(stderr, "Two or more cards are the same");
-        exit(1);
-    }
-}
-
-bool all_unique(int const table[9]) {
-    int i, j;
-
-    for (i = 0; i < 9; i++) {
-        for (j = i + 1; j < 9; j++) {
+    for (int i = 0; i < 9; i++) {
+        for (int j = i + 1; j < 9; j++) {
             if (table[i] == table[j]) {
-                // found two equal elements
-                return false;
+                fprintf(stderr, "Two or more cards are the same");
+                exit(1);
             }
         }
     }
-    return true;
 }
 
 void merge_arrays(int const player1[7], int const player2[7], int table[9]) {
-    int i;
-
-    // copy the elements from the first array into the new array
-    for (i = 0; i < 7; i++) {
+    for (int i = 0; i < 7; i++) {
         table[i] = player1[i];
     }
-
-    for (i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++) {
         table[7 + i] = player2[i];
     }
 }

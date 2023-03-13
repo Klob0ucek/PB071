@@ -14,10 +14,6 @@ int evaluate_game(int player1[7],int player2[7]);
 int four_of_kind_win(int player1[7], int player2[7]);
 int check_four_of_kind(int player[7]);
 
-/*
-int check_flush(int *player);
-int flush_win(int player1[7], int player2[7]);*/
-
 /* Parse the number of players at the table for the bonus extension.
  * IMPORTANT: Do not modify this function! */
 static int parse_players (int argc, char **argv)
@@ -93,41 +89,6 @@ int check_four_of_kind(int *player) {
     }
     return 0;
 }
-
-/*
-int flush_win(int player1[7], int player2[7]) {
-    int p1w = check_flush(player1);
-    int p2w = check_flush(player2);
-    if (p1w) {
-        return 1;
-    }
-    if (p2w) {
-        return 2;
-    }
-    return 0;
-}
-
-int check_flush(int *player) {
-    int color_counter, card_color;
-    for (int i = 0; i < 3; ++i) {
-        color_counter = 1;
-        card_color = player[i] % 10;
-        for (int j = 0; j < 7; ++j) {
-            if (i == j) {
-                continue;
-            }
-            if (card_color == (player[j] % 10)) {
-                color_counter += 1;
-            }
-            if (color_counter == 5) {
-                return player[i];
-            }
-        }
-    }
-    return 0;
-}*/
-
-
 
 bool load_instance(int player1[7], int player2[7]) {
     bool next_instance;
@@ -269,17 +230,24 @@ bool load_card(int *card) {
         case '9':
             *card += 9;
             break;
-        case 'J':
+        case '1':
             *card += 10;
+            c = getchar();
+            if (c != '0') {
+                return false;
+            }
             break;
-        case 'Q':
+        case 'J':
             *card += 11;
             break;
-        case 'K':
+        case 'Q':
             *card += 12;
             break;
-        case 'A':
+        case 'K':
             *card += 13;
+            break;
+        case 'A':
+            *card += 14;
             break;
         default:
             return false;
@@ -308,5 +276,5 @@ bool load_card(int *card) {
 
 /* my notation:
  * hearts, diamonds, spades, clubs = 1, 2, 3, 4
- * 2,3,4,5,6,7,8,9, = 2,3,4,5,6,7,8,9
+ * 2,3,4,5,6,7,8,9, = 2,3,4,5,6,7,8,9, 10
  * J, Q, K, A = 10, 11, 12, 13*/

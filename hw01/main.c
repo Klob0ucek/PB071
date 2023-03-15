@@ -6,23 +6,23 @@
 
 bool load_chars(int amount, uint64_t *result)
 {
-    uint64_t num = 0;
+    uint64_t input = 0;
     int c;
 
     while (amount > 0 && (c = getchar()) != EOF) {
-        num <<= 8;
+        input <<= 8;
         amount--;
-        num |= c;
+        input |= c;
     }
     if (c == EOF) {
         while (amount > 0) {
-            num <<= 8;
+            input <<= 8;
             amount--;
         }
-        *result = num;
+        *result = input;
         return false;
     }
-    *result = num;
+    *result = input;
     return true;
 }
 
@@ -48,7 +48,15 @@ void print_chars(uint64_t out, int amount)
     }
 }
 
-uint64_t input32to40(uint64_t input)
+/**
+ *
+ * @param input number to extend or shorten
+ * @param inOutSwitch true if you want to extend input number to 40 bits
+ *                    false if you want to shorten input number to 32 bits
+ *
+ * @return refactored number
+ */
+uint64_t extend_shorten_number(uint64_t input, bool inOutSwitch)
 {
     uint64_t mask = 0x80000000;
     uint64_t plus_mask = 0x10000000000;
@@ -64,8 +72,14 @@ uint64_t input32to40(uint64_t input)
             skip = skip << 1;
             continue;
         }
-        if (mask & input) {
-            out = out + plus_mask;
+        if (inOutSwitch) {
+            if (mask & input) {
+                out = out + plus_mask;
+            }
+        } else {
+            if (plus_mask & input) {
+                out |= mask;
+            }
         }
         mask = mask >> 1;
     }
@@ -116,42 +130,18 @@ uint64_t fill_parity(uint64_t num)
     return num;
 }
 
-uint64_t input40to32(uint64_t num)
-{
-    uint64_t mask = 0x80000000;
-    uint64_t plus_mask = 0x10000000000;
-    int skip = 1;
-    uint64_t result = 0;
-
-    for (int i = 0; i < 40; i++) {
-        plus_mask = plus_mask >> 1;
-        if (i == 0 || i == 39) {
-            continue;
-        }
-        if (i == skip) {
-            skip = skip << 1;
-            continue;
-        }
-        if (plus_mask & num) {
-            result |= mask;
-        }
-        mask = mask >> 1;
-    }
-    return result;
-}
-
 bool encode(void)
 {
     uint64_t num = 0;
     while (load_chars(4, &num) == true) {
-        num = input32to40(num);
+        num = extend_shorten_number(num, true);
         num = reverse(num);
         num = fill_parity(num);
         num = reverse(num);
         print_chars(num, 5);
     }
     if (num != 0) {
-        num = input32to40(num);
+        num = extend_shorten_number(num, true);
         num = reverse(num);
         num = fill_parity(num);
         num = reverse(num);
@@ -163,17 +153,17 @@ bool encode(void)
 bool decode(void)
 {
     uint64_t num = 0;
-    bool error;
+    bool continue_reading;
     while (true) {
-        error = load_chars(5, &num);
-        if (num == 0 && !error) {
+        continue_reading = load_chars(5, &num);
+        if (num == 0 && !continue_reading) {
             break;
         }
-        if (!error) {
+        if (!continue_reading) {
             fprintf(stderr, "Wrong code word\n");
             return false;
         }
-        num = input40to32(num);
+        num = extend_shorten_number(num, false);
         print_chars(num, 4);
     }
     return true;

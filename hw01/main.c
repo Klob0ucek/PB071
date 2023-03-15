@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+uint64_t const MASK_40_BITS = 0x10000000000;
+uint64_t const MASK_32_BITS = 0x80000000;
+
+
 bool load_chars(int amount, uint64_t *result)
 {
     uint64_t input = 0;
@@ -58,8 +62,8 @@ void print_chars(uint64_t out, int amount)
  */
 uint64_t extend_shorten_number(uint64_t input, bool inOutSwitch)
 {
-    uint64_t mask = 0x80000000;
-    uint64_t plus_mask = 0x10000000000;
+    uint64_t mask = MASK_32_BITS;
+    uint64_t plus_mask = MASK_40_BITS;
     int skip = 1;
     uint64_t out = 0;
 
@@ -88,8 +92,8 @@ uint64_t extend_shorten_number(uint64_t input, bool inOutSwitch)
 
 uint64_t reverse(uint64_t num)
 {
-    uint64_t mask = 0x1;
-    uint64_t plus_mask = 0x10000000000;
+    uint64_t mask = 1;
+    uint64_t plus_mask = MASK_40_BITS;
     uint64_t result = 0;
     while (plus_mask > 0) {
         if (num & mask) {

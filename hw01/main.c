@@ -133,19 +133,19 @@ uint64_t fill_parity(uint64_t num)
 bool encode(void)
 {
     uint64_t num = 0;
-    while (load_chars(4, &num) == true) {
-        num = extend_shorten_number(num, true);
-        num = reverse(num);
-        num = fill_parity(num);
-        num = reverse(num);
-        print_chars(num, 5);
-    }
-    if (num != 0) {
-        num = extend_shorten_number(num, true);
-        num = reverse(num);
-        num = fill_parity(num);
-        num = reverse(num);
-        print_chars(num, 5);
+    bool continue_loading;
+    while (true) {
+        continue_loading = load_chars(4, &num);
+        if (continue_loading || (!continue_loading && num != 0)) {
+            num = extend_shorten_number(num, true);
+            num = reverse(num);
+            num = fill_parity(num);
+            num = reverse(num);
+            print_chars(num, 5);
+        }
+        if (!continue_loading) {
+            break;
+        }
     }
     return true;
 }

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint-gcc.h>
-#include <strings.h>
 
 bool load_card(int *card);
 void load_player(int player[7]);
@@ -43,9 +42,19 @@ int main(int argc, char **argv)
         int player1[7];
         int player2[7];
         next_game = load_instance(player1, player2);
-        evaluate_game(player1, player2);
-
-
+        switch (evaluate_game(player1, player2)) {
+            case 0:
+                printf("Draw\n");
+                break;
+            case 1:
+                printf("Player 1\n");
+                break;
+            case 2:
+                printf("Player 2\n");
+                break;
+            default:
+                printf("Game undecided");
+        }
         if (!next_game) {
             break;
         }
@@ -53,27 +62,85 @@ int main(int argc, char **argv)
     return 0;
 }
 
+int analyze_data (uint8_t *stats) {
+    uint8_t pair1 = 0;
+    uint8_t pair2 = 0;
+    uint8_t triple = 0;
+    uint8_t four = 0;
+    uint8_t straight = 0;
+    uint8_t flush = -1;
+
+    for(int i = 0; i < 4; i++) {
+        if (stats[i] >= 5) {
+            flush = i;
+        }
+    }
+    int in_row = stats[16];
+    for (int i = 4; i < 17; i++) {
+        uint8_t card = stats[i];
+        if (card > 0) {
+            in_row++;
+            if (card == 2) {
+                pair2 = pair1;
+                pair1 = i;
+            }
+            if (card == 3) {
+                triple = i;
+            }
+            if (card == 4){
+                four = i;
+            }
+            if (in_row == 5) {
+                straight = i;
+            }
+        } else {
+            in_row = 0;
+        }
+    }
+
+    printf("P1: %d, P2: %d, T: %d, F: %d, FL: %d, ST: %d\n", pair1, pair2, triple, four, flush, straight);
+    // we saved all usable win conditions - now decide best combination
+    if (straight && (flush < 4)) {
+        return 1;
+    }
+    if (four){
+        return 2;
+    }
+    if (triple && pair1){
+        return 3;
+    }
+    if (flush < 4) {
+        return 4;
+    }
+    if (straight) {
+        return 5;
+    }
+    if (triple) {
+        return 6;
+    }
+    if (pair1 && pair2) {
+        return 7;
+    }
+    if (pair1){
+        return 8;
+    }
+    return 9;
+}
 
 int evaluate_game(int player1[7],int player2[7]) {
     uint8_t p1_hand_stats[17];
-    memset(p1_hand_stats, 0, sizeof(p1_hand_stats));
     hand_stats(p1_hand_stats, player1);
     uint8_t p2_hand_stats[17];
-    memset(p2_hand_stats, 0, sizeof(p2_hand_stats));
     hand_stats(p2_hand_stats, player2);
 
+    int win_condition_p1 = analyze_data(p1_hand_stats);
+    int win_condition_p2 = analyze_data(p2_hand_stats);
 
-    printf("Player1 stats: ");
-    for (int i = 0; i < 17; ++i) {
-        printf("%d ", p1_hand_stats[i]);
+    printf("%d, %d", win_condition_p1, win_condition_p2);
+    if (win_condition_p1 == win_condition_p2) {
+        return 0;
     }
-    printf("\n");
-
-    printf("Player2 stats: ");
-    for (int i = 0; i < 17; ++i) {
-        printf("%d ", p2_hand_stats[i]);
-    }
-    return 0;
+    return (win_condition_p1 < win_condition_p2) ? 1 : 2;
 }
 
 /**
@@ -125,133 +192,6 @@ void validate_game(const int player1[7], const int player2[7]){
             }
         }
     }
-}
-
-int four_of_kind (uint8_t *stats, int *high) {
-    for (int i = 4; i < 17; i++){
-        if (stats[i] == 4) {
-            return 2;
-            // TODO set high
-        }
-    }
-    return 0;
-}
-
-int full_house (uint8_t *stats, int *high) {
-    int pair;
-    int triple;
-    for (int i = 4; i < 17; i++){
-        if (stats[i] == 2) {
-            pair = i;
-        }
-        if (stats[i] == 3) {
-            triple = i;
-        }
-    }
-    if (pair && triple) {
-        // TODO set high
-        return 3;
-    }
-    return 0;
-}
-
-int flush(uint8_t *stats, int *high){
-    for (int i = 0; i < 4; ++i) {
-        if (stats[i] >= 5){
-            return 4; // TODO find best card in flush
-        }
-    }
-}
-
-int straight(uint8_t *stats, int *high){
-    int in_row = (stats[16]) ? 1 : 0;
-    for (int i = 4; i < 17; ++i) {
-        if (stats[i] > 0) {
-            in_row++;
-            if (in_row >= 5) {
-                if (i + 1 < 17 && stats[i + 1] > 0){
-                    continue;
-                }
-                else {
-                    //TODO set high
-                    return 5;
-                }
-            }
-        } else {
-            in_row = 0;
-        }
-    }
-    return 0;
-}
-
-/**
- * Finds triple in players hand
- *
- * @param stats stats about players cards
- * @param high pointer at best triple
- * @return
- */
-int three_of_kind(uint8_t *stats, int *high) {
-    int triple;
-    for (int i = 4; i < 17; ++i) {
-        if (stats[i] == 3) {
-            triple = i;
-        }
-    }
-    if (triple){
-        // TODO set high
-        return 6;
-    }
-    return 0;
-}
-
-/**
- * Finds one or two pairs in players cards
- *
- * @param stats player stats
- * @param high pointer at highest card of pair
- *             if two pairs found return higher pair * 100 + lower pair
- * @return return win condition No.7 if two pairs No.8, else 0
- */
-int pairs(uint8_t *stats, int *high){
-    int pairs = 0;
-    int pair1 = 0;
-    int pair2 = 0;
-    for (int i = 4; i < 17; ++i) {
-        if (stats[i] == 2) {
-            pairs++;
-            if (pairs % 2 == 1){
-                pair1 = i;
-            } else {
-                pair2 = i;
-            }
-        }
-    }
-    if (pairs >= 2) {
-        // TODO set high
-        return 7;
-    }
-    if (pairs == 1) {
-        //TODO set high
-        return 8;
-    }
-    return 0;
-}
-
-/**
- * Finds highest card
- *
- * @param stats stats about players cards
- * @param high pinter at highest card
- * @return win condition No.9
- */
-int high_card(uint8_t *stats, int *high) {
-    for (int i = 4; i < 17; i++) {
-        if (stats[i] > 0) {
-            *high = i;
-        }
-    }
-    return 9;
 }
 
 /**

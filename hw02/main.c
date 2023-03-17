@@ -214,7 +214,6 @@ int evaluate_game(int player1[7],int player2[7]) {
     int win_condition_p1 = analyze_data(p1_hand_stats, util_p1, &p1_win_cards);
     int win_condition_p2 = analyze_data(p2_hand_stats, util_p2, &p2_win_cards);
 
-    printf("%d, %d", win_condition_p1, win_condition_p2);
     if (win_condition_p1 == win_condition_p2) {
         switch (win_condition_p1) {
             case 9: // high card

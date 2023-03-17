@@ -72,7 +72,6 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
     uint8_t flush = -1;
 
     for(int i = 0; i < 4; i++) {
-        printf("%d ", stats[i]);
         if (stats[i] >= 5) {
             flush = i;
         }
@@ -100,13 +99,11 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
     }
 
-    printf("P1: %d, P2: %d, T: %d, F: %d, FL: %d, ST: %d\n", pair1, pair2, triple, four, flush, straight);
-    int util_i = 0;
-    if (straight && (flush < 4)) {
+    if (straight && (flush < 4)) { // deciding best combination
         *win_cards = straight;
         return 1;
     }
-    if (four){
+    if (four){ //four of kind win condition
         *win_cards = four;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -119,11 +116,11 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
         return 2;
     }
-    if (triple && pair1){
+    if (triple && pair1){ // three cards and a pair win condition
         *win_cards = triple * 100 + pair1;
         return 3;
     }
-    if (flush < 4) {
+    if (flush < 4) { // flush win condition
         for (int i = 16; i > 3; i--){
             if (stats[i] % 10 == flush) {
                 util_array[util_i] = i;
@@ -135,11 +132,11 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
         return 4;
     }
-    if (straight) {
+    if (straight) { 
         *win_cards = straight;
         return 5;
     }
-    if (triple) {
+    if (triple) { // three card win condition
         *win_cards = triple;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -153,7 +150,7 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
 
         return 6;
     }
-    if (pair1 && pair2) {
+    if (pair1 && pair2) { // two pair win condition
         *win_cards = pair1 * 100 + pair2;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -166,7 +163,7 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
         return 7;
     }
-    if (pair1){
+    if (pair1){ // one pair win condition
         *win_cards = pair1;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -188,7 +185,7 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
             break;
         }
     }
-    return 9;
+    return 9; // high card win condition
 }
 
 

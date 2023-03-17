@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint-gcc.h>
-#include <intrin.h>
+#include <string.h>
 
 bool load_card(int *card);
 void load_player(int player[7]);

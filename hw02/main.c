@@ -71,7 +71,6 @@ int analyze_data(uint8_t *stats, int *util_array, int *win_cards)
     uint8_t flush = -1;
 
     for (int i = 0; i < 4; i++) {
-        printf("%d ", stats[i]);
         if (stats[i] >= 5) {
             flush = i;
         }
@@ -99,7 +98,6 @@ int analyze_data(uint8_t *stats, int *util_array, int *win_cards)
         }
     }
 
-    printf("P1: %d, P2: %d, T: %d, F: %d, FL: %d, ST: %d\n", pair1, pair2, triple, four, flush, straight);
     int util_i = 0;
     if (straight && (flush < 4)) {
         *win_cards = straight;
@@ -216,7 +214,6 @@ int evaluate_game(int player1[7], int player2[7])
     int win_condition_p1 = analyze_data(p1_hand_stats, util_p1, &p1_win_cards);
     int win_condition_p2 = analyze_data(p2_hand_stats, util_p2, &p2_win_cards);
 
-    printf("%d, %d", win_condition_p1, win_condition_p2);
     if (win_condition_p1 == win_condition_p2) {
         switch (win_condition_p1) {
         case 9: // high card

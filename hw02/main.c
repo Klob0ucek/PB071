@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint-gcc.h>
+#include <intrin.h>
 
 bool load_card(int *card);
 void load_player(int player[7]);
@@ -53,7 +54,7 @@ int main(int argc, char **argv)
                 printf("Player 2\n");
                 break;
             default:
-                printf("Game undecided");
+                printf("Game undecided\n");
         }
         if (!next_game) {
             break;
@@ -62,7 +63,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-int analyze_data (uint8_t *stats) {
+int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
     uint8_t pair1 = 0;
     uint8_t pair2 = 0;
     uint8_t triple = 0;
@@ -71,6 +72,7 @@ int analyze_data (uint8_t *stats) {
     uint8_t flush = -1;
 
     for(int i = 0; i < 4; i++) {
+        printf("%d ", stats[i]);
         if (stats[i] >= 5) {
             flush = i;
         }
@@ -78,7 +80,9 @@ int analyze_data (uint8_t *stats) {
     int in_row = stats[16];
     for (int i = 4; i < 17; i++) {
         uint8_t card = stats[i];
-        if (card > 0) {
+        if (card == 0) {
+            in_row = 0;
+        } else {
             in_row++;
             if (card == 2) {
                 pair2 = pair1;
@@ -90,55 +94,210 @@ int analyze_data (uint8_t *stats) {
             if (card == 4){
                 four = i;
             }
-            if (in_row == 5) {
+            if (in_row >= 5) {
                 straight = i;
             }
-        } else {
-            in_row = 0;
         }
     }
 
     printf("P1: %d, P2: %d, T: %d, F: %d, FL: %d, ST: %d\n", pair1, pair2, triple, four, flush, straight);
-    // we saved all usable win conditions - now decide best combination
+    int util_i = 0;
     if (straight && (flush < 4)) {
+        *win_cards = straight;
         return 1;
     }
     if (four){
+        *win_cards = four;
+        for (int i = 16; i > 3; i--){
+            if (stats[i] == 1) {
+                util_array[util_i] = i;
+                util_i++;
+            }
+            if (util_i == 1) {
+                break;
+            }
+        }
         return 2;
     }
     if (triple && pair1){
+        *win_cards = triple * 100 + pair1;
         return 3;
     }
     if (flush < 4) {
+        for (int i = 16; i > 3; i--){
+            if (stats[i] % 10 == flush) {
+                util_array[util_i] = i;
+                util_i++;
+            }
+            if (util_i == 5) {
+                break;
+            }
+        }
         return 4;
     }
     if (straight) {
+        *win_cards = straight;
         return 5;
     }
     if (triple) {
+        *win_cards = triple;
+        for (int i = 16; i > 3; i--){
+            if (stats[i] == 1) {
+                util_array[util_i] = i;
+                util_i++;
+            }
+            if (util_i == 2) {
+                break;
+            }
+        }
+
         return 6;
     }
     if (pair1 && pair2) {
+        *win_cards = pair1 * 100 + pair2;
+        for (int i = 16; i > 3; i--){
+            if (stats[i] == 1) {
+                util_array[util_i] = i;
+                util_i++;
+            }
+            if (util_i == 1) {
+                break;
+            }
+        }
         return 7;
     }
     if (pair1){
+        *win_cards = pair1;
+        for (int i = 16; i > 3; i--){
+            if (stats[i] == 1) {
+                util_array[util_i] = i;
+                util_i++;
+            }
+            if (util_i == 3) {
+                break;
+            }
+        }
         return 8;
+    }
+    for (int i = 16; i > 3; i--){
+        if (stats[i] == 1) {
+            util_array[util_i] = i;
+            util_i++;
+        }
+        if (util_i == 5) {
+            break;
+        }
     }
     return 9;
 }
 
+
+/**
+ * Function that evaluates game instance
+ *
+ * @param player1 player 1 cards
+ * @param player2 player 2 cards
+ * @return returns 0 if draw, 1 if player 1 is winner else 2 if player 2 is winner
+ */
+
 int evaluate_game(int player1[7],int player2[7]) {
     uint8_t p1_hand_stats[17];
+    memset(p1_hand_stats, 0x00, 17);
+    int util_p1[5];
+    int p1_win_cards;
     hand_stats(p1_hand_stats, player1);
+
     uint8_t p2_hand_stats[17];
+    memset(p2_hand_stats, 0x00, 17);
+    int util_p2[5];
+    int p2_win_cards;
     hand_stats(p2_hand_stats, player2);
 
-    int win_condition_p1 = analyze_data(p1_hand_stats);
-    int win_condition_p2 = analyze_data(p2_hand_stats);
+    int win_condition_p1 = analyze_data(p1_hand_stats, util_p1, &p1_win_cards);
+    int win_condition_p2 = analyze_data(p2_hand_stats, util_p2, &p2_win_cards);
 
     printf("%d, %d", win_condition_p1, win_condition_p2);
     if (win_condition_p1 == win_condition_p2) {
-        return 0;
+        switch (win_condition_p1) {
+            case 9: // high card
+                for (int i = 0; i < 5; i++) {
+                    if (util_p1[i] == util_p2[i]) {
+                        continue;
+                    }
+                    return (util_p1[i] > util_p2[i]) ? 1 : 2;
+                }
+                return 0;
+            case 8: // one pair
+                if (p1_win_cards == p2_win_cards){
+                    for (int i = 0; i < 3; ++i) {
+                        if (util_p1[i] == util_p2[i]) {
+                            continue;
+                        }
+                        return (util_p1[i] > util_p2[i]) ? 1 : 2;
+                    }
+                    return 0;
+                }
+                return (p1_win_cards > p2_win_cards) ? 1 : 2;
+            case 7: // two pairs
+                if (p1_win_cards / 100 == p2_win_cards / 100) {
+                    if (p1_win_cards % 100 == p2_win_cards % 100) {
+                        if (util_p1[0] == util_p2[0]) {
+                            return 0;
+                        }
+                        return (util_p1[0] > util_p2[0]) ? 1: 2;
+                    }
+                    return (p1_win_cards % 100 > p2_win_cards % 100) ? 1: 2;
+                }
+                return (p1_win_cards / 100 > p2_win_cards / 100) ? 1: 2;
+            case 6: // three of kind
+                if (p1_win_cards == p2_win_cards){
+                    for (int i = 0; i < 2; ++i) {
+                        if (util_p1[i] == util_p2[i]) {
+                            continue;
+                        }
+                        return (util_p1[i] > util_p2[i]) ? 1 : 2;
+                    }
+                    return 0;
+                }
+                return (p1_win_cards > p2_win_cards) ? 1 : 2;
+            case 5: // straight
+                if (p1_win_cards == p2_win_cards) {
+                    return 0;
+                }
+                return (p1_win_cards > p2_win_cards) ? 1 : 2;
+            case 4: // flush
+                for (int i = 0; i < 5; i++) {
+                    if (util_p1[i] == util_p2[i]) {
+                        continue;
+                    }
+                    return (util_p1[i] > util_p2[i]) ? 1 : 2;
+                }
+                return 0;
+            case 3: // full house
+                if (p1_win_cards / 100 == p2_win_cards / 100) {
+                    if (p1_win_cards % 100 == p2_win_cards % 100) {
+                        return 0;
+                    }
+                    return (p1_win_cards % 100 > p2_win_cards % 100) ? 1: 2;
+                }
+                return (p1_win_cards / 100 > p2_win_cards / 100) ? 1: 2;
+            case 2: // four of kind
+                if (p1_win_cards == p2_win_cards) {
+                    if (util_p1[0] == util_p2[0]) {
+                        return 0;
+                    }
+                    return (util_p1[0] == util_p2[0]) ? 1 : 2;
+                }
+                return (p1_win_cards > p2_win_cards) ? 1 : 2;
+            case 1:
+                if (p1_win_cards == p2_win_cards) {
+                    return 0;
+                }
+                return (p1_win_cards > p2_win_cards) ? 1 : 2;
+            default:
+                fprintf(stderr, "Evaluation error");
+                return 0;
+        }
     }
     return (win_condition_p1 < win_condition_p2) ? 1 : 2;
 }

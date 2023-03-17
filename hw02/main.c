@@ -99,11 +99,12 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
     }
 
-    if (straight && (flush < 4)) { // deciding best combination
+    int util_i = 0;
+    if (straight && (flush < 4)) {
         *win_cards = straight;
         return 1;
     }
-    if (four){ //four of kind win condition
+    if (four){
         *win_cards = four;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -116,11 +117,11 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
         return 2;
     }
-    if (triple && pair1){ // three cards and a pair win condition
+    if (triple && pair1){
         *win_cards = triple * 100 + pair1;
         return 3;
     }
-    if (flush < 4) { // flush win condition
+    if (flush < 4) {
         for (int i = 16; i > 3; i--){
             if (stats[i] % 10 == flush) {
                 util_array[util_i] = i;
@@ -132,11 +133,11 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
         return 4;
     }
-    if (straight) { 
+    if (straight) {
         *win_cards = straight;
         return 5;
     }
-    if (triple) { // three card win condition
+    if (triple) {
         *win_cards = triple;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -150,7 +151,7 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
 
         return 6;
     }
-    if (pair1 && pair2) { // two pair win condition
+    if (pair1 && pair2) {
         *win_cards = pair1 * 100 + pair2;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -163,7 +164,7 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
         }
         return 7;
     }
-    if (pair1){ // one pair win condition
+    if (pair1){
         *win_cards = pair1;
         for (int i = 16; i > 3; i--){
             if (stats[i] == 1) {
@@ -185,7 +186,7 @@ int analyze_data (uint8_t *stats, int *util_array, int *win_cards) {
             break;
         }
     }
-    return 9; // high card win condition
+    return 9;
 }
 
 

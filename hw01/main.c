@@ -9,24 +9,23 @@ uint64_t const MASK_32_BITS = 0x80000000;
 
 bool load_chars(int amount, uint64_t *result)
 {
-    uint64_t input = 0;
-    int c;
+   uint64_t  input = 0;
+   int c;
+   bool end_of_file = false;
 
-    while (amount > 0 && (c = getchar()) != EOF) {
-        input <<= 8;
-        amount--;
-        input |= c;
-    }
-    if (c == EOF) {
-        while (amount > 0) {
-            input <<= 8;
-            amount--;
-        }
-        *result = input;
-        return false;
-    }
-    *result = input;
-    return true;
+   while (amount > 0){
+       c = getchar();
+       if (c == EOF) {
+           end_of_file = true;
+       }
+       input <<= 8;
+       amount--;
+       if (!end_of_file) {
+           input |= c;
+       }
+   }
+   *result = input;
+    return !end_of_file;
 }
 
 void print_chars(uint64_t out, int amount)

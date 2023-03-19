@@ -7,7 +7,6 @@
 uint64_t const MASK_40_BITS = 0x10000000000;
 uint64_t const MASK_32_BITS = 0x80000000;
 
-
 bool load_chars(int amount, uint64_t *result)
 {
     uint64_t input = 0;
@@ -32,23 +31,15 @@ bool load_chars(int amount, uint64_t *result)
 
 void print_chars(uint64_t out, int amount)
 {
-    uint64_t mask = 1;
-    mask <<= ((8 * amount) - 1);
-
-    int character;
-    int character_mask;
+    uint64_t char_mask = 0xff;
+    char_mask <<= (8 * (amount - 1));
+    uint64_t character;
 
     for (int i = 0; i < amount; i++) {
-        character = 0;
-        character_mask = 0x80;
-        for (int j = 0; j < 8; j++) {
-            if (mask & out) {
-                character |= character_mask;
-            }
-            mask >>= 1;
-            character_mask >>= 1;
-        }
+        character = out & char_mask;
+        character >>= (amount - i - 1) * 8;
         putchar(character);
+        char_mask >>= 8;
     }
 }
 

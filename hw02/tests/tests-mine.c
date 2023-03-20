@@ -43,7 +43,7 @@ TEST(second_card_err) {
 
 TEST(format_err) {
     INPUT_STRING(
-            "As   Ks\n"
+            "As+Ks\n"
             "2s 3s\n"
             "4s 5s 6s 7s 8s\n"
     );

@@ -266,6 +266,7 @@ bool load_card(int *card)
     switch (c) {
         case EOF:
             *card = EOF;
+            printf("aaa");
             return true;
         case '2':
             *card += 4;
@@ -376,6 +377,7 @@ bool load_player(int *player)
     int card = 0;
     if (load_card(&card)) {
         if (card == EOF) {
+            printf("bbb");
             return true;
         }
         player[0] = card;
@@ -469,13 +471,13 @@ int main(int argc, char **argv)
         }
         switch (evaluate_game(player1, player2)) {
         case 0:
-            printf("Draw\n");
+            fprintf(stdout, "Draw\n");
             break;
         case 1:
-            printf("Player 1\n");
+            fprintf(stdout, "Player 1\n");
             break;
         case 2:
-            printf("Player 2\n");
+            fprintf(stdout, "Player 2\n");
             break;
         default:
             printf("Game undecided\n");

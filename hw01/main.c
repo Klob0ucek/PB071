@@ -9,22 +9,22 @@ uint64_t const MASK_32_BITS = 0x80000000;
 
 bool load_chars(int amount, uint64_t *result)
 {
-   uint64_t  input = 0;
-   int c;
-   bool end_of_file = false;
+    uint64_t input = 0;
+    int c;
+    bool end_of_file = false;
 
-   while (amount > 0){
-       c = getchar();
-       if (c == EOF) {
-           end_of_file = true;
-       }
-       input <<= 8;
-       amount--;
-       if (!end_of_file) {
-           input |= c;
-       }
-   }
-   *result = input;
+    while (amount > 0) {
+        c = getchar();
+        if (c == EOF) {
+            end_of_file = true;
+        }
+        input <<= 8;
+        amount--;
+        if (!end_of_file) {
+            input |= c;
+        }
+    }
+    *result = input;
     return !end_of_file;
 }
 
@@ -86,7 +86,7 @@ int parity(int bit, uint64_t num)
     uint64_t mask = 1;
     mask = mask << 1;
     for (int i = 1; i < 40; i++) {
-        if (bit & i) {
+        if (bit & (39 - i)) {
             if (num & mask) {
                 count_ones += 1;
             }
@@ -98,20 +98,8 @@ int parity(int bit, uint64_t num)
 
 uint64_t fill_parity(uint64_t num)
 {
-    uint64_t mask = 1;
-    uint64_t plus_mask = MASK_40_BITS;
-    uint64_t working = 0;
-    while (plus_mask > 0) {
-        if (num & mask) {
-            working += plus_mask;
-        }
-        mask <<= 1;
-        plus_mask >>= 1;
-    }
-    working >>= 1;
-
     for (int i = 1; i < 40; i = i << 1) {
-        if (parity(i, working)) {
+        if (parity(i, num)) {
             uint64_t parity_bit = 1;
             parity_bit <<= 39 - i;
             num |= parity_bit;

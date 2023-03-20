@@ -80,22 +80,6 @@ uint64_t extend_shorten_number(uint64_t input, bool inOutSwitch)
     return out;
 }
 
-uint64_t reverse(uint64_t num)
-{
-    uint64_t mask = 1;
-    uint64_t plus_mask = MASK_40_BITS;
-    uint64_t result = 0;
-    while (plus_mask > 0) {
-        if (num & mask) {
-            result += plus_mask;
-        }
-        mask = mask << 1;
-        plus_mask = plus_mask >> 1;
-    }
-    result = result >> 1;
-    return result;
-}
-
 int parity(int bit, uint64_t num)
 {
     int count_ones = 0;
@@ -114,10 +98,22 @@ int parity(int bit, uint64_t num)
 
 uint64_t fill_parity(uint64_t num)
 {
+    uint64_t mask = 1;
+    uint64_t plus_mask = MASK_40_BITS;
+    uint64_t working = 0;
+    while (plus_mask > 0) {
+        if (num & mask) {
+            working += plus_mask;
+        }
+        mask <<= 1;
+        plus_mask >>= 1;
+    }
+    working >>= 1;
+
     for (int i = 1; i < 40; i = i << 1) {
-        if (parity(i, num)) {
+        if (parity(i, working)) {
             uint64_t parity_bit = 1;
-            parity_bit <<= i;
+            parity_bit <<= 39 - i;
             num |= parity_bit;
         }
     }
@@ -132,9 +128,7 @@ bool encode(void)
         continue_loading = load_chars(4, &num);
         if (continue_loading || (!continue_loading && num != 0)) {
             num = extend_shorten_number(num, true);
-            num = reverse(num);
             num = fill_parity(num);
-            num = reverse(num);
             print_chars(num, 5);
         }
         if (!continue_loading) {

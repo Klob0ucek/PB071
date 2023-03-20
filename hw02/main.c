@@ -266,7 +266,6 @@ bool load_card(int *card)
     switch (c) {
         case EOF:
             *card = EOF;
-            printf("aaa");
             return true;
         case '2':
             *card += 4;
@@ -377,7 +376,6 @@ bool load_player(int *player)
     int card = 0;
     if (load_card(&card)) {
         if (card == EOF) {
-            printf("bbb");
             return true;
         }
         player[0] = card;

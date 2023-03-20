@@ -197,3 +197,214 @@ TEST(high_straight_win) {
     app_main();
     ASSERT_FILE(stdout, "Player 2\n");
 }
+
+TEST(stderr_test1) {
+    INPUT_STRING(
+            "AS Ks\n"
+            "2s 3s\n"
+            "4s 5s 6s 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test2) {
+    INPUT_STRING(
+            "As KS\n"
+            "2s 3s\n"
+            "4s 5s 6s 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test3) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2S 3s\n"
+            "4s 5s 6s 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test4) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3S\n"
+            "4s 5s 6s 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test5) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4D 5s 6s 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test6) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5D 6s 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test7) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6D 7s 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test8) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6s 7C 8s\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test9) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6s 7s 8H\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid card input\n");
+}
+TEST(stderr_test10) {
+        INPUT_STRING(
+                "As Ks\n"
+                "2s 3s\n"
+                "4s 5s 6s 7s 8hddd\n"
+        );
+
+        int retval = app_main();
+        ASSERT(retval != 0);
+        ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test11) {
+    INPUT_STRING(
+            "AsfKs\n"
+            "2s 3s\n"
+            "4s 5s 6s 7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test12) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2sg3s\n"
+            "4s 5s 6s 7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test13) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4se5s 6s 7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test14) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5sF6s 7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test15) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6sG7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test16) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6s 7sC8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test17) {
+    INPUT_STRING(
+            "As KsA"
+            "2s 3s\n"
+            "4s 5s 6s 7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+TEST(stderr_test18) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3sdd"
+            "4s 5s 6s 7s 8h\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
+}
+
+TEST(stderr_test19) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6s 7s As\n"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Two or more cards are the same\n");
+}

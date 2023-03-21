@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int analyze_data(const uint8_t * stats, const int *player, int *util_array, int *win_cards)
+int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *win_cards)
 {
     uint8_t pair1 = 0;
     uint8_t pair2 = 0;
@@ -66,8 +66,8 @@ int analyze_data(const uint8_t * stats, const int *player, int *util_array, int 
     if (flush < 4) { // flush fixed
         for (int i = 16; i > 3; i--) {
             if (stats[i] != 0) {
-                for (int j = 0; j < 7; j++){
-                    if (player[j] % 10 == flush && player[j] / 10 == i){
+                for (int j = 0; j < 7; j++) {
+                    if (player[j] % 10 == flush && player[j] / 10 == i) {
                         util_array[util_i] = i;
                         util_i++;
                     }
@@ -164,89 +164,89 @@ int evaluate_game(int player1[7], int player2[7])
     int p2_win_cards;
     hand_stats(p2_hand_stats, player2);
 
-    int win_condition_p1 = analyze_data(p1_hand_stats, player1,util_p1, &p1_win_cards);
+    int win_condition_p1 = analyze_data(p1_hand_stats, player1, util_p1, &p1_win_cards);
     int win_condition_p2 = analyze_data(p2_hand_stats, player2, util_p2, &p2_win_cards);
 
     if (win_condition_p1 == win_condition_p2) {
         switch (win_condition_p1) {
-            case 9: // high card
-                for (int i = 0; i < 5; i++) {
+        case 9: // high card
+            for (int i = 0; i < 5; i++) {
+                if (util_p1[i] == util_p2[i]) {
+                    continue;
+                }
+                return (util_p1[i] > util_p2[i]) ? 1 : 2;
+            }
+            return 0;
+        case 8: // one pair
+            if (p1_win_cards == p2_win_cards) {
+                for (int i = 0; i < 3; ++i) {
                     if (util_p1[i] == util_p2[i]) {
                         continue;
                     }
                     return (util_p1[i] > util_p2[i]) ? 1 : 2;
                 }
                 return 0;
-            case 8: // one pair
-                if (p1_win_cards == p2_win_cards) {
-                    for (int i = 0; i < 3; ++i) {
-                        if (util_p1[i] == util_p2[i]) {
-                            continue;
-                        }
-                        return (util_p1[i] > util_p2[i]) ? 1 : 2;
-                    }
-                    return 0;
-                }
-                return (p1_win_cards > p2_win_cards) ? 1 : 2;
-            case 7: // two pairs
-                if (p1_win_cards / 100 == p2_win_cards / 100) {
-                    if (p1_win_cards % 100 == p2_win_cards % 100) {
-                        if (util_p1[0] == util_p2[0]) {
-                            return 0;
-                        }
-                        return (util_p1[0] > util_p2[0]) ? 1 : 2;
-                    }
-                    return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
-                }
-                return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
-            case 6: // three of kind
-                if (p1_win_cards == p2_win_cards) {
-                    for (int i = 0; i < 2; ++i) {
-                        if (util_p1[i] == util_p2[i]) {
-                            continue;
-                        }
-                        return (util_p1[i] > util_p2[i]) ? 1 : 2;
-                    }
-                    return 0;
-                }
-                return (p1_win_cards > p2_win_cards) ? 1 : 2;
-            case 5: // straight
-                if (p1_win_cards == p2_win_cards) {
-                    return 0;
-                }
-                return (p1_win_cards > p2_win_cards) ? 1 : 2;
-            case 4: // flush
-                for (int i = 0; i < 5; i++) {
-                    if (util_p1[i] == util_p2[i]) {
-                        continue;
-                    }
-                    return (util_p1[i] > util_p2[i]) ? 1 : 2;
-                }
-                return 0;
-            case 3: // full house
-                if (p1_win_cards / 100 == p2_win_cards / 100) {
-                    if (p1_win_cards % 100 == p2_win_cards % 100) {
-                        return 0;
-                    }
-                    return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
-                }
-                return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
-            case 2: // four of kind
-                if (p1_win_cards == p2_win_cards) {
+            }
+            return (p1_win_cards > p2_win_cards) ? 1 : 2;
+        case 7: // two pairs
+            if (p1_win_cards / 100 == p2_win_cards / 100) {
+                if (p1_win_cards % 100 == p2_win_cards % 100) {
                     if (util_p1[0] == util_p2[0]) {
                         return 0;
                     }
                     return (util_p1[0] > util_p2[0]) ? 1 : 2;
                 }
-                return (p1_win_cards > p2_win_cards) ? 1 : 2;
-            case 1:
-                if (p1_win_cards == p2_win_cards) {
+                return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
+            }
+            return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
+        case 6: // three of kind
+            if (p1_win_cards == p2_win_cards) {
+                for (int i = 0; i < 2; ++i) {
+                    if (util_p1[i] == util_p2[i]) {
+                        continue;
+                    }
+                    return (util_p1[i] > util_p2[i]) ? 1 : 2;
+                }
+                return 0;
+            }
+            return (p1_win_cards > p2_win_cards) ? 1 : 2;
+        case 5: // straight
+            if (p1_win_cards == p2_win_cards) {
+                return 0;
+            }
+            return (p1_win_cards > p2_win_cards) ? 1 : 2;
+        case 4: // flush
+            for (int i = 0; i < 5; i++) {
+                if (util_p1[i] == util_p2[i]) {
+                    continue;
+                }
+                return (util_p1[i] > util_p2[i]) ? 1 : 2;
+            }
+            return 0;
+        case 3: // full house
+            if (p1_win_cards / 100 == p2_win_cards / 100) {
+                if (p1_win_cards % 100 == p2_win_cards % 100) {
                     return 0;
                 }
-                return (p1_win_cards > p2_win_cards) ? 1 : 2;
-            default:
-                fprintf(stderr, "Evaluation error\n");
+                return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
+            }
+            return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
+        case 2: // four of kind
+            if (p1_win_cards == p2_win_cards) {
+                if (util_p1[0] == util_p2[0]) {
+                    return 0;
+                }
+                return (util_p1[0] > util_p2[0]) ? 1 : 2;
+            }
+            return (p1_win_cards > p2_win_cards) ? 1 : 2;
+        case 1:
+            if (p1_win_cards == p2_win_cards) {
                 return 0;
+            }
+            return (p1_win_cards > p2_win_cards) ? 1 : 2;
+        default:
+            fprintf(stderr, "Evaluation error\n");
+            return 0;
         }
     }
     return (win_condition_p1 < win_condition_p2) ? 1 : 2;
@@ -274,68 +274,68 @@ bool load_card(int *card, bool need_white_space)
         } else {
             if (white_space || !need_white_space) {
                 switch (c) {
-                    case EOF:
-                        *card = EOF;
-                        return true;
-                    case '2':
-                        *card += 4;
-                        break;
-                    case '3':
-                        *card += 5;
-                        break;
-                    case '4':
-                        *card += 6;
-                        break;
-                    case '5':
-                        *card += 7;
-                        break;
-                    case '6':
-                        *card += 8;
-                        break;
-                    case '7':
-                        *card += 9;
-                        break;
-                    case '8':
-                        *card += 10;
-                        break;
-                    case '9':
-                        *card += 11;
-                        break;
-                    case 'T':
-                        *card += 12;
-                        break;
-                    case 'J':
-                        *card += 13;
-                        break;
-                    case 'Q':
-                        *card += 14;
-                        break;
-                    case 'K':
-                        *card += 15;
-                        break;
-                    case 'A':
-                        *card += 16;
-                        break;
-                    default:
-                        return false;
+                case EOF:
+                    *card = EOF;
+                    return true;
+                case '2':
+                    *card += 4;
+                    break;
+                case '3':
+                    *card += 5;
+                    break;
+                case '4':
+                    *card += 6;
+                    break;
+                case '5':
+                    *card += 7;
+                    break;
+                case '6':
+                    *card += 8;
+                    break;
+                case '7':
+                    *card += 9;
+                    break;
+                case '8':
+                    *card += 10;
+                    break;
+                case '9':
+                    *card += 11;
+                    break;
+                case 'T':
+                    *card += 12;
+                    break;
+                case 'J':
+                    *card += 13;
+                    break;
+                case 'Q':
+                    *card += 14;
+                    break;
+                case 'K':
+                    *card += 15;
+                    break;
+                case 'A':
+                    *card += 16;
+                    break;
+                default:
+                    return false;
                 }
                 *card *= 10;
                 c = getchar();
                 switch (c) {
-                    case 'h':
-                        *card += 0;
-                        break;
-                    case 'd':
-                        *card += 1;
-                        break;
-                    case 's':
-                        *card += 2;
-                        break;
-                    case 'c':
-                        *card += 3;
-                        break;
-                    default:
-                        return false;
+                case 'h':
+                    *card += 0;
+                    break;
+                case 'd':
+                    *card += 1;
+                    break;
+                case 's':
+                    *card += 2;
+                    break;
+                case 'c':
+                    *card += 3;
+                    break;
+                default:
+                    return false;
                 }
                 return true;
             } else {
@@ -438,12 +438,12 @@ bool load_instance(int player1[7], int player2[7], bool *first_char_EOF)
 static int parse_players(int argc, char **argv)
 {
     switch (argc) {
-        case 1:
-            return 2;
-        case 2:
-            return atoi(argv[1]);
-        default:
-            return 0;
+    case 1:
+        return 2;
+    case 2:
+        return atoi(argv[1]);
+    default:
+        return 0;
     }
 }
 
@@ -466,17 +466,17 @@ int main(int argc, char **argv)
             return 0;
         }
         switch (evaluate_game(player1, player2)) {
-            case 0:
-                fprintf(stdout, "Draw\n");
-                break;
-            case 1:
-                fprintf(stdout, "Player 1\n");
-                break;
-            case 2:
-                fprintf(stdout, "Player 2\n");
-                break;
-            default:
-                printf("Game undecided\n");
+        case 0:
+            fprintf(stdout, "Draw\n");
+            break;
+        case 1:
+            fprintf(stdout, "Player 1\n");
+            break;
+        case 2:
+            fprintf(stdout, "Player 2\n");
+            break;
+        default:
+            printf("Game undecided\n");
         }
         if (!next_game) {
             break;

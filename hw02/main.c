@@ -261,112 +261,112 @@ int evaluate_game(int player1[7], int player2[7])
  * @param card is pointer at a number where will be the card stored
  * @return false if unknown cards are loaded else true
  */
-bool load_card(int *card)
+bool load_card(int *card, bool need_white_space)
 {
     int c;
+    bool white_space = false;
     *card = 0;
-    c = getchar();
-    switch (c) {
-        case EOF:
-            *card = EOF;
-            return true;
-        case '2':
-            *card += 4;
-            break;
-        case '3':
-            *card += 5;
-            break;
-        case '4':
-            *card += 6;
-            break;
-        case '5':
-            *card += 7;
-            break;
-        case '6':
-            *card += 8;
-            break;
-        case '7':
-            *card += 9;
-            break;
-        case '8':
-            *card += 10;
-            break;
-        case '9':
-            *card += 11;
-            break;
-        case 'T':
-            *card += 12;
-            break;
-        case 'J':
-            *card += 13;
-            break;
-        case 'Q':
-            *card += 14;
-            break;
-        case 'K':
-            *card += 15;
-            break;
-        case 'A':
-            *card += 16;
-            break;
-        default:
-            return false;
+    while (true) {
+        c = getchar();
+        if (c == '\n' || c == '\v' || c == ' ' || c == '\t') {
+            white_space = true;
+            continue;
+        } else {
+            if (white_space || !need_white_space) {
+                switch (c) {
+                    case EOF:
+                        *card = EOF;
+                        return true;
+                    case '2':
+                        *card += 4;
+                        break;
+                    case '3':
+                        *card += 5;
+                        break;
+                    case '4':
+                        *card += 6;
+                        break;
+                    case '5':
+                        *card += 7;
+                        break;
+                    case '6':
+                        *card += 8;
+                        break;
+                    case '7':
+                        *card += 9;
+                        break;
+                    case '8':
+                        *card += 10;
+                        break;
+                    case '9':
+                        *card += 11;
+                        break;
+                    case 'T':
+                        *card += 12;
+                        break;
+                    case 'J':
+                        *card += 13;
+                        break;
+                    case 'Q':
+                        *card += 14;
+                        break;
+                    case 'K':
+                        *card += 15;
+                        break;
+                    case 'A':
+                        *card += 16;
+                        break;
+                    default:
+                        return false;
+                }
+                *card *= 10;
+                c = getchar();
+                switch (c) {
+                    case 'h':
+                        *card += 0;
+                        break;
+                    case 'd':
+                        *card += 1;
+                        break;
+                    case 's':
+                        *card += 2;
+                        break;
+                    case 'c':
+                        *card += 3;
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+            } else {
+                fprintf(stderr, "White space missing\n");
+                exit(1);
+            }
+        }
     }
-    *card *= 10;
-    c = getchar();
-    switch (c) {
-        case 'h':
-            *card += 0;
-            break;
-        case 'd':
-            *card += 1;
-            break;
-        case 's':
-            *card += 2;
-            break;
-        case 'c':
-            *card += 3;
-            break;
-        default:
-            return false;
-    }
-    return true;
 }
 
 bool load_table(int *player1, int *player2)
 {
     int card = 0;
     int ch;
-    for (int i = 0; i < 4; ++i) {
-        if (load_card(&card)) {
+    bool need_white_space = false;
+    for (int i = 0; i < 5; ++i) {
+        if (load_card(&card, need_white_space)) {
             player1[i + 2] = card;
             player2[i + 2] = card;
         } else {
             fprintf(stderr, "Invalid card input\n");
             exit(1);
         }
-        ch = getchar();
-        if (!(ch == ' ' || ch == '\t')) {
-            fprintf(stderr, "Invalid input format\n");
-            exit(1);
-        }
-    }
-    if (load_card(&card)) {
-        player1[6] = card;
-        player2[6] = card;
-    } else {
-        fprintf(stderr, "Invalid card input\n");
-        exit(1);
+        need_white_space = true;
     }
     ch = getchar();
-    switch (ch) {
-        case EOF:
-            return false;
-        case '\n':
-            return true;
-        default:
-            fprintf(stderr, "Invalid input format\n");
-            exit(1);
+    if (ch != '\n') {
+        fprintf(stderr, "Invalid input format\n");
+        exit(1);
+    } else {
+        return true;
     }
 }
 /**
@@ -377,7 +377,7 @@ bool load_table(int *player1, int *player2)
 bool load_player(int *player)
 {
     int card = 0;
-    if (load_card(&card)) {
+    if (load_card(&card, false)) {
         if (card == EOF) {
             return true;
         }
@@ -386,19 +386,14 @@ bool load_player(int *player)
         fprintf(stderr, "Invalid card input\n");
         exit(1);
     }
-    int ch = getchar();
-    if (!(ch == ' ' || ch == '\t')) {
-        fprintf(stderr, "Invalid input format\n");
-        exit(1);
-    }
     card = 0;
-    if (load_card(&card)) {
+    if (load_card(&card, true)) {
         player[1] = card;
     } else {
         fprintf(stderr, "Invalid card input\n");
         exit(1);
     }
-    ch = getchar();
+    int ch = getchar();
     if (ch != '\n') {
         fprintf(stderr, "Invalid input format\n");
         exit(1);

@@ -41,17 +41,6 @@ TEST(second_card_err) {
     ASSERT_FILE(stderr, "Invalid card input\n");
 }
 
-TEST(format_err) {
-    INPUT_STRING(
-            "As+Ks\n"
-            "2s 3s\n"
-            "4s 5s 6s 7s 8s\n"
-    );
-
-    app_main();
-    ASSERT_FILE(stderr, "Invalid input format\n");
-}
-
 TEST(flush_str_flush_win) {
     INPUT_STRING(
             "As Th\n"

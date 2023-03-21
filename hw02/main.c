@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int analyze_data(uint8_t * stats, int *util_array, int *win_cards)
+int analyze_data(const uint8_t * stats, const int *player, int *util_array, int *win_cards)
 {
     uint8_t pair1 = 0;
     uint8_t pair2 = 0;
@@ -63,11 +63,15 @@ int analyze_data(uint8_t * stats, int *util_array, int *win_cards)
         *win_cards = triple * 100 + pair1;
         return 3;
     }
-    if (flush < 4) {
+    if (flush < 4) { // flush fixed
         for (int i = 16; i > 3; i--) {
-            if (stats[i] % 10 == flush) {
-                util_array[util_i] = i;
-                util_i++;
+            if (stats[i] != 0) {
+                for (int j = 0; j < 7; j++){
+                    if (player[j] % 10 == flush && player[j] / 10 == i){
+                        util_array[util_i] = i;
+                        util_i++;
+                    }
+                }
             }
             if (util_i == 5) {
                 break;
@@ -90,7 +94,6 @@ int analyze_data(uint8_t * stats, int *util_array, int *win_cards)
                 break;
             }
         }
-
         return 6;
     }
     if (pair1 && pair2) {
@@ -161,8 +164,8 @@ int evaluate_game(int player1[7], int player2[7])
     int p2_win_cards;
     hand_stats(p2_hand_stats, player2);
 
-    int win_condition_p1 = analyze_data(p1_hand_stats, util_p1, &p1_win_cards);
-    int win_condition_p2 = analyze_data(p2_hand_stats, util_p2, &p2_win_cards);
+    int win_condition_p1 = analyze_data(p1_hand_stats, player1,util_p1, &p1_win_cards);
+    int win_condition_p2 = analyze_data(p2_hand_stats, player2, util_p2, &p2_win_cards);
 
     if (win_condition_p1 == win_condition_p2) {
         switch (win_condition_p1) {
@@ -233,7 +236,7 @@ int evaluate_game(int player1[7], int player2[7])
                     if (util_p1[0] == util_p2[0]) {
                         return 0;
                     }
-                    return (util_p1[0] == util_p2[0]) ? 1 : 2;
+                    return (util_p1[0] > util_p2[0]) ? 1 : 2;
                 }
                 return (p1_win_cards > p2_win_cards) ? 1 : 2;
             case 1:
@@ -440,12 +443,12 @@ bool load_instance(int player1[7], int player2[7], bool *first_char_EOF)
 static int parse_players(int argc, char **argv)
 {
     switch (argc) {
-    case 1:
-        return 2;
-    case 2:
-        return atoi(argv[1]);
-    default:
-        return 0;
+        case 1:
+            return 2;
+        case 2:
+            return atoi(argv[1]);
+        default:
+            return 0;
     }
 }
 
@@ -468,17 +471,17 @@ int main(int argc, char **argv)
             return 0;
         }
         switch (evaluate_game(player1, player2)) {
-        case 0:
-            fprintf(stdout, "Draw\n");
-            break;
-        case 1:
-            fprintf(stdout, "Player 1\n");
-            break;
-        case 2:
-            fprintf(stdout, "Player 2\n");
-            break;
-        default:
-            printf("Game undecided\n");
+            case 0:
+                fprintf(stdout, "Draw\n");
+                break;
+            case 1:
+                fprintf(stdout, "Player 1\n");
+                break;
+            case 2:
+                fprintf(stdout, "Player 2\n");
+                break;
+            default:
+                printf("Game undecided\n");
         }
         if (!next_game) {
             break;

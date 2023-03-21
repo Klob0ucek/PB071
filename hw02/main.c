@@ -271,9 +271,9 @@ bool load_card(int *card, bool need_white_space)
         if (c == '\n' || c == '\v' || c == ' ' || c == '\t') {
             white_space = true;
             continue;
-        } else {
-            if (white_space || !need_white_space) {
-                switch (c) {
+        }
+        if (white_space || !need_white_space) {
+            switch (c) {
                 case EOF:
                     *card = EOF;
                     return true;
@@ -318,10 +318,10 @@ bool load_card(int *card, bool need_white_space)
                     break;
                 default:
                     return false;
-                }
-                *card *= 10;
-                c = getchar();
-                switch (c) {
+            }
+            *card *= 10;
+            c = getchar();
+            switch (c) {
                 case 'h':
                     *card += 0;
                     break;
@@ -336,13 +336,11 @@ bool load_card(int *card, bool need_white_space)
                     break;
                 default:
                     return false;
-                }
-                return true;
-            } else {
-                fprintf(stderr, "White space missing\n");
-                exit(1);
             }
+            return true;
         }
+        fprintf(stderr, "White space missing\n");
+        exit(1);
     }
 }
 

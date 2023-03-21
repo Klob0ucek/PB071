@@ -317,7 +317,7 @@ TEST(stderr_test11) {
 
     int retval = app_main();
     ASSERT(retval != 0);
-    ASSERT_FILE(stderr, "Invalid input format\n");
+    ASSERT_FILE(stderr, "White space missing\n");
 }
 TEST(stderr_test12) {
     INPUT_STRING(
@@ -328,7 +328,7 @@ TEST(stderr_test12) {
 
     int retval = app_main();
     ASSERT(retval != 0);
-    ASSERT_FILE(stderr, "Invalid input format\n");
+    ASSERT_FILE(stderr, "White space missing\n");
 }
 TEST(stderr_test13) {
     INPUT_STRING(
@@ -339,7 +339,7 @@ TEST(stderr_test13) {
 
     int retval = app_main();
     ASSERT(retval != 0);
-    ASSERT_FILE(stderr, "Invalid input format\n");
+    ASSERT_FILE(stderr, "White space missing\n");
 }
 TEST(stderr_test14) {
     INPUT_STRING(
@@ -350,7 +350,7 @@ TEST(stderr_test14) {
 
     int retval = app_main();
     ASSERT(retval != 0);
-    ASSERT_FILE(stderr, "Invalid input format\n");
+    ASSERT_FILE(stderr, "White space missing\n");
 }
 TEST(stderr_test15) {
     INPUT_STRING(
@@ -361,7 +361,7 @@ TEST(stderr_test15) {
 
     int retval = app_main();
     ASSERT(retval != 0);
-    ASSERT_FILE(stderr, "Invalid input format\n");
+    ASSERT_FILE(stderr, "White space missing\n");
 }
 TEST(stderr_test16) {
     INPUT_STRING(
@@ -372,7 +372,7 @@ TEST(stderr_test16) {
 
     int retval = app_main();
     ASSERT(retval != 0);
-    ASSERT_FILE(stderr, "Invalid input format\n");
+    ASSERT_FILE(stderr, "White space missing\n");
 }
 TEST(stderr_test17) {
     INPUT_STRING(
@@ -407,4 +407,31 @@ TEST(stderr_test19) {
     int retval = app_main();
     ASSERT(retval != 0);
     ASSERT_FILE(stderr, "Two or more cards are the same\n");
+}
+TEST(stderr_test20) {
+    INPUT_STRING(
+            "As\n"
+            "Ah\n"
+            "Ac\n"
+            "Ad\n"
+            "Ks\n"
+            "Kc\n"
+            "Kd\n"
+            "Kh\n"
+            "Qs\n"
+    );
+
+    app_main();
+    ASSERT_FILE(stdout, "Draw\n");
+}
+TEST(stderr_test_no_new_line) {
+    INPUT_STRING(
+            "As Ks\n"
+            "2s 3s\n"
+            "4s 5s 6s 7s Ad"
+    );
+
+    int retval = app_main();
+    ASSERT(retval != 0);
+    ASSERT_FILE(stderr, "Invalid input format\n");
 }

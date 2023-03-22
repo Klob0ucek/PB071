@@ -11,14 +11,14 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
     uint8_t triple = 0;
     uint8_t four = 0;
     uint8_t straight = 0;
-    uint8_t flush = -1;
+    uint8_t flush = 255;
 
     for (int i = 0; i < 4; i++) {
         if (stats[i] >= 5) {
             flush = i;
         }
     }
-    int in_row = stats[16];
+    int in_row = (stats[16] >= 1) ? 1 : 0;
     for (int i = 4; i < 17; i++) {
         uint8_t card = stats[i];
         if (card == 0) {
@@ -49,7 +49,7 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
     if (four) {
         *win_cards = four;
         for (int i = 16; i > 3; i--) {
-            if (stats[i] == 1) {
+            if (stats[i] >= 1 && i != four) {
                 util_array[util_i] = i;
                 util_i++;
             }
@@ -155,13 +155,15 @@ int evaluate_game(int player1[7], int player2[7])
     uint8_t p1_hand_stats[17];
     memset(p1_hand_stats, 0x00, 17);
     int util_p1[5];
-    int p1_win_cards;
+    memset(util_p1, 0x00, 5);
+    int p1_win_cards = 0;
     hand_stats(p1_hand_stats, player1);
 
     uint8_t p2_hand_stats[17];
     memset(p2_hand_stats, 0x00, 17);
     int util_p2[5];
-    int p2_win_cards;
+    memset(util_p1, 0x00, 5);
+    int p2_win_cards = 0;
     hand_stats(p2_hand_stats, player2);
 
     int win_condition_p1 = analyze_data(p1_hand_stats, player1, util_p1, &p1_win_cards);

@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdint-gcc.h>
 #include <stdio.h>
@@ -152,17 +153,13 @@ void hand_stats(uint8_t *player_hand_stats, const int player[7])
 
 int evaluate_game(int player1[7], int player2[7])
 {
-    uint8_t p1_hand_stats[17];
-    memset(p1_hand_stats, 0x00, 17);
-    int util_p1[5];
-    memset(util_p1, 0x00, 5);
+    uint8_t p1_hand_stats[17] = {0};
+    int util_p1[5] = {0};
     int p1_win_cards = 0;
     hand_stats(p1_hand_stats, player1);
 
-    uint8_t p2_hand_stats[17];
-    memset(p2_hand_stats, 0x00, 17);
-    int util_p2[5];
-    memset(util_p1, 0x00, 5);
+    uint8_t p2_hand_stats[17] = {0};
+    int util_p2[5] = {0};
     int p2_win_cards = 0;
     hand_stats(p2_hand_stats, player2);
 
@@ -270,7 +267,7 @@ bool load_card(int *card, bool need_white_space)
     *card = 0;
     while (true) {
         c = getchar();
-        if (c == '\n' || c == '\v' || c == ' ' || c == '\t') {
+        if (isspace(c)) {
             white_space = true;
             continue;
         }
@@ -351,10 +348,10 @@ bool load_table(int *player1, int *player2)
     int card = 0;
     int ch;
     bool need_white_space = false;
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 2; i < 7; ++i) {
         if (load_card(&card, need_white_space)) {
-            player1[i + 2] = card;
-            player2[i + 2] = card;
+            player1[i] = card;
+            player2[i] = card;
         } else {
             fprintf(stderr, "Invalid card input\n");
             exit(1);
@@ -365,9 +362,8 @@ bool load_table(int *player1, int *player2)
     if (ch != '\n') {
         fprintf(stderr, "Invalid input format\n");
         exit(1);
-    } else {
-        return true;
     }
+    return true;
 }
 /**
  * Function that will load cards of a player

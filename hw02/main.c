@@ -5,7 +5,7 @@
 #include <ctype.h>
 
 const char CARD_VALUES[] = {EOF, '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
-const char CARD_SUITS[] = {EOF, 'h', 'd', 's', 'c'};
+const char CARD_SUITS[] = {'h', 'd', 's', 'c'};
 
 enum win_condition {
     Straight_flush = 1, Four_of_kind, Full_house, Flush, Straight, Three_oof_kind,
@@ -19,7 +19,7 @@ enum win_condition analyze_data(const uint8_t *stats, const int *player, int *ut
     uint8_t triple = 0;
     uint8_t four = 0;
     uint8_t straight = 0;
-    uint8_t flush = 255;
+    uint8_t flush = 0;
 
     for (int i = 0; i < 4; i++) {
         if (stats[i] >= 5) {
@@ -153,8 +153,8 @@ enum win_condition analyze_data(const uint8_t *stats, const int *player, int *ut
 void hand_stats(uint8_t *player_hand_stats, const int player[7])
 {
     for (int i = 0; i < 7; ++i) {
-        player_hand_stats[(player[i] % 10)] += 1;
-        player_hand_stats[(player[i] / 10)] += 1;
+        player_hand_stats[(player[i] % 10) - 1] += 1;
+        player_hand_stats[(player[i] / 10) + 3] += 1;
     }
 }
 
@@ -164,6 +164,9 @@ int evaluate_game(int players_cards[2][7])
     int util_p1[5] = {0};
     int p1_win_cards = 0;
     hand_stats(p1_hand_stats, players_cards[0]);
+    for (int i = 0; i < 17; i++){
+        printf("%d ", p1_hand_stats[i]);
+    }
 
     uint8_t p2_hand_stats[17] = {0};
     int util_p2[5] = {0};
@@ -279,69 +282,30 @@ bool load_card(int *card, bool need_white_space)
             continue;
         }
         if (white_space || !need_white_space) {
-            switch (c) {
-                case EOF:
-                    *card = EOF;
-                    return true;
-                case '2':
-                    *card += 4;
+            for (int i = 0; i < 14; ++i) {
+                if (c == CARD_VALUES[i]){
+                    if (i == 0) {
+                        *card = EOF;
+                        return true;
+                    }
+                    *card = i;
                     break;
-                case '3':
-                    *card += 5;
-                    break;
-                case '4':
-                    *card += 6;
-                    break;
-                case '5':
-                    *card += 7;
-                    break;
-                case '6':
-                    *card += 8;
-                    break;
-                case '7':
-                    *card += 9;
-                    break;
-                case '8':
-                    *card += 10;
-                    break;
-                case '9':
-                    *card += 11;
-                    break;
-                case 'T':
-                    *card += 12;
-                    break;
-                case 'J':
-                    *card += 13;
-                    break;
-                case 'Q':
-                    *card += 14;
-                    break;
-                case 'K':
-                    *card += 15;
-                    break;
-                case 'A':
-                    *card += 16;
-                    break;
-                default:
-                    return false;
+                }
             }
+            if (*card == 0) {
+                return false;
+            }
+
             *card *= 10;
             c = getchar();
-            switch (c) {
-                case 'h':
-                    *card += 0;
+            for (int i = 0; i < 4; ++i) {
+                if (c == CARD_SUITS[i]){
+                    *card += i + 1;
                     break;
-                case 'd':
-                    *card += 1;
-                    break;
-                case 's':
-                    *card += 2;
-                    break;
-                case 'c':
-                    *card += 3;
-                    break;
-                default:
-                    return false;
+                }
+            }
+            if (*card % 10 == 0) {
+                return false;
             }
             return true;
         }
@@ -365,6 +329,7 @@ bool load_table(int *player1, int *player2)
         }
         need_white_space = true;
     }
+
     ch = getchar();
     if (ch != '\n') {
         fprintf(stderr, "Invalid input format\n");
@@ -386,7 +351,7 @@ bool load_player(int *player)
             if (card == EOF && !first_card) {
                 return true;
             }
-            player[0] = card;
+            player[i] = card;
             first_card = true;
         } else {
             fprintf(stderr, "Invalid card input\n");

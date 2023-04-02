@@ -1,11 +1,18 @@
-#include <ctype.h>
 #include <stdbool.h>
 #include <stdint-gcc.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <ctype.h>
 
-int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *win_cards)
+const char CARD_VALUES[] = {EOF, '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
+const char CARD_SUITS[] = {EOF, 'h', 'd', 's', 'c'};
+
+enum win_condition {
+    Straight_flush = 1, Four_of_kind, Full_house, Flush, Straight, Three_oof_kind,
+    Two_pair, Pair, High_card
+};
+
+enum win_condition analyze_data(const uint8_t *stats, const int *player, int *util_array, int *win_cards)
 {
     uint8_t pair1 = 0;
     uint8_t pair2 = 0;
@@ -45,7 +52,7 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
     int util_i = 0;
     if (straight && (flush < 4)) {
         *win_cards = straight;
-        return 1;
+        return Straight_flush;
     }
     if (four) {
         *win_cards = four;
@@ -58,11 +65,11 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
                 break;
             }
         }
-        return 2;
+        return Four_of_kind;
     }
     if (triple && pair1) {
         *win_cards = triple * 100 + pair1;
-        return 3;
+        return Full_house;
     }
     if (flush < 4) { // flush fixed
         for (int i = 16; i > 3; i--) {
@@ -78,11 +85,11 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
                 break;
             }
         }
-        return 4;
+        return Flush;
     }
     if (straight) {
         *win_cards = straight;
-        return 5;
+        return Straight;
     }
     if (triple) {
         *win_cards = triple;
@@ -95,7 +102,7 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
                 break;
             }
         }
-        return 6;
+        return Three_oof_kind;
     }
     if (pair1 && pair2) {
         *win_cards = pair1 * 100 + pair2;
@@ -108,7 +115,7 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
                 break;
             }
         }
-        return 7;
+        return Two_pair;
     }
     if (pair1) {
         *win_cards = pair1;
@@ -121,7 +128,7 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
                 break;
             }
         }
-        return 8;
+        return Pair;
     }
     for (int i = 16; i > 3; i--) {
         if (stats[i] == 1) {
@@ -132,7 +139,7 @@ int analyze_data(const uint8_t *stats, const int *player, int *util_array, int *
             break;
         }
     }
-    return 9;
+    return High_card;
 }
 
 
@@ -151,24 +158,24 @@ void hand_stats(uint8_t *player_hand_stats, const int player[7])
     }
 }
 
-int evaluate_game(int player1[7], int player2[7])
+int evaluate_game(int players_cards[2][7])
 {
     uint8_t p1_hand_stats[17] = {0};
     int util_p1[5] = {0};
     int p1_win_cards = 0;
-    hand_stats(p1_hand_stats, player1);
+    hand_stats(p1_hand_stats, players_cards[0]);
 
     uint8_t p2_hand_stats[17] = {0};
     int util_p2[5] = {0};
     int p2_win_cards = 0;
-    hand_stats(p2_hand_stats, player2);
+    hand_stats(p2_hand_stats, players_cards[1]);
 
-    int win_condition_p1 = analyze_data(p1_hand_stats, player1, util_p1, &p1_win_cards);
-    int win_condition_p2 = analyze_data(p2_hand_stats, player2, util_p2, &p2_win_cards);
+    int win_condition_p1 = analyze_data(p1_hand_stats, players_cards[0], util_p1, &p1_win_cards);
+    int win_condition_p2 = analyze_data(p2_hand_stats, players_cards[1], util_p2, &p2_win_cards);
 
     if (win_condition_p1 == win_condition_p2) {
         switch (win_condition_p1) {
-        case 9: // high card
+        case High_card: // high card
             for (int i = 0; i < 5; i++) {
                 if (util_p1[i] == util_p2[i]) {
                     continue;
@@ -176,7 +183,7 @@ int evaluate_game(int player1[7], int player2[7])
                 return (util_p1[i] > util_p2[i]) ? 1 : 2;
             }
             return 0;
-        case 8: // one pair
+        case Pair: // one pair
             if (p1_win_cards == p2_win_cards) {
                 for (int i = 0; i < 3; ++i) {
                     if (util_p1[i] == util_p2[i]) {
@@ -187,7 +194,7 @@ int evaluate_game(int player1[7], int player2[7])
                 return 0;
             }
             return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case 7: // two pairs
+        case Two_pair: // two pairs
             if (p1_win_cards / 100 == p2_win_cards / 100) {
                 if (p1_win_cards % 100 == p2_win_cards % 100) {
                     if (util_p1[0] == util_p2[0]) {
@@ -198,7 +205,7 @@ int evaluate_game(int player1[7], int player2[7])
                 return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
             }
             return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
-        case 6: // three of kind
+        case Three_oof_kind: // three of kind
             if (p1_win_cards == p2_win_cards) {
                 for (int i = 0; i < 2; ++i) {
                     if (util_p1[i] == util_p2[i]) {
@@ -209,12 +216,12 @@ int evaluate_game(int player1[7], int player2[7])
                 return 0;
             }
             return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case 5: // straight
+        case Straight: // straight
             if (p1_win_cards == p2_win_cards) {
                 return 0;
             }
             return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case 4: // flush
+        case Flush: // flush
             for (int i = 0; i < 5; i++) {
                 if (util_p1[i] == util_p2[i]) {
                     continue;
@@ -222,7 +229,7 @@ int evaluate_game(int player1[7], int player2[7])
                 return (util_p1[i] > util_p2[i]) ? 1 : 2;
             }
             return 0;
-        case 3: // full house
+        case Full_house: // full house
             if (p1_win_cards / 100 == p2_win_cards / 100) {
                 if (p1_win_cards % 100 == p2_win_cards % 100) {
                     return 0;
@@ -230,7 +237,7 @@ int evaluate_game(int player1[7], int player2[7])
                 return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
             }
             return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
-        case 2: // four of kind
+        case Four_of_kind: // four of kind
             if (p1_win_cards == p2_win_cards) {
                 if (util_p1[0] == util_p2[0]) {
                     return 0;
@@ -238,7 +245,7 @@ int evaluate_game(int player1[7], int player2[7])
                 return (util_p1[0] > util_p2[0]) ? 1 : 2;
             }
             return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case 1:
+        case Straight_flush:
             if (p1_win_cards == p2_win_cards) {
                 return 0;
             }
@@ -373,21 +380,18 @@ bool load_table(int *player1, int *player2)
 bool load_player(int *player)
 {
     int card = 0;
-    if (load_card(&card, false)) {
-        if (card == EOF) {
-            return true;
+    bool first_card = false;
+    for (int i = 0; i < 2; i++) {
+        if (load_card(&card, first_card)) {
+            if (card == EOF && !first_card) {
+                return true;
+            }
+            player[0] = card;
+            first_card = true;
+        } else {
+            fprintf(stderr, "Invalid card input\n");
+            exit(1);
         }
-        player[0] = card;
-    } else {
-        fprintf(stderr, "Invalid card input\n");
-        exit(1);
-    }
-    card = 0;
-    if (load_card(&card, true)) {
-        player[1] = card;
-    } else {
-        fprintf(stderr, "Invalid card input\n");
-        exit(1);
     }
     int ch = getchar();
     if (ch != '\n') {
@@ -397,14 +401,14 @@ bool load_player(int *player)
     return false;
 }
 
-void validate_game(const int player1[7], const int player2[7])
+void validate_game(int players_cards[2][7])
 {
     int table[9];
     for (int i = 0; i < 7; i++) {
-        table[i] = player1[i];
+        table[i] = players_cards[0][i];
     }
     for (int i = 0; i < 2; i++) {
-        table[7 + i] = player2[i];
+        table[7 + i] = players_cards[1][i];
     }
     for (int i = 0; i < 9; i++) {
         for (int j = i + 1; j < 9; j++) {
@@ -416,16 +420,16 @@ void validate_game(const int player1[7], const int player2[7])
     }
 }
 
-bool load_instance(int player1[7], int player2[7], bool *first_char_EOF)
+bool load_instance(int players_cards[2][7], bool *first_char_EOF)
 {
     bool next_instance;
-    *first_char_EOF = load_player(player1);
+    *first_char_EOF = load_player(players_cards[0]);
     if (*first_char_EOF) {
         return false;
     }
-    load_player(player2);
-    next_instance = load_table(player1, player2);
-    validate_game(player1, player2);
+    load_player(players_cards[1]);
+    next_instance = load_table(players_cards[0], players_cards[1]);
+    validate_game(players_cards);
     return next_instance;
 }
 
@@ -454,14 +458,13 @@ int main(int argc, char **argv)
 
     bool next_game;
     while (true) {
-        int player1[7];
-        int player2[7];
+        int players_cards[2][7]; // 2 is number of player in the game
         bool first_char_EOF;
-        next_game = load_instance(player1, player2, &first_char_EOF);
+        next_game = load_instance(players_cards, &first_char_EOF);
         if (first_char_EOF) {
             return 0;
         }
-        switch (evaluate_game(player1, player2)) {
+        switch (evaluate_game(players_cards)) {
         case 0:
             fprintf(stdout, "Draw\n");
             break;

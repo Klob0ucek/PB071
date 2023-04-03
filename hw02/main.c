@@ -76,16 +76,15 @@ void fill_pair_or_three(const int first, int left, const int value_stats[13], in
     for (util_i = 0; util_i < 5 - left; util_i++) {
         util_array[util_i] = first + 2;
     }
-    for (int i = 12; i >= 0; i--) {
-        if (value_stats[i] == 1) {
-            util_array[i] = i + 2;
+    util_i = 5 - left;
+    int index = 12;
+    while (util_i < 5 || index >= 0) {
+        if (value_stats[index] != 0 && value_stats[index] != first) {
+            util_array[util_i] = index + 2;
             util_i++;
         }
-        if (util_i == 5) {
-            break;
-        }
+        index--;
     }
-
 }
 
 enum win_condition analyze_data(const int suit_stats[4], const int value_stats[13],

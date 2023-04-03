@@ -12,7 +12,84 @@ enum win_condition {
     Two_pair, Pair, High_card
 };
 
-enum win_condition analyze_data(const uint8_t *stats, const int *player, int *util_array, int *win_cards)
+void fill_straight_flush(const int highest, int util_array[5]) {
+    for (int i = 0; i < 5; i++) {
+        util_array[i] = highest + 2 - i;
+    }
+}
+
+void fill_four(const int first, const int second, const int value_stats[13], int util_array[5]){
+    for (int i = 0; i < 2; ++i) {
+        util_array[i] = first + 2;
+    }
+    for (int i = 2; i < 4; ++i) {
+        util_array[i] = second + 2;
+    }
+    int index = 12;
+    while (value_stats[index] == 0 || value_stats[index] == first || value_stats[index] == second){
+        index--;
+    }
+    util_array[4] = index + 2;
+}
+
+void fill_full_house(const int triple, const int pair, int util_array[5]){
+    for (int i = 0; i < 3; i ++) {
+        util_array[i] = triple + 2;
+    }
+    for (int i = 3; i < 5; i ++) {
+        util_array[i] = pair + 2;
+    }
+}
+
+void fill_flush(const int flush, const int value_stats[13], const int player[7], int util_array[5]){
+    int util_i = 0;
+    for (int i = 12; i >= 0; i--) {
+        if (value_stats[i] != 0) {
+            for (int j = 0; j < 7; j++) {
+                if (player[j] % 10 == flush - 1 && player[j] / 10 == i + 1) {
+                    util_array[util_i] = i + 2;
+                    util_i++;
+                }
+            }
+        }
+        if (util_i == 5) {
+            break;
+        }
+    }
+}
+
+void fill_high_card(const int value_stats[13], int util_array[5]){
+    int util_i = 0;
+    for (int i = 12; i >= 0; i--) {
+        if (value_stats[i] == 1) {
+            util_array[util_i] = i + 2;
+            util_i++;
+        }
+        if (util_i == 5) {
+            break;
+        }
+    }
+}
+
+void fill_pair_or_three(const int first, int left, const int value_stats[13], int util_array[5]) {
+    int util_i;
+    for (util_i = 0; util_i < 5 - left; util_i++) {
+        util_array[util_i] = first + 2;
+    }
+    for (int i = 12; i >= 0; i--) {
+        if (value_stats[i] == 1) {
+            util_array[i] = i + 2;
+            util_i++;
+        }
+        if (util_i == 5) {
+            break;
+        }
+    }
+
+}
+
+enum win_condition analyze_data(const int suit_stats[4], const int value_stats[13],
+        int players_cards[7], int util_array[5])
 {
     uint8_t pair1 = 0;
     uint8_t pair2 = 0;
@@ -22,13 +99,13 @@ enum win_condition analyze_data(const uint8_t *stats, const int *player, int *ut
     uint8_t flush = 0;
 
     for (int i = 0; i < 4; i++) {
-        if (stats[i] >= 5) {
-            flush = i;
+        if (suit_stats[i] >= 5) {
+            flush = i + 1;
         }
     }
-    int in_row = (stats[16] >= 1) ? 1 : 0;
-    for (int i = 4; i < 17; i++) {
-        uint8_t card = stats[i];
+    int in_row = (value_stats[12] >= 1) ? 1 : 0;
+    for (int i = 0; i < 13; i++) {
+        int card = value_stats[i];
         if (card == 0) {
             in_row = 0;
         } else {
@@ -49,216 +126,75 @@ enum win_condition analyze_data(const uint8_t *stats, const int *player, int *ut
         }
     }
 
-    int util_i = 0;
-    if (straight && (flush < 4)) {
-        *win_cards = straight;
+    if (straight && (flush > 0)) {
+        fill_straight_flush(straight, util_array);
         return Straight_flush;
     }
     if (four) {
-        *win_cards = four;
-        for (int i = 16; i > 3; i--) {
-            if (stats[i] >= 1 && i != four) {
-                util_array[util_i] = i;
-                util_i++;
-            }
-            if (util_i == 1) {
-                break;
-            }
-        }
+        fill_four(four, four, value_stats, util_array);
         return Four_of_kind;
     }
     if (triple && pair1) {
-        *win_cards = triple * 100 + pair1;
+        fill_full_house(triple, pair1, util_array);
         return Full_house;
     }
-    if (flush < 4) { // flush fixed
-        for (int i = 16; i > 3; i--) {
-            if (stats[i] != 0) {
-                for (int j = 0; j < 7; j++) {
-                    if (player[j] % 10 == flush && player[j] / 10 == i) {
-                        util_array[util_i] = i;
-                        util_i++;
-                    }
-                }
-            }
-            if (util_i == 5) {
-                break;
-            }
-        }
+    if (flush > 0) { // flush fixed
+        fill_flush(flush, value_stats, players_cards, util_array);
         return Flush;
     }
     if (straight) {
-        *win_cards = straight;
+        fill_straight_flush(straight, util_array);
         return Straight;
     }
     if (triple) {
-        *win_cards = triple;
-        for (int i = 16; i > 3; i--) {
-            if (stats[i] == 1) {
-                util_array[util_i] = i;
-                util_i++;
-            }
-            if (util_i == 2) {
-                break;
-            }
-        }
+        fill_pair_or_three(triple, 2, value_stats, util_array);
         return Three_oof_kind;
     }
     if (pair1 && pair2) {
-        *win_cards = pair1 * 100 + pair2;
-        for (int i = 16; i > 3; i--) {
-            if (stats[i] == 1) {
-                util_array[util_i] = i;
-                util_i++;
-            }
-            if (util_i == 1) {
-                break;
-            }
-        }
+        fill_four(pair1, pair2, value_stats, util_array);
         return Two_pair;
     }
     if (pair1) {
-        *win_cards = pair1;
-        for (int i = 16; i > 3; i--) {
-            if (stats[i] == 1) {
-                util_array[util_i] = i;
-                util_i++;
-            }
-            if (util_i == 3) {
-                break;
-            }
-        }
+        fill_pair_or_three(pair1, 3, value_stats, util_array);
         return Pair;
     }
-    for (int i = 16; i > 3; i--) {
-        if (stats[i] == 1) {
-            util_array[util_i] = i;
-            util_i++;
-        }
-        if (util_i == 5) {
-            break;
-        }
-    }
+    fill_high_card(value_stats, util_array);
     return High_card;
 }
 
-
-/**
- * Function that evaluates game instance
- *
- * @param player1 player 1 cards
- * @param player2 player 2 cards
- * @return returns 0 if draw, 1 if player 1 is winner else 2 if player 2 is winner
- */
-void hand_stats(uint8_t *player_hand_stats, const int player[7])
+void hand_stats(int suits_stats[4], int value_stats[13], const int player[7])
 {
     for (int i = 0; i < 7; ++i) {
-        player_hand_stats[(player[i] % 10) - 1] += 1;
-        player_hand_stats[(player[i] / 10) + 3] += 1;
+        suits_stats[(player[i] % 10) - 1] += 1;
+        value_stats[(player[i] / 10) - 1] += 1;
     }
 }
 
 int evaluate_game(int players_cards[2][7])
 {
-    uint8_t p1_hand_stats[17] = {0};
-    int util_p1[5] = {0};
-    int p1_win_cards = 0;
-    hand_stats(p1_hand_stats, players_cards[0]);
-    for (int i = 0; i < 17; i++){
-        printf("%d ", p1_hand_stats[i]);
+    // if there are more players, change the size of 2d array
+    int suit_stats[2][4] = {0};
+    int value_stats[2][13] = {0};
+    int util_array[2][5] = {0};
+    enum win_condition win_conditions[2] = {0};
+
+    enum win_condition condition;
+    for (int i = 0; i < 2; i++){
+        hand_stats(suit_stats[i], value_stats[i], players_cards[i]);
+        condition = analyze_data(suit_stats[i], value_stats[i], players_cards[i], util_array[i]);
+        win_conditions[i] = condition;
     }
 
-    uint8_t p2_hand_stats[17] = {0};
-    int util_p2[5] = {0};
-    int p2_win_cards = 0;
-    hand_stats(p2_hand_stats, players_cards[1]);
-
-    int win_condition_p1 = analyze_data(p1_hand_stats, players_cards[0], util_p1, &p1_win_cards);
-    int win_condition_p2 = analyze_data(p2_hand_stats, players_cards[1], util_p2, &p2_win_cards);
-
-    if (win_condition_p1 == win_condition_p2) {
-        switch (win_condition_p1) {
-        case High_card: // high card
-            for (int i = 0; i < 5; i++) {
-                if (util_p1[i] == util_p2[i]) {
-                    continue;
-                }
-                return (util_p1[i] > util_p2[i]) ? 1 : 2;
+    // this would have to be more complicated for more players
+    if (win_conditions[0] == win_conditions[1]) {
+        for (int i = 0; i < 5; i++) {
+            if (util_array[0][i] != util_array[1][i]){
+                return (util_array[0][i] > util_array[1][i]) ? 1 : 2;
             }
-            return 0;
-        case Pair: // one pair
-            if (p1_win_cards == p2_win_cards) {
-                for (int i = 0; i < 3; ++i) {
-                    if (util_p1[i] == util_p2[i]) {
-                        continue;
-                    }
-                    return (util_p1[i] > util_p2[i]) ? 1 : 2;
-                }
-                return 0;
-            }
-            return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case Two_pair: // two pairs
-            if (p1_win_cards / 100 == p2_win_cards / 100) {
-                if (p1_win_cards % 100 == p2_win_cards % 100) {
-                    if (util_p1[0] == util_p2[0]) {
-                        return 0;
-                    }
-                    return (util_p1[0] > util_p2[0]) ? 1 : 2;
-                }
-                return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
-            }
-            return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
-        case Three_oof_kind: // three of kind
-            if (p1_win_cards == p2_win_cards) {
-                for (int i = 0; i < 2; ++i) {
-                    if (util_p1[i] == util_p2[i]) {
-                        continue;
-                    }
-                    return (util_p1[i] > util_p2[i]) ? 1 : 2;
-                }
-                return 0;
-            }
-            return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case Straight: // straight
-            if (p1_win_cards == p2_win_cards) {
-                return 0;
-            }
-            return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case Flush: // flush
-            for (int i = 0; i < 5; i++) {
-                if (util_p1[i] == util_p2[i]) {
-                    continue;
-                }
-                return (util_p1[i] > util_p2[i]) ? 1 : 2;
-            }
-            return 0;
-        case Full_house: // full house
-            if (p1_win_cards / 100 == p2_win_cards / 100) {
-                if (p1_win_cards % 100 == p2_win_cards % 100) {
-                    return 0;
-                }
-                return (p1_win_cards % 100 > p2_win_cards % 100) ? 1 : 2;
-            }
-            return (p1_win_cards / 100 > p2_win_cards / 100) ? 1 : 2;
-        case Four_of_kind: // four of kind
-            if (p1_win_cards == p2_win_cards) {
-                if (util_p1[0] == util_p2[0]) {
-                    return 0;
-                }
-                return (util_p1[0] > util_p2[0]) ? 1 : 2;
-            }
-            return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        case Straight_flush:
-            if (p1_win_cards == p2_win_cards) {
-                return 0;
-            }
-            return (p1_win_cards > p2_win_cards) ? 1 : 2;
-        default:
-            fprintf(stderr, "Evaluation error\n");
-            return 0;
         }
+        return 0;
     }
-    return (win_condition_p1 < win_condition_p2) ? 1 : 2;
+    return (win_conditions[0] < win_conditions[1]) ? 1 : 2;
 }
 
 /**

@@ -172,9 +172,9 @@ void hand_stats(int suits_stats[4], int value_stats[13], const int player[7])
 int evaluate_game(int players_cards[2][7])
 {
     // if there are more players, change the size of 2d array
-    int suit_stats[2][4] = {0};
-    int value_stats[2][13] = {0};
-    int util_array[2][5] = {0};
+    int suit_stats[2][4] = {{0}, {0}};
+    int value_stats[2][13] = {{0}, {0}};
+    int util_array[2][5] = {{0}, {0}};
     enum win_condition win_conditions[2] = {0};
 
     enum win_condition condition;

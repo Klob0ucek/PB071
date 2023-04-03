@@ -79,7 +79,7 @@ void fill_pair_or_three(const int first, int left, const int value_stats[13], in
     util_i = 5 - left;
     int index = 12;
     while (util_i < 5 || index >= 0) {
-        if (value_stats[index] != 0 && value_stats[index] != first) {
+        if (value_stats[index] != 0 && index != first) {
             util_array[util_i] = index + 2;
             util_i++;
         }

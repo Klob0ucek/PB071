@@ -26,7 +26,7 @@ void fill_four(const int first, const int second, const int value_stats[13], int
         util_array[i] = second + 2;
     }
     int index = 12;
-    while (value_stats[index] == 0 || value_stats[index] == first || value_stats[index] == second){
+    while (value_stats[index] == 0 || index == first || index == second){
         index--;
     }
     util_array[4] = index + 2;

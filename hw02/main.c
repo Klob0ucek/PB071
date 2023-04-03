@@ -1,24 +1,34 @@
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdint-gcc.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 
-const char CARD_VALUES[] = {EOF, '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
-const char CARD_SUITS[] = {'h', 'd', 's', 'c'};
+const char CARD_VALUES[] = { EOF, '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A' };
+const char CARD_SUITS[] = { 'h', 'd', 's', 'c' };
 
-enum win_condition {
-    Straight_flush = 1, Four_of_kind, Full_house, Flush, Straight, Three_oof_kind,
-    Two_pair, Pair, High_card
+enum win_condition
+{
+    Straight_flush = 1,
+    Four_of_kind,
+    Full_house,
+    Flush,
+    Straight,
+    Three_oof_kind,
+    Two_pair,
+    Pair,
+    High_card
 };
 
-void fill_straight_flush(const int highest, int util_array[5]) {
+void fill_straight_flush(const int highest, int util_array[5])
+{
     for (int i = 0; i < 5; i++) {
         util_array[i] = highest + 2 - i;
     }
 }
 
-void fill_four(const int first, const int second, const int value_stats[13], int util_array[5]){
+void fill_four(const int first, const int second, const int value_stats[13], int util_array[5])
+{
     for (int i = 0; i < 2; ++i) {
         util_array[i] = first + 2;
     }
@@ -26,22 +36,24 @@ void fill_four(const int first, const int second, const int value_stats[13], int
         util_array[i] = second + 2;
     }
     int index = 12;
-    while (value_stats[index] == 0 || index == first || index == second){
+    while (value_stats[index] == 0 || index == first || index == second) {
         index--;
     }
     util_array[4] = index + 2;
 }
 
-void fill_full_house(const int triple, const int pair, int util_array[5]){
-    for (int i = 0; i < 3; i ++) {
+void fill_full_house(const int triple, const int pair, int util_array[5])
+{
+    for (int i = 0; i < 3; i++) {
         util_array[i] = triple + 2;
     }
-    for (int i = 3; i < 5; i ++) {
+    for (int i = 3; i < 5; i++) {
         util_array[i] = pair + 2;
     }
 }
 
-void fill_flush(const int flush, const int value_stats[13], const int player[7], int util_array[5]){
+void fill_flush(const int flush, const int value_stats[13], const int player[7], int util_array[5])
+{
     int util_i = 0;
     for (int i = 12; i >= 0; i--) {
         if (value_stats[i] != 0) {
@@ -58,7 +70,8 @@ void fill_flush(const int flush, const int value_stats[13], const int player[7],
     }
 }
 
-void fill_high_card(const int value_stats[13], int util_array[5]){
+void fill_high_card(const int value_stats[13], int util_array[5])
+{
     int util_i = 0;
     for (int i = 12; i >= 0; i--) {
         if (value_stats[i] == 1) {
@@ -71,7 +84,8 @@ void fill_high_card(const int value_stats[13], int util_array[5]){
     }
 }
 
-void fill_pair_or_three(const int first, int left, const int value_stats[13], int util_array[5]) {
+void fill_pair_or_three(const int first, int left, const int value_stats[13], int util_array[5])
+{
     int util_i;
     for (util_i = 0; util_i < 5 - left; util_i++) {
         util_array[util_i] = first + 2;
@@ -87,8 +101,7 @@ void fill_pair_or_three(const int first, int left, const int value_stats[13], in
     }
 }
 
-enum win_condition analyze_data(const int suit_stats[4], const int value_stats[13],
-        int players_cards[7], int util_array[5])
+enum win_condition analyze_data(const int suit_stats[4], const int value_stats[13], int players_cards[7], int util_array[5])
 {
     uint8_t pair1 = 0;
     uint8_t pair2 = 0;
@@ -172,13 +185,13 @@ void hand_stats(int suits_stats[4], int value_stats[13], const int player[7])
 int evaluate_game(int players_cards[2][7])
 {
     // if there are more players, change the size of 2d array
-    int suit_stats[2][4] = {{0}, {0}};
-    int value_stats[2][13] = {{0}, {0}};
-    int util_array[2][5] = {{0}, {0}};
-    enum win_condition win_conditions[2] = {0};
+    int suit_stats[2][4] = { { 0 }, { 0 } };
+    int value_stats[2][13] = { { 0 }, { 0 } };
+    int util_array[2][5] = { { 0 }, { 0 } };
+    enum win_condition win_conditions[2] = { 0 };
 
     enum win_condition condition;
-    for (int i = 0; i < 2; i++){
+    for (int i = 0; i < 2; i++) {
         hand_stats(suit_stats[i], value_stats[i], players_cards[i]);
         condition = analyze_data(suit_stats[i], value_stats[i], players_cards[i], util_array[i]);
         win_conditions[i] = condition;
@@ -187,7 +200,7 @@ int evaluate_game(int players_cards[2][7])
     // this would have to be more complicated for more players
     if (win_conditions[0] == win_conditions[1]) {
         for (int i = 0; i < 5; i++) {
-            if (util_array[0][i] != util_array[1][i]){
+            if (util_array[0][i] != util_array[1][i]) {
                 return (util_array[0][i] > util_array[1][i]) ? 1 : 2;
             }
         }
@@ -218,7 +231,7 @@ bool load_card(int *card, bool need_white_space)
         }
         if (white_space || !need_white_space) {
             for (int i = 0; i < 14; ++i) {
-                if (c == CARD_VALUES[i]){
+                if (c == CARD_VALUES[i]) {
                     if (i == 0) {
                         *card = EOF;
                         return true;
@@ -234,7 +247,7 @@ bool load_card(int *card, bool need_white_space)
             *card *= 10;
             c = getchar();
             for (int i = 0; i < 4; ++i) {
-                if (c == CARD_SUITS[i]){
+                if (c == CARD_SUITS[i]) {
                     *card += i + 1;
                     break;
                 }

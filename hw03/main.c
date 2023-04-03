@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
+#include <limits.h>
 
 // TODO: [Optional] Think about an appropriate division of the solution into files.
 //                  e.g. Move data loading and validating to another .c file.
@@ -22,6 +23,27 @@ struct container_t {
     unsigned int house_number;
     bool public;
 };
+
+struct all_containers{
+    struct container_t **containers;
+    int amount;
+};
+
+bool print_container(const struct container_t *container) {
+    printf("ID: %o, ", container->id);
+    printf("Type: %d, ", container->garb_type);
+    printf("Capacity: %o, ", container->capacity);
+    printf("Address: %s %o, ", container->street, container->house_number);
+    printf("Neighbours: Fill neighbours\n");
+    return true;
+}
+
+bool print_all(const struct all_containers *all_containers){
+    for (int i = 0; i < all_containers->amount; ++i) {
+        print_container(all_containers->containers[i]);
+    }
+    return true;
+}
 
 bool load_container(int line_index, struct container_t **container) {
     struct container_t *new_container = malloc(sizeof(struct container_t));
@@ -120,7 +142,7 @@ bool load_container(int line_index, struct container_t **container) {
     return true;
 }
 
-bool parse_input(const char *containers_path, const char *paths_path) {
+bool parse_input(const char *containers_path, const char *paths_path, struct all_containers *all_conts) {
     int cont_size = 10;
     struct container_t **containers;
     containers = malloc(sizeof(void *) * cont_size);
@@ -131,8 +153,6 @@ bool parse_input(const char *containers_path, const char *paths_path) {
 
     int index = 0;
     struct container_t *container;
-    init_data_source(containers_path, paths_path);
-
     while (true) {
         if (get_container_id(index) == NULL) {
             break;
@@ -153,12 +173,23 @@ bool parse_input(const char *containers_path, const char *paths_path) {
             cont_size *= 2;
             containers = &new_containers;
         }
-        printf("Cont NO.%d of ID %d, %s\n", index, container->id, container->name);
         containers[index] = container;
         index++;
     }
-    destroy_data_source();
+    struct all_containers all = {containers, index};
+    *all_conts = all;
     return true;
+}
+
+bool free_all_containers(struct all_containers *all_conts){
+    for (int i = 0; i < all_conts->amount; ++i) {
+        free(all_conts->containers[i]);
+        all_conts->containers[i] = NULL;
+    }
+    free(all_conts->containers);
+    all_conts->containers = NULL;
+    free(all_conts);
+    all_conts = NULL;
 }
 
 bool filter_types(const char *filter_str, enum garbage_type **filters) {
@@ -192,9 +223,6 @@ bool filter_types(const char *filter_str, enum garbage_type **filters) {
         index++;
         *filters = filter_array;
     }
-    for (int i = 0; i < index; ++i) {
-        printf("%d\n", filter_array[i]);
-    }
     return true;
 }
 
@@ -215,9 +243,13 @@ bool private_filter(char *input, bool *want_private) {
 
 int main(int argc, char *argv[]) {
 
+
     const char* cont_path_test = "C:/Files/MUNI/PB071/C/hw03/data/Brno-BosonohyContainers.csv";
     const char* road_path_test = "C:/Files/MUNI/PB071/C/hw03/data/Brno-BosonohyPaths.csv";
-    parse_input(cont_path_test,road_path_test);
+    init_data_source(cont_path_test, road_path_test);
+    struct all_containers all_containers;
+    parse_input(cont_path_test,road_path_test, &all_containers);
+    destroy_data_source();
 
 
     if (argc < 3){
@@ -225,7 +257,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     if (argc == 3) {
-        printf("We will print out all containers");
+        print_all(&all_containers);
     }
     if (argc == 4 && strcmp(argv[1], "-s") == 0) {
         printf("%s", argv[1]);
@@ -246,7 +278,6 @@ int main(int argc, char *argv[]) {
                 int low = 0;
                 int high = 0;
                 parse_interval(argv[i + 1], &low, &high);
-                printf("%d-%d\n", low, high);
 
                 //filter data
 
@@ -263,6 +294,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+    free_all_containers(&all_containers);
 
     return EXIT_SUCCESS; // May your program be as successful as this macro. Good luck!
 }

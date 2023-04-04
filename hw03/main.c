@@ -139,7 +139,6 @@ bool load_container(int line_index, struct container_t **container) {
     new_container->public = public;
 
     *container = new_container;
-    print_container(*container);
     return true;
 }
 
@@ -165,15 +164,21 @@ bool parse_input(struct all_containers *all_conts) {
             return false;
         }
         if (index == cont_size) {
-            struct container_t *new_containers = realloc(containers, cont_size);
+            cont_size *= 2;
+            struct container_t *new_containers = realloc(containers, sizeof(void *) * cont_size);
             if (new_containers == NULL) {
                 perror("Realloc Failure");
                 free(containers);
+
+                // possible memory leak here
+
                 return false;
             }
-            cont_size *= 2;
+
             containers = &new_containers;
         }
+        printf("Index: %d - ", index);
+        print_container(container);
         containers[index] = container;
         index++;
     }

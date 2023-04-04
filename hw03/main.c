@@ -25,24 +25,24 @@ struct container_t {
 };
 
 struct all_containers{
-    struct container_t **containers;
+    struct container_t *containers;
     int amount;
 };
 
-bool print_container(const struct container_t *container) {
-    printf("ID: %o, ", container->id);
-    printf("Type: %d, ", container->garb_type);
-    printf("Capacity: %o, ", container->capacity);
-    printf("Address: %s %o, ", container->street, container->house_number);
+bool print_container(const struct container_t container) {
+    printf("ID: %o, ", container.id);
+    printf("Type: %d, ", container.garb_type);
+    printf("Capacity: %o, ", container.capacity);
+    printf("Address: %s %o, ", container.street, container.house_number);
     printf("Neighbours: Fill neighbours\n");
     return true;
 }
 
-bool print_all(const struct all_containers *all_containers){
-    for (int i = 0; i < all_containers->amount; ++i) {
-        print_container(all_containers->containers[i]);
+void print_all(const struct all_containers *all_containers){
+    struct container_t *boxes = all_containers->containers;
+    for (int i = 0; i < (*all_containers).amount; ++i) {
+        print_container(boxes[i]);
     }
-    return true;
 }
 
 int load_container(int line_index, struct container_t *container) {
@@ -167,20 +167,13 @@ bool parse_input(struct all_containers *all_conts) {
         containers[index] = container;
         index++;
     }
-    struct all_containers all = {&containers, index};
+    struct all_containers all = {containers, index};
     *all_conts = all;
     return true;
 }
 
 bool free_all_containers(struct all_containers *all_conts){
-    for (int i = 0; i < all_conts->amount; ++i) {
-        free(all_conts->containers[i]);
-        all_conts->containers[i] = NULL;
-    }
     free(all_conts->containers);
-    all_conts->containers = NULL;
-    free(all_conts);
-    all_conts = NULL;
     return true;
 }
 
@@ -241,6 +234,8 @@ int main(int argc, char *argv[]) {
     init_data_source(cont_path_test, road_path_test);
     struct all_containers all_containers;
     parse_input(&all_containers);
+    printf("Containers Loaded: %d\n", all_containers.amount);
+    print_all(&all_containers);
     destroy_data_source();
 
 

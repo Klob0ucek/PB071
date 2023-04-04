@@ -45,34 +45,29 @@ bool print_all(const struct all_containers *all_containers){
     return true;
 }
 
-bool load_container(int line_index, struct container_t **container) {
-    struct container_t *new_container = malloc(sizeof(struct container_t));
-    if (new_container == NULL) {
-        free(new_container);
-        perror("Malloc Failure");
-        return false;
+int load_container(int line_index, struct container_t *container) {
+    const char *id_str = get_container_id(line_index);
+    if (id_str == NULL) {
+        return -1;
     }
 
     // loading container id - !!! doesnt check if id is unique !!!
-    unsigned int id = atoi(get_container_id(line_index));
+    unsigned int id = atoi(id_str);
     if (id <= 0 || id > UINT_MAX) {
-        return false;
+        return 0;
     }
-    new_container->id = id;
 
     // loading X coordinates
     double x_coords = atof(get_container_x(line_index));
     if (x_coords == 0.0) {
-        return false;
+        return 0;
     }
-    new_container->coordinates_x = x_coords;
 
     //loading Y coordinates
     double y_coords = atof(get_container_y(line_index));
     if (y_coords == 0.0) {
-        return false;
+        return 0;
     }
-    new_container->coordinates_y = y_coords;
 
     //loading garbage type
     enum garbage_type garb;
@@ -90,28 +85,24 @@ bool load_container(int line_index, struct container_t **container) {
     } else if (strcmp(garb_str, "Textile") == 0) {
         garb = Textile;
     } else {
-        return false;
+        return 0;
     }
-    new_container->garb_type = garb;
 
     // loading capacity
     unsigned int capacity = atoi(get_container_capacity(line_index));
     if (capacity <= 0 || capacity > UINT_MAX) {
-        return false;
+        return 0;
     }
-    new_container->capacity = capacity;
 
     //loading container name
     const char *original_str = get_container_name(line_index);
     char *name = malloc(strlen(original_str) * sizeof(char) + 1);
     strcpy(name, original_str);
-    new_container->name = name;
 
     //loading container street
     original_str = get_container_street(line_index);
     char *street = malloc(strlen(original_str) * sizeof(char) + 1);
     strcpy(street, original_str);
-    new_container->street = street;
 
     // loading container house number
     const char *house_number = get_container_number(line_index);
@@ -121,10 +112,9 @@ bool load_container(int line_index, struct container_t **container) {
     } else {
         house_num = atoi(house_number);
         if (house_num <= 0 || house_num > UINT_MAX) {
-            return false;
+            return 0;
         }
     }
-    new_container->house_number = house_num;
 
     //loading if container is public or private
     bool public;
@@ -134,55 +124,50 @@ bool load_container(int line_index, struct container_t **container) {
     } else if (strcmp(public_garb, "N") == 0) {
         public = false;
     } else {
-        return false;
+        return 0;
     }
-    new_container->public = public;
 
+    struct container_t new_container = {id, x_coords,y_coords,garb, capacity, name, street, house_num, public};
     *container = new_container;
-    return true;
+    return 1;
 }
 
 bool parse_input(struct all_containers *all_conts) {
     int cont_size = 10;
-    struct container_t **containers;
-    containers = malloc(sizeof(void *) * cont_size);
+    struct container_t *containers;
+    containers = malloc(sizeof(struct container_t) * cont_size);
     if (containers == NULL) {
         perror("Malloc Failre");
         return false;
     }
 
     int index = 0;
-    struct container_t *container;
+    struct container_t container;
     while (true) {
-        if (get_container_id(index) == NULL) {
+        int cont_load_success = load_container(index, &container);
+        if (cont_load_success == -1) {
             break;
         }
-        bool cont_load_success = load_container(index, &container);
-        if (!cont_load_success) {
+        if (cont_load_success == 0) {
             fprintf(stderr, "Invalid input file with containers");
             free(containers);
             return false;
         }
+
         if (index == cont_size) {
             cont_size *= 2;
-            struct container_t *new_containers = realloc(containers, sizeof(void *) * cont_size);
+            struct container_t *new_containers = realloc(containers, sizeof(struct container_t) * cont_size);
             if (new_containers == NULL) {
                 perror("Realloc Failure");
                 free(containers);
-
-                // possible memory leak here
-
                 return false;
             }
-
-            containers = &new_containers;
+            containers = new_containers;
         }
-        printf("Index: %d - ", index);
-        print_container(container);
         containers[index] = container;
         index++;
     }
-    struct all_containers all = {containers, index};
+    struct all_containers all = {&containers, index};
     *all_conts = all;
     return true;
 }
@@ -200,7 +185,7 @@ bool free_all_containers(struct all_containers *all_conts){
 }
 
 bool filter_types(const char *filter_str, enum garbage_type **filters) {
-    enum garbage_type *filter_array = calloc(sizeof(enum garbage_type) * 6, sizeof(enum garbage_type));
+    enum garbage_type *filter_array = calloc(6, sizeof(enum garbage_type));
     if (filter_array == NULL) {
         perror("Malloc Failure");
         return false;

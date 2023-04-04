@@ -139,10 +139,11 @@ bool load_container(int line_index, struct container_t **container) {
     new_container->public = public;
 
     *container = new_container;
+    print_container(*container);
     return true;
 }
 
-bool parse_input(const char *containers_path, const char *paths_path, struct all_containers *all_conts) {
+bool parse_input(struct all_containers *all_conts) {
     int cont_size = 10;
     struct container_t **containers;
     containers = malloc(sizeof(void *) * cont_size);
@@ -190,6 +191,7 @@ bool free_all_containers(struct all_containers *all_conts){
     all_conts->containers = NULL;
     free(all_conts);
     all_conts = NULL;
+    return true;
 }
 
 bool filter_types(const char *filter_str, enum garbage_type **filters) {
@@ -248,7 +250,7 @@ int main(int argc, char *argv[]) {
     const char* road_path_test = "C:/Files/MUNI/PB071/C/hw03/data/Brno-BosonohyPaths.csv";
     init_data_source(cont_path_test, road_path_test);
     struct all_containers all_containers;
-    parse_input(cont_path_test,road_path_test, &all_containers);
+    parse_input(&all_containers);
     destroy_data_source();
 
 

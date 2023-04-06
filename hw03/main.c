@@ -22,19 +22,55 @@ struct container_t {
     char *street;
     unsigned int house_number;
     bool public;
+    // !!! ON HEAP !!!
+    unsigned int *neighbours; // will contain sorted ids of neighbours - still can contain same ids
+    int neighbour_count;
 };
 
 struct all_containers{
+    // !!! ON HEAP !!!
     struct container_t *containers;
     int amount;
 };
 
+char *garbage_type_to_string(enum garbage_type garb){
+    switch (garb) {
+        case Plastic:
+            return "Plastics and Aluminium";
+        case Paper:
+            return "Paper";
+        case Bio:
+            return "Biodegradable waste";
+        case Clear:
+            return "Clear glass";
+        case Colored:
+            return "Colored glass";
+        case Textile:
+            return "Textile";
+        default:
+            return "NaN";
+    }
+}
+
+void print_neighbours(const struct container_t container) {
+    unsigned int printed = 0;
+    for (int i = 0; i < container.neighbour_count; ++i) {
+        if (container.neighbours[i] == printed) {
+            continue;
+        }
+        printf(" %u", container.neighbours[i]);
+        printed = container.neighbours[i];
+    }
+}
+
 bool print_container(const struct container_t container) {
     printf("ID: %o, ", container.id);
-    printf("Type: %d, ", container.garb_type);
+    printf("Type: %s, ", garbage_type_to_string(container.garb_type));
     printf("Capacity: %o, ", container.capacity);
     printf("Address: %s %o, ", container.street, container.house_number);
-    printf("Neighbours: Fill neighbours\n");
+    printf("Neighbours:");
+    print_neighbours(container);
+    printf("\n");
     return true;
 }
 
@@ -43,6 +79,88 @@ void print_all(const struct all_containers *all_containers){
     for (int i = 0; i < (*all_containers).amount; ++i) {
         print_container(boxes[i]);
     }
+}
+
+int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour) {
+    if (get_path_a_id(index) == NULL){
+        return -1;
+    }
+    unsigned int a;
+    unsigned int b;
+    sscanf(get_path_a_id(index), "%u", &a);
+    sscanf(get_path_b_id(index), "%u", &b);
+
+    if (a == wanted_id) {
+        *neighbour = b;
+        return 1;
+    }
+    if (b == wanted_id){
+        *neighbour = a;
+        return 1;
+    }
+    return 0;
+}
+
+int compare_ints(const void* a, const void* b)
+{
+    // copied from cppreference
+    unsigned int arg1 = *(const unsigned int*)a;
+    unsigned int arg2 = *(const unsigned int*)b;
+
+    if (arg1 < arg2) return -1;
+    if (arg1 > arg2) return 1;
+    return 0;
+}
+
+
+bool fill_neighbours(struct container_t *container) {
+    int size = 10;
+    unsigned int *neighbours =  malloc(sizeof(unsigned int) * size);
+    if (neighbours == NULL) {
+        perror("Malloc Failre");
+        return false;
+    }
+
+    int index = 0;
+    unsigned int new_neighbour;
+    int neighbour_count = 0;
+    int state;
+    while (true){
+        state = try_neighbour(index, container->id, &new_neighbour);
+        if (state == -1){
+            break;
+        }
+        if (state == 1) {
+            if (size == neighbour_count) {
+                size *= 2;
+                unsigned int *neighbours_new = realloc(neighbours, sizeof(unsigned int) * size);
+                if (neighbours_new == NULL) {
+                    perror("Realloc Failure");
+                    free(neighbours);
+                    return false;
+                }
+                neighbours = neighbours_new;
+            }
+            neighbours[neighbour_count] = new_neighbour;
+            neighbour_count++;
+        }
+        index++;
+    }
+    // remalloc to correct size
+    unsigned int *neighbours_new = realloc(neighbours, sizeof(unsigned int) * neighbour_count);
+    if (neighbours_new == NULL) {
+        perror("Realloc Failure");
+        free(neighbours);
+        return false;
+    }
+    neighbours = neighbours_new;
+
+    // qsort - list of elements, amount of elements, size of element, function that compares two elements
+    qsort(neighbours, neighbour_count, sizeof(unsigned int), compare_ints);
+
+    container->neighbours = neighbours;
+    container->neighbour_count = neighbour_count;
+    return true;
 }
 
 int load_container(int line_index, struct container_t *container) {
@@ -127,12 +245,17 @@ int load_container(int line_index, struct container_t *container) {
         return 0;
     }
 
-    struct container_t new_container = {id, x_coords,y_coords,garb, capacity, name, street, house_num, public};
+    struct container_t new_container = {id, x_coords,y_coords,garb,
+            capacity, name, street, house_num, public, NULL, 0};
+
+    if (!fill_neighbours(&new_container)){
+        return 0;
+    }
     *container = new_container;
     return 1;
 }
 
-bool parse_input(struct all_containers *all_conts) {
+bool parse_input(struct all_containers *all_containers) {
     int cont_size = 10;
     struct container_t *containers;
     containers = malloc(sizeof(struct container_t) * cont_size);
@@ -168,13 +291,23 @@ bool parse_input(struct all_containers *all_conts) {
         index++;
     }
     struct all_containers all = {containers, index};
-    *all_conts = all;
+    *all_containers = all;
     return true;
 }
 
-bool free_all_containers(struct all_containers *all_conts){
+bool deep_free_all_containers(struct all_containers *all_conts){
+    for (int i = 0; i < all_conts->amount; i++){
+        free(all_conts->containers[i].neighbours);
+        all_conts->containers[i].neighbours = NULL;
+    }
     free(all_conts->containers);
     return true;
+}
+
+bool free_struct_all_containers(struct all_containers *all_conts){
+    free(all_conts->containers);
+    all_conts->containers = NULL;
+    all_conts = NULL;
 }
 
 bool filter_types(const char *filter_str, enum garbage_type **filters) {
@@ -183,7 +316,6 @@ bool filter_types(const char *filter_str, enum garbage_type **filters) {
         perror("Malloc Failure");
         return false;
     }
-    memset(filter_array, 0, sizeof(enum garbage_type));
 
     int index = 0;
     while (true) {
@@ -206,8 +338,9 @@ bool filter_types(const char *filter_str, enum garbage_type **filters) {
             return false;
         }
         index++;
-        *filters = filter_array;
     }
+    *filters = filter_array;
+
     return true;
 }
 
@@ -226,16 +359,51 @@ bool private_filter(char *input, bool *want_private) {
     return true;
 }
 
+bool filter_garb_type(const enum garbage_type *filters, struct all_containers *all_conts){
+    int cont_size = 10;
+    struct container_t *filtered_containers = malloc(sizeof(struct container_t) * cont_size);
+    if (filtered_containers == NULL) {
+        perror("Malloc Failre");
+        return false;
+    }
+
+    int index = 0;
+    for (int i = 0; i < all_conts->amount; ++i){
+        struct container_t current_container = all_conts->containers[i];
+        for (int j = 0; j < 6; ++j) {
+            if (filters[j] == current_container.garb_type){
+                if (index == cont_size) {
+                    cont_size *= 2;
+                    struct container_t *new_filtered_containers = realloc(filtered_containers, sizeof(struct container_t) * cont_size);
+                    if (new_filtered_containers == NULL) {
+                        perror("Realloc Failure");
+                        free(filtered_containers);
+                        return false;
+                    }
+                    filtered_containers = new_filtered_containers;
+                }
+                filtered_containers[index] = current_container;
+                index++;
+            }
+        }
+    }
+
+    free_struct_all_containers(all_conts);
+
+    struct all_containers all = {filtered_containers, index};
+    *all_conts = all;
+    return true;
+}
+
 int main(int argc, char *argv[]) {
-
-
+    
     const char* cont_path_test = "C:/Files/MUNI/PB071/C/hw03/data/Brno-BosonohyContainers.csv";
     const char* road_path_test = "C:/Files/MUNI/PB071/C/hw03/data/Brno-BosonohyPaths.csv";
+
     init_data_source(cont_path_test, road_path_test);
     struct all_containers all_containers;
     parse_input(&all_containers);
     printf("Containers Loaded: %d\n", all_containers.amount);
-    print_all(&all_containers);
     destroy_data_source();
 
 
@@ -248,17 +416,22 @@ int main(int argc, char *argv[]) {
     }
     if (argc == 4 && strcmp(argv[1], "-s") == 0) {
         printf("%s", argv[1]);
-        printf("We will print out container groups");
+        printf("We will print out container groups\n");
     } else {
-        printf("We will be filtering data and printing out");
+        printf("We will be filtering data and printing out\n");
         for (int i = 1; i < (argc - 2); i += 2) {
             if (strcmp(argv[i], "-t") == 0) {
                 enum garbage_type *type_filter;
                 if (!filter_types(argv[i + 1], &type_filter)){
                     return EXIT_FAILURE;
                 }
-
-                // filter data
+                if (!filter_garb_type(type_filter, &all_containers)){
+                    fprintf(stderr, "Data filtering failed");
+                    return EXIT_FAILURE;
+                }
+                print_all(&all_containers);
+                free(type_filter);
+                type_filter = NULL;
 
             }
             if (strcmp(argv[i], "-c") == 0) {
@@ -281,7 +454,7 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    free_all_containers(&all_containers);
+    deep_free_all_containers(&all_containers);
 
     return EXIT_SUCCESS; // May your program be as successful as this macro. Good luck!
 }

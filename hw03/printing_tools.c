@@ -50,6 +50,8 @@ void print_container(const struct container_t container) {
     printf("Capacity: %u, ", container.capacity);
     if ((strcmp(container.street, "") != 0) && container.house_number != 0){
         printf("Address: %s %u, ", container.street, container.house_number);
+    } else {
+        printf("Address:, ");
     }
     if (container.neighbour_count != 0) {
         printf("Neighbours:");

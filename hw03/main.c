@@ -33,7 +33,7 @@ bool filter_types(const char *filter_str, enum garbage_type **filters) {
         } else if (filter_str[index] == 'T') {
             filter_array[index] = Textile;
         } else {
-            fprintf(stderr, "Invalid filter type");
+            fprintf(stderr, "Invalid filter type\n");
             return false;
         }
         index++;
@@ -134,7 +134,8 @@ int main(int argc, char *argv[]) {
     parse_input(&all_containers, cont_path_test, road_path_test);
 
     if (argc < 3){
-        fprintf(stderr, "Not Enough Arguments");
+        fprintf(stderr, "Not Enough Arguments\n");
+        deep_free_all_containers(&all_containers);
         return EXIT_FAILURE;
     }
     if (argc == 3) {
@@ -144,12 +145,14 @@ int main(int argc, char *argv[]) {
     }
     if (argc == 4 && strcmp(argv[1], "-s") == 0) {
         if (!groupify(&all_containers)){
-            fprintf(stderr, "Grouping containers failed");
-            return false;
+            fprintf(stderr, "Grouping containers failed\n");
+            deep_free_all_containers(&all_containers);
+            return EXIT_FAILURE;
         }
+
+        print_groups(&all_containers);
         deep_free_all_containers(&all_containers);
         return EXIT_SUCCESS;
-        // TODO we need to print groups then
 
     } else {
         enum garbage_type *type_filter = NULL;
@@ -171,19 +174,19 @@ int main(int argc, char *argv[]) {
             }
             else if (strcmp(argv[i], "-p") == 0) {
                 if (!(private_filter(argv[i + 1], &want_private))){
-                    fprintf(stderr, "Invalid filter option");
+                    fprintf(stderr, "Invalid filter option\n");
                     deep_free_all_containers(&all_containers);
                     return EXIT_FAILURE;
                 }
             } else {
-                fprintf(stderr, "Unknown argument: Use -t, -c or -p with appropriate values");
+                fprintf(stderr, "Unknown argument: Use -t, -c or -p\n");
                 deep_free_all_containers(&all_containers);
                 return EXIT_FAILURE;
             }
         }
 
         if (!filter_containers(type_filter, use_capacity, low, high, want_private, &all_containers)){
-            fprintf(stderr, "Data filtering failed");
+            fprintf(stderr, "Data filtering failed\n");
             deep_free_all_containers(&all_containers);
             return EXIT_FAILURE;
         }

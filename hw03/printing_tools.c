@@ -4,25 +4,31 @@
 #include "printing_tools.h"
 
 #include "stdio.h"
-#include "stdbool.h"
 #include "string.h"
 
-char *garbage_type_to_string(enum garbage_type garb) {
+void print_garb_type(enum garbage_type garb) {
     switch (garb) {
         case Plastic:
-            return "Plastics and Aluminium";
+            printf("Plastics and Aluminium");
+            break;
         case Paper:
-            return "Paper";
+            printf("Paper");
+            break;
         case Bio:
-            return "Biodegradable waste";
+            printf("Biodegradable waste");
+            break;
         case Clear:
-            return "Clear glass";
+            printf("Clear glass");
+            break;
         case Colored:
-            return "Colored glass";
+            printf("Colored glass");
+            break;
         case Textile:
-            return "Textile";
+            printf("Textile");
+            break;
         default:
-            return "NaN";
+            printf("NaN");
+            break;
     }
 }
 
@@ -37,9 +43,10 @@ void print_neighbours(const struct container_t container) {
     }
 }
 
-bool print_container(const struct container_t container) {
+void print_container(const struct container_t container) {
     printf("ID: %u, ", container.id);
-    printf("Type: %s, ", garbage_type_to_string(container.garb_type));
+    printf("Type: ");
+    print_garb_type(container.garb_type);
     printf("Capacity: %u, ", container.capacity);
     if ((strcmp(container.street, "") != 0) && container.house_number != 0){
         printf("Address: %s %u, ", container.street, container.house_number);
@@ -49,12 +56,60 @@ bool print_container(const struct container_t container) {
         print_neighbours(container);
     }
     printf("\n");
-    return true;
 }
 
 void print_all(const struct all_containers *all_containers) {
     struct container_t *boxes = all_containers->containers;
     for (int i = 0; i < (*all_containers).amount; ++i) {
         print_container(boxes[i]);
+    }
+}
+
+
+void print_int_to_type(const int type) {
+    switch (type) {
+        case 0:
+            printf("A");
+            break;
+        case 1:
+            printf("P");
+            break;
+        case 2:
+            printf("B");
+            break;
+        case 3:
+            printf("G");
+            break;
+        case 4:
+            printf("C");
+            break;
+        case 5:
+            printf("T");
+            break;
+        default:
+            fprintf(stderr, "Incorrect value");
+            return;
+    }
+}
+
+void print_group_type(const int *types) {
+    for (int i = 0; i < 6; i++){
+        if (types[i] == 1){
+            print_int_to_type(i);
+        }
+    }
+}
+
+void print_group(struct group current_group){
+    printf("%d;", current_group.id);
+    print_group_type(current_group.garbage_types);
+    printf(";");
+    printf("Neighbouring groups");
+    printf("\n");
+}
+
+void print_groups(struct all_containers *all_containers){
+    for (int i = 0; i < all_containers->group_amount;  i++){
+        print_group(all_containers->groups[i]);
     }
 }

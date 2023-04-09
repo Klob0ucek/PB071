@@ -189,7 +189,6 @@ int load_container(int line_index, struct container_t *container) {
 
 bool parse_input(struct all_containers *all_containers, const char *cont_path_test, const char *road_path_test) {
 
-
     init_data_source(cont_path_test, road_path_test);
 
     int cont_size = 10;
@@ -208,7 +207,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
             break;
         }
         if (cont_load_success == 0) {
-            fprintf(stderr, "Invalid input file with containers");
+            fprintf(stderr, "Invalid input file with containers\n");
             free(containers);
             return false;
         }
@@ -247,6 +246,8 @@ bool free_container(struct container_t container) {
 bool free_group(struct group current_group){
     free(current_group.containers);
     current_group.containers = NULL;
+    free(current_group.garbage_types);
+    current_group.garbage_types = NULL;
     return true;
 }
 
@@ -281,6 +282,27 @@ void free_groups(struct all_containers *all_conts) {
     all_conts->group_amount = 0;
 }
 
+
+int garb_to_int(enum garbage_type type) {
+    switch (type) {
+        case Plastic:
+            return 0;
+        case Paper:
+            return 1;
+        case Bio:
+            return 2;
+        case Clear:
+            return 3;
+        case Colored:
+            return 4;
+        case Textile:
+            return 5;
+        default:
+            fprintf(stderr, "Incorrect enum type\n");
+            return -1;
+    }
+}
+
 bool make_new_group(struct group *pointer_group, int id, double x, double y, unsigned int first_id,
                     enum garbage_type garbage) {
     int groups_size = 5;
@@ -289,10 +311,16 @@ bool make_new_group(struct group *pointer_group, int id, double x, double y, uns
         perror("Malloc failure");
         return false;
     }
-
     group_ids[0] = first_id;
-    enum garbage_type new_garbage_types[6] = {0};
-    new_garbage_types[garbage - 1] = 1;
+
+
+    int *new_garbage_types = calloc(6, sizeof(int));
+    if (new_garbage_types == NULL){
+        perror("Calloc Failure");
+        free(group_ids);
+        return false;
+    }
+    new_garbage_types[garb_to_int(garbage)] = 1;
 
     struct group new_group = {id, x, y, group_ids,
                               1, 5, new_garbage_types};
@@ -306,7 +334,6 @@ bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbag
         unsigned int *new_group_ids = realloc(group->containers, sizeof(unsigned int) * group->alloc_size);
         if (new_group_ids == NULL) {
             perror("Realloc Failure");
-            // free all groups if failed
             return false;
         }
         group->containers = new_group_ids;
@@ -314,7 +341,7 @@ bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbag
 
     group->containers[group->container_count] = id;
     group->container_count +=1;
-    group->garbage_types[garbage - 1] = 1;
+    group->garbage_types[garb_to_int(garbage)] = 1;
     return true;
 }
 
@@ -365,12 +392,5 @@ bool groupify(struct all_containers *all_conts) {
     }
     all_conts->groups = groups;
     all_conts->group_amount = group_index;
-    for (int i = 0; i < all_conts->group_amount; i++) {
-        printf("GROUPID: %u - ", all_conts->groups[i].id);
-        for (int j = 0; j < all_conts->groups[i].container_count; j++){
-            printf("%u ", all_conts->groups[i].containers[j]);
-        }
-        printf("\n");
-    }
     return true;
 }

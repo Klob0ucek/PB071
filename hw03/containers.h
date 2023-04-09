@@ -52,7 +52,8 @@ struct group{
     unsigned int *containers;
     int container_count;
     int alloc_size;
-    enum garbage_type *garbage_types;
+    // on heap
+    int *garbage_types;
 };
 
 
@@ -74,12 +75,12 @@ bool deep_free_all_containers(struct all_containers *all_conts);
 
 void free_struct_all_containers(struct all_containers *all_conts);
 
+void free_groups(struct all_containers *all_conts);
 
+int garb_to_int(enum garbage_type type);
 
 bool make_new_group(struct group *pointer_group, int id, double x, double y, unsigned int first_id, enum garbage_type garbage);
 
 bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbage);
-
-void free_groups(struct all_containers *all_conts);
 
 bool groupify(struct all_containers *all_conts);

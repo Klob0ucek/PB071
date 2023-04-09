@@ -1,3 +1,4 @@
+
 #include "containers.h"
 
 #include "stdbool.h"
@@ -186,7 +187,11 @@ int load_container(int line_index, struct container_t *container) {
     return 1;
 }
 
-bool parse_input(struct all_containers *all_containers) {
+bool parse_input(struct all_containers *all_containers, const char *cont_path_test, const char *road_path_test) {
+
+
+    init_data_source(cont_path_test, road_path_test);
+
     int cont_size = 10;
     struct container_t *containers;
     containers = malloc(sizeof(struct container_t) * cont_size);
@@ -223,15 +228,41 @@ bool parse_input(struct all_containers *all_containers) {
     }
     struct all_containers all = {containers, index, NULL, 0};
     *all_containers = all;
+    destroy_data_source();
+    return true;
+}
+
+bool free_container(struct container_t container) {
+    if (container.neighbours != NULL) {
+        free(container.neighbours);
+        container.neighbours = NULL;
+    }
+    free(container.name);
+    container.name = NULL;
+    free(container.street);
+    container.street = NULL;
+    return true;
+}
+
+bool free_group(struct group current_group){
+    free(current_group.containers);
+    current_group.containers = NULL;
     return true;
 }
 
 bool deep_free_all_containers(struct all_containers *all_conts) {
     for (int i = 0; i < all_conts->amount; i++){
-        free(all_conts->containers[i].neighbours);
-        all_conts->containers[i].neighbours = NULL;
+        free_container(all_conts->containers[i]);
     }
+    for (int i = 0; i < all_conts->group_amount; i++){
+        free_group(all_conts->groups[i]);
+    }
+
     free(all_conts->containers);
+    all_conts->containers = NULL;
+    free(all_conts->groups);
+    all_conts->groups = NULL;
+
     return true;
 }
 
@@ -241,12 +272,9 @@ void free_struct_all_containers(struct all_containers *all_conts) {
     all_conts = NULL;
 }
 
-
-
 void free_groups(struct all_containers *all_conts) {
     for (int i = 0; i < all_conts->group_amount; i++){
-        free(all_conts->groups[i].containers);
-        all_conts->groups[i].containers = NULL;
+        free_group(all_conts->groups[i]);
     }
     free(all_conts->groups);
     all_conts->groups = NULL;

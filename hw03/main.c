@@ -7,7 +7,6 @@
 // TODO: [Optional] Think about an appropriate division of the solution into files.
 //                  e.g. Move data loading and validating to another .c file.
 
-#include "data_source.h" // TODO: Read the content of this file.
 #include "printing_tools.h"
 
 bool filter_types(const char *filter_str, enum garbage_type **filters) {
@@ -114,13 +113,13 @@ bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsi
             filtered_containers[index] = current_container;
             index++;
         } else {
-            free(current_container.neighbours);
+            free_container(current_container);
         }
     }
 
     free_struct_all_containers(all_conts);
 
-    struct all_containers all = {filtered_containers, index};
+    struct all_containers all = {filtered_containers, index, NULL, 0};
     *all_conts = all;
     return true;
 }
@@ -130,11 +129,9 @@ int main(int argc, char *argv[]) {
     const char* cont_path_test = argv[argc - 2];
     const char* road_path_test = argv[argc - 1];
 
-    init_data_source(cont_path_test, road_path_test);
-    struct all_containers all_containers;
-    parse_input(&all_containers);
-    destroy_data_source();
 
+    struct all_containers all_containers;
+    parse_input(&all_containers, cont_path_test, road_path_test);
 
     if (argc < 3){
         fprintf(stderr, "Not Enough Arguments");
@@ -142,13 +139,16 @@ int main(int argc, char *argv[]) {
     }
     if (argc == 3) {
         print_all(&all_containers);
+        deep_free_all_containers(&all_containers);
+        return EXIT_SUCCESS;
     }
     if (argc == 4 && strcmp(argv[1], "-s") == 0) {
         if (!groupify(&all_containers)){
             fprintf(stderr, "Grouping containers failed");
             return false;
         }
-
+        deep_free_all_containers(&all_containers);
+        return EXIT_SUCCESS;
         // TODO we need to print groups then
 
     } else {
@@ -161,6 +161,7 @@ int main(int argc, char *argv[]) {
         for (int i = 1; i < (argc - 2); i += 2) {
             if (strcmp(argv[i], "-t") == 0) {
                 if (!filter_types(argv[i + 1], &type_filter)) {
+                    deep_free_all_containers(&all_containers);
                     return EXIT_FAILURE;
                 }
             }
@@ -171,16 +172,19 @@ int main(int argc, char *argv[]) {
             else if (strcmp(argv[i], "-p") == 0) {
                 if (!(private_filter(argv[i + 1], &want_private))){
                     fprintf(stderr, "Invalid filter option");
-                    return false;
+                    deep_free_all_containers(&all_containers);
+                    return EXIT_FAILURE;
                 }
             } else {
                 fprintf(stderr, "Unknown argument: Use -t, -c or -p with appropriate values");
-                return false;
+                deep_free_all_containers(&all_containers);
+                return EXIT_FAILURE;
             }
         }
 
         if (!filter_containers(type_filter, use_capacity, low, high, want_private, &all_containers)){
             fprintf(stderr, "Data filtering failed");
+            deep_free_all_containers(&all_containers);
             return EXIT_FAILURE;
         }
 

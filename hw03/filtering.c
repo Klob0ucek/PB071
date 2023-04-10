@@ -1,51 +1,13 @@
 //
 // Created by Jan on 10.04.2023.
 //
-
 #include "filtering.h"
+
 #include "stdbool.h"
-#include "containers.h"
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
 
-
-bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max,
-                       int want_private, struct all_containers *all_conts) {
-    int cont_size = 10;
-    struct container_t *filtered_containers = malloc(sizeof(struct container_t) * cont_size);
-    if (filtered_containers == NULL) {
-        perror("Malloc Failre");
-        return false;
-    }
-
-    int index = 0;
-    for (int i = 0; i < all_conts->amount; ++i){
-        struct container_t current_container = all_conts->containers[i];
-        if (keep_container(filters, use_capacity, min, max, want_private, &current_container)){
-            if (index == cont_size) {
-                cont_size *= 2;
-                struct container_t *new_filtered_containers = realloc(filtered_containers, sizeof(struct container_t) * cont_size);
-                if (new_filtered_containers == NULL) {
-                    perror("Realloc Failure");
-                    free(filtered_containers);
-                    return false;
-                }
-                filtered_containers = new_filtered_containers;
-            }
-            filtered_containers[index] = current_container;
-            index++;
-        } else {
-            free_container(current_container);
-        }
-    }
-
-    free_struct_all_containers(all_conts);
-
-    struct all_containers all = {filtered_containers, index, NULL, 0};
-    *all_conts = all;
-    return true;
-}
 
 bool keep_container(const enum garbage_type *filters, bool use_capacity, const unsigned int min, const unsigned int max,
                     const int want_private, struct container_t *container) {
@@ -122,5 +84,42 @@ bool filter_types(const char *filter_str, enum garbage_type **filters) {
     }
     *filters = filter_array;
 
+    return true;
+}
+
+bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max,
+                       int want_private, struct all_containers *all_conts) {
+    int cont_size = 10;
+    struct container_t *filtered_containers = malloc(sizeof(struct container_t) * cont_size);
+    if (filtered_containers == NULL) {
+        perror("Malloc Failre");
+        return false;
+    }
+
+    int index = 0;
+    for (int i = 0; i < all_conts->amount; ++i){
+        struct container_t current_container = all_conts->containers[i];
+        if (keep_container(filters, use_capacity, min, max, want_private, &current_container)){
+            if (index == cont_size) {
+                cont_size *= 2;
+                struct container_t *new_filtered_containers = realloc(filtered_containers, sizeof(struct container_t) * cont_size);
+                if (new_filtered_containers == NULL) {
+                    perror("Realloc Failure");
+                    free(filtered_containers);
+                    return false;
+                }
+                filtered_containers = new_filtered_containers;
+            }
+            filtered_containers[index] = current_container;
+            index++;
+        } else {
+            free_container(current_container);
+        }
+    }
+
+    free_struct_all_containers(all_conts);
+
+    struct all_containers all = {filtered_containers, index, NULL, 0};
+    *all_conts = all;
     return true;
 }

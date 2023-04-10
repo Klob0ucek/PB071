@@ -6,7 +6,7 @@
 #define HW03_PRINTING_TOOLS_H
 
 #endif //HW03_PRINTING_TOOLS_H
-#include "containers.h"
+#include "general_structs.h"
 
 void print_garb_type(enum garbage_type garb);
 

@@ -7,9 +7,8 @@
 
 #endif //HW03_FILTERING_H
 
-#include "stdbool.h"
 #include "containers.h"
-
+#include "stdbool.h"
 
 bool filter_types(const char *filter_str, enum garbage_type **filters);
 

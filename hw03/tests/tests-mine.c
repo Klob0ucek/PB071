@@ -34,7 +34,7 @@ TEST(my_test_1)
             "8;APBGC;1,2,3,4,5,7\n"
             "9;APGC;1,2,3,5,10\n"
             "10;APGCT;1,2,3,5,9\n"
-            "11;B;1,2,4,6,7\n"
+            "11;B;1,2,4,6,7"
             ;
 
     ASSERT_FILE(stdout, correct_output);
@@ -50,7 +50,7 @@ TEST(my_test_2)
             "ID: 22164, Type: Textile, Capacity: 1000, Address: Bosonozske namesti 669, Neighbors: 4135 4477 22119 22698 23952\n"
             "ID: 22119, Type: Textile, Capacity: 1000, Address: Prazska 702, Neighbors: 4135 4136 4481 4482 6198 6199 6297 6298 6719 6720 6723 6724 8300 8301 10440 10660 10879 10882 10897 10974 11119 11612 11613 11844 12090 12094 12095 12096 12109 12189 12346 13657 14376 17490 18509 22164 22212 22698 23200 23201 23947 23948 23949 23951 23952 23953 23954 24045 24048 24053 24054 24055 26115 26242\n"
             "ID: 22211, Type: Textile, Capacity: 1000, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
-            "ID: 22212, Type: Textile, Capacity: 1000, Address: Pracata 783, Neighbors: 4135 13657 22119 23947 23952\n"
+            "ID: 22212, Type: Textile, Capacity: 1000, Address: Pracata 783, Neighbors: 4135 13657 22119 23947 23952"
     ;
 
     ASSERT_FILE(stdout, correct_output);

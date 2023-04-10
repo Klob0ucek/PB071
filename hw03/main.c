@@ -10,9 +10,10 @@ int main(int argc, char *argv[]) {
     const char* cont_path_test = argv[argc - 2];
     const char* road_path_test = argv[argc - 1];
 
-
     struct all_containers all_containers;
-    parse_input(&all_containers, cont_path_test, road_path_test);
+    if (!parse_input(&all_containers, cont_path_test, road_path_test)){
+        return EXIT_FAILURE;
+    }
 
     if (argc < 3){
         fprintf(stderr, "Not Enough Arguments\n");

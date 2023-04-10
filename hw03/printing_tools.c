@@ -48,6 +48,7 @@ void print_container(const struct container_t container) {
     printf("ID: %u, ", container.id);
     printf("Type: ");
     print_garb_type(container.garb_type);
+    printf(", ");
     printf("Capacity: %u, ", container.capacity);
     if ((strcmp(container.street, "") != 0) && container.house_number != 0){
         printf("Address: %s %u, ", container.street, container.house_number);

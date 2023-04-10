@@ -201,7 +201,10 @@ int load_container(int line_index, struct container_t *container) {
 
 bool parse_input(struct all_containers *all_containers, const char *cont_path_test, const char *road_path_test) {
 
-    init_data_source(cont_path_test, road_path_test);
+    if (!init_data_source(cont_path_test, road_path_test)){
+        fprintf(stderr, "Failed to load parser!\n");
+        return false;
+    }
 
     int cont_size = 10;
     struct container_t *containers;
@@ -237,6 +240,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
         containers[index] = container;
         index++;
     }
+
     struct all_containers all = {containers, index, NULL, 0};
     *all_containers = all;
     destroy_data_source();

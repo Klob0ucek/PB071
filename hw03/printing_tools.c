@@ -55,10 +55,8 @@ void print_container(const struct container_t container) {
     } else {
         printf("Address:, ");
     }
-    if (container.neighbour_count != 0) {
-        printf("Neighbours:");
-        print_neighbours(container);
-    }
+    printf("Neighbours:");
+    print_neighbours(container);
     printf("\n");
 }
 

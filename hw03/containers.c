@@ -1,20 +1,20 @@
 
 #include "containers.h"
 
+#include "data_source.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include "data_source.h"
 #include "string.h"
+
 #include <limits.h>
 
 //
 // Created by Jan on 07.04.2023.
 //
 
-
-
-int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour) {
-    if (get_path_a_id(index) == NULL){
+int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour)
+{
+    if (get_path_a_id(index) == NULL) {
         return -1;
     }
     unsigned int a;
@@ -26,34 +26,41 @@ int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour) {
         *neighbour = b;
         return 1;
     }
-    if (b == wanted_id){
+    if (b == wanted_id) {
         *neighbour = a;
         return 1;
     }
     return 0;
 }
 
-int compare_unsigned_ints(const void *a, const void *b) {
+int compare_unsigned_ints(const void *a, const void *b)
+{
     // copied from cppreference
-    unsigned int arg1 = *(const unsigned int*)a;
-    unsigned int arg2 = *(const unsigned int*)b;
+    unsigned int arg1 = *(const unsigned int *) a;
+    unsigned int arg2 = *(const unsigned int *) b;
 
-    if (arg1 < arg2) return -1;
-    if (arg1 > arg2) return 1;
+    if (arg1 < arg2)
+        return -1;
+    if (arg1 > arg2)
+        return 1;
     return 0;
 }
 
-int compare_ints(const void *a, const void *b) {
+int compare_ints(const void *a, const void *b)
+{
     // copied from cppreference
-    int arg1 = *(const int*)a;
-    int arg2 = *(const int*)b;
+    int arg1 = *(const int *) a;
+    int arg2 = *(const int *) b;
 
-    if (arg1 < arg2) return -1;
-    if (arg1 > arg2) return 1;
+    if (arg1 < arg2)
+        return -1;
+    if (arg1 > arg2)
+        return 1;
     return 0;
 }
 
-bool fill_neighbours(struct container_t *container) {
+bool fill_neighbours(struct container_t *container)
+{
     int size = 10;
     unsigned int *neighbours = malloc(sizeof(unsigned int) * size);
     if (neighbours == NULL) {
@@ -65,9 +72,9 @@ bool fill_neighbours(struct container_t *container) {
     unsigned int new_neighbour;
     int neighbour_count = 0;
     int state;
-    while (true){
+    while (true) {
         state = try_neighbour(index, container->id, &new_neighbour);
-        if (state == -1){
+        if (state == -1) {
             break;
         }
         if (state == 1) {
@@ -103,7 +110,8 @@ bool fill_neighbours(struct container_t *container) {
     return true;
 }
 
-int load_container(int line_index, struct container_t *container) {
+int load_container(int line_index, struct container_t *container)
+{
     const char *id_str = get_container_id(line_index);
     if (id_str == NULL) {
         return -1;
@@ -182,26 +190,27 @@ int load_container(int line_index, struct container_t *container) {
     bool public;
     const char *public_garb = get_container_public(line_index);
     if (strcmp(public_garb, "Y") == 0) {
-        public = true;
+      public
+        = true;
     } else if (strcmp(public_garb, "N") == 0) {
-        public = false;
+      public
+        = false;
     } else {
         return 0;
     }
 
-    struct container_t new_container = {id, x_coords,y_coords, 0, garb,
-                                        capacity, name, street, house_num, public, NULL, 0};
+    struct container_t new_container = { id, x_coords, y_coords, 0, garb, capacity, name, street, house_num, public, NULL, 0 };
 
-    if (!fill_neighbours(&new_container)){
+    if (!fill_neighbours(&new_container)) {
         return 0;
     }
     *container = new_container;
     return 1;
 }
 
-bool parse_input(struct all_containers *all_containers, const char *cont_path_test, const char *road_path_test) {
-
-    if (!init_data_source(cont_path_test, road_path_test)){
+bool parse_input(struct all_containers *all_containers, const char *cont_path_test, const char *road_path_test)
+{
+    if (!init_data_source(cont_path_test, road_path_test)) {
         fprintf(stderr, "Failed to load parser!\n");
         return false;
     }
@@ -241,13 +250,14 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
         index++;
     }
 
-    struct all_containers all = {containers, index, NULL, 0};
+    struct all_containers all = { containers, index, NULL, 0 };
     *all_containers = all;
     destroy_data_source();
     return true;
 }
 
-bool free_container(struct container_t container) {
+bool free_container(struct container_t container)
+{
     if (container.neighbours != NULL) {
         free(container.neighbours);
         container.neighbours = NULL;
@@ -259,7 +269,8 @@ bool free_container(struct container_t container) {
     return true;
 }
 
-bool free_group(struct group current_group){
+bool free_group(struct group current_group)
+{
     free(current_group.containers);
     current_group.containers = NULL;
     free(current_group.garbage_types);
@@ -267,11 +278,12 @@ bool free_group(struct group current_group){
     return true;
 }
 
-bool deep_free_all_containers(struct all_containers *all_conts) {
-    for (int i = 0; i < all_conts->amount; i++){
+bool deep_free_all_containers(struct all_containers *all_conts)
+{
+    for (int i = 0; i < all_conts->amount; i++) {
         free_container(all_conts->containers[i]);
     }
-    for (int i = 0; i < all_conts->group_amount; i++){
+    for (int i = 0; i < all_conts->group_amount; i++) {
         free_group(all_conts->groups[i]);
     }
 
@@ -283,14 +295,16 @@ bool deep_free_all_containers(struct all_containers *all_conts) {
     return true;
 }
 
-void free_struct_all_containers(struct all_containers *all_conts) {
+void free_struct_all_containers(struct all_containers *all_conts)
+{
     free(all_conts->containers);
     all_conts->containers = NULL;
     all_conts = NULL;
 }
 
-void free_groups(struct all_containers *all_conts) {
-    for (int i = 0; i < all_conts->group_amount; i++){
+void free_groups(struct all_containers *all_conts)
+{
+    for (int i = 0; i < all_conts->group_amount; i++) {
         free_group(all_conts->groups[i]);
     }
     free(all_conts->groups);
@@ -298,54 +312,53 @@ void free_groups(struct all_containers *all_conts) {
     all_conts->group_amount = 0;
 }
 
-
-int garb_to_int(enum garbage_type type) {
+int garb_to_int(enum garbage_type type)
+{
     switch (type) {
-        case Plastic:
-            return 0;
-        case Paper:
-            return 1;
-        case Bio:
-            return 2;
-        case Clear:
-            return 3;
-        case Colored:
-            return 4;
-        case Textile:
-            return 5;
-        default:
-            fprintf(stderr, "Incorrect enum type\n");
-            return -1;
+    case Plastic:
+        return 0;
+    case Paper:
+        return 1;
+    case Bio:
+        return 2;
+    case Clear:
+        return 3;
+    case Colored:
+        return 4;
+    case Textile:
+        return 5;
+    default:
+        fprintf(stderr, "Incorrect enum type\n");
+        return -1;
     }
 }
 
-bool make_new_group(struct group *pointer_group, int id, double x, double y, unsigned int first_id,
-                    enum garbage_type garbage) {
+bool make_new_group(struct group *pointer_group, int id, double x, double y, unsigned int first_id, enum garbage_type garbage)
+{
     int groups_size = 5;
     unsigned int *group_ids = malloc(sizeof(unsigned int) * groups_size);
-    if (group_ids == NULL){
+    if (group_ids == NULL) {
         perror("Malloc failure");
         return false;
     }
     group_ids[0] = first_id;
 
-
     int *new_garbage_types = calloc(6, sizeof(int));
-    if (new_garbage_types == NULL){
+    if (new_garbage_types == NULL) {
         perror("Calloc Failure");
         free(group_ids);
         return false;
     }
     new_garbage_types[garb_to_int(garbage)] = 1;
 
-    struct group new_group = {id, x, y, group_ids,
-                              1, 5, new_garbage_types};
+    struct group new_group = { id, x, y, group_ids, 1, 5, new_garbage_types };
     *pointer_group = new_group;
     return true;
 }
 
-bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbage) {
-    if (group->container_count == group->alloc_size){
+bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbage)
+{
+    if (group->container_count == group->alloc_size) {
         group->alloc_size *= 2;
         unsigned int *new_group_ids = realloc(group->containers, sizeof(unsigned int) * group->alloc_size);
         if (new_group_ids == NULL) {
@@ -356,12 +369,13 @@ bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbag
     }
 
     group->containers[group->container_count] = id;
-    group->container_count +=1;
+    group->container_count += 1;
     group->garbage_types[garb_to_int(garbage)] = 1;
     return true;
 }
 
-bool groupify(struct all_containers *all_conts) {
+bool groupify(struct all_containers *all_conts)
+{
     int cont_size = 10;
     struct group *groups;
     groups = malloc(sizeof(struct group) * cont_size);
@@ -371,7 +385,7 @@ bool groupify(struct all_containers *all_conts) {
     }
 
     int group_index = 0;
-    for (int i = 0; i < all_conts->amount; i++){
+    for (int i = 0; i < all_conts->amount; i++) {
         struct container_t current_container = all_conts->containers[i];
 
         if (group_index == cont_size) {
@@ -386,8 +400,8 @@ bool groupify(struct all_containers *all_conts) {
         }
 
         for (int j = 0; j < group_index; j++) {
-            if (groups[j].coordinates_x == current_container.coordinates_x && groups[j].coordinates_y == current_container.coordinates_y){
-                if (!add_to_group(&groups[j], current_container.id, current_container.garb_type)){
+            if (groups[j].coordinates_x == current_container.coordinates_x && groups[j].coordinates_y == current_container.coordinates_y) {
+                if (!add_to_group(&groups[j], current_container.id, current_container.garb_type)) {
                     free_groups(all_conts);
                     return false;
                 }
@@ -396,10 +410,9 @@ bool groupify(struct all_containers *all_conts) {
                 break;
             }
         }
-        if (current_container.group == 0){
+        if (current_container.group == 0) {
             struct group new_group;
-            if (!make_new_group(&new_group, group_index + 1, current_container.coordinates_x,
-                                current_container.coordinates_y, current_container.id, current_container.garb_type)){
+            if (!make_new_group(&new_group, group_index + 1, current_container.coordinates_x, current_container.coordinates_y, current_container.id, current_container.garb_type)) {
                 free_groups(all_conts);
                 return false;
             }
@@ -413,9 +426,10 @@ bool groupify(struct all_containers *all_conts) {
     return true;
 }
 
-bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container) {
+bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container)
+{
     for (int i = 0; i < all_conts->amount; ++i) {
-        if (all_conts->containers[i].id == wanted_id){
+        if (all_conts->containers[i].id == wanted_id) {
             *container = all_conts->containers[i];
             return true;
         }
@@ -423,16 +437,18 @@ bool find_container_by_id(unsigned int wanted_id, const struct all_containers *a
     return false;
 }
 
-bool id_in_group(int searched, const int *group_neighbours, int size) {
+bool id_in_group(int searched, const int *group_neighbours, int size)
+{
     for (int i = 0; i < size; ++i) {
-        if (group_neighbours[i] == searched){
+        if (group_neighbours[i] == searched) {
             return true;
         }
     }
     return false;
 }
 
-bool fill_neighbouring_groups(const struct all_containers *all_conts, struct group current_group, int **result, int *result_size) {
+bool fill_neighbouring_groups(const struct all_containers *all_conts, struct group current_group, int **result, int *result_size)
+{
     int size = 10;
     int index = 0;
     int *groups_neighbours = calloc(size, sizeof(int));
@@ -443,14 +459,14 @@ bool fill_neighbouring_groups(const struct all_containers *all_conts, struct gro
 
     struct container_t outer_container;
     struct container_t inner_container;
-    for (int i = 0; i < current_group.container_count; i++){
-        if (!find_container_by_id(current_group.containers[i], all_conts, &outer_container)){
+    for (int i = 0; i < current_group.container_count; i++) {
+        if (!find_container_by_id(current_group.containers[i], all_conts, &outer_container)) {
             free(groups_neighbours);
             perror("Container not found!");
             return false;
         }
         for (int j = 0; j < outer_container.neighbour_count; ++j) {
-            if (!find_container_by_id(outer_container.neighbours[j], all_conts, &inner_container)){
+            if (!find_container_by_id(outer_container.neighbours[j], all_conts, &inner_container)) {
                 free(groups_neighbours);
                 perror("Container not found!");
                 return false;
@@ -465,14 +481,14 @@ bool fill_neighbouring_groups(const struct all_containers *all_conts, struct gro
                 }
                 groups_neighbours = new_groups;
             }
-            if (!id_in_group(inner_container.group, groups_neighbours, index)){
+            if (!id_in_group(inner_container.group, groups_neighbours, index)) {
                 groups_neighbours[index] = inner_container.group;
                 index++;
             }
         }
     }
     int *new_group = realloc(groups_neighbours, sizeof(int) * index);
-    if (new_group == NULL){
+    if (new_group == NULL) {
         perror("Realloc failure");
         free(groups_neighbours);
         return false;

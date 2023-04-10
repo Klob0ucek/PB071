@@ -4,13 +4,12 @@
 #include "filtering.h"
 
 #include "stdbool.h"
-#include "stdlib.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
 
-
-bool keep_container(const enum garbage_type *filters, bool use_capacity, const unsigned int min, const unsigned int max,
-                    const int want_private, struct container_t *container) {
+bool keep_container(const enum garbage_type *filters, bool use_capacity, const unsigned int min, const unsigned int max, const int want_private, struct container_t *container)
+{
     bool keep_type = true;
     if (filters != NULL) {
         keep_type = false;
@@ -31,14 +30,15 @@ bool keep_container(const enum garbage_type *filters, bool use_capacity, const u
     bool keep_private = true;
     if (want_private != -1) {
         keep_private = false;
-        if ((want_private == 1 && container->public) || (want_private == 0 && !container->public)){
+        if ((want_private == 1 && container->public) || (want_private == 0 && !container->public)) {
             keep_private = true;
         }
     }
     return keep_type && keep_capacity && keep_private;
 }
 
-bool private_filter(char *input, int *want_private) {
+bool private_filter(char *input, int *want_private)
+{
     if (strcmp(input, "Y") == 0) {
         *want_private = 1;
     } else if (strcmp(input, "N") == 0) {
@@ -49,11 +49,13 @@ bool private_filter(char *input, int *want_private) {
     return true;
 }
 
-void parse_interval(char *s, unsigned int *x, unsigned int *y) {
+void parse_interval(char *s, unsigned int *x, unsigned int *y)
+{
     sscanf(s, "%u-%u", x, y);
 }
 
-bool filter_types(const char *filter_str, enum garbage_type **filters) {
+bool filter_types(const char *filter_str, enum garbage_type **filters)
+{
     enum garbage_type *filter_array = calloc(6, sizeof(enum garbage_type));
     if (filter_array == NULL) {
         perror("Malloc Failure");
@@ -87,8 +89,8 @@ bool filter_types(const char *filter_str, enum garbage_type **filters) {
     return true;
 }
 
-bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max,
-                       int want_private, struct all_containers *all_conts) {
+bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max, int want_private, struct all_containers *all_conts)
+{
     int cont_size = 10;
     struct container_t *filtered_containers = malloc(sizeof(struct container_t) * cont_size);
     if (filtered_containers == NULL) {
@@ -97,9 +99,9 @@ bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsi
     }
 
     int index = 0;
-    for (int i = 0; i < all_conts->amount; ++i){
+    for (int i = 0; i < all_conts->amount; ++i) {
         struct container_t current_container = all_conts->containers[i];
-        if (keep_container(filters, use_capacity, min, max, want_private, &current_container)){
+        if (keep_container(filters, use_capacity, min, max, want_private, &current_container)) {
             if (index == cont_size) {
                 cont_size *= 2;
                 struct container_t *new_filtered_containers = realloc(filtered_containers, sizeof(struct container_t) * cont_size);
@@ -119,7 +121,7 @@ bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsi
 
     free_struct_all_containers(all_conts);
 
-    struct all_containers all = {filtered_containers, index, NULL, 0};
+    struct all_containers all = { filtered_containers, index, NULL, 0 };
     *all_conts = all;
     return true;
 }

@@ -5,23 +5,21 @@
 #ifndef HW03_CONTAINERS_H
 #define HW03_CONTAINERS_H
 
-
-
 #endif //HW03_CONTAINERS_H
-#include "stdbool.h"
 #include "general_structs.h"
+#include "stdbool.h"
 
 int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour);
 
 int compare_unsigned_ints(const void *a, const void *b);
 
-int compare_ints(const void* a, const void* b);
+int compare_ints(const void *a, const void *b);
 
 bool fill_neighbours(struct container_t *container);
 
 int load_container(int line_index, struct container_t *container);
 
-bool parse_input(struct all_containers *all_containers, const char* cont_path_test, const char* road_path_test);
+bool parse_input(struct all_containers *all_containers, const char *cont_path_test, const char *road_path_test);
 
 bool free_container(struct container_t container);
 

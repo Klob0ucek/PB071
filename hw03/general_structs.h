@@ -6,12 +6,18 @@
 #ifndef HW03_GENERAL_STRUCTS_H
 #define HW03_GENERAL_STRUCTS_H
 
-
-enum garbage_type {
-    Plastic = 1, Paper, Bio, Clear, Colored, Textile
+enum garbage_type
+{
+    Plastic = 1,
+    Paper,
+    Bio,
+    Clear,
+    Colored,
+    Textile
 };
 
-struct container_t {
+struct container_t
+{
     unsigned int id;
 
     double coordinates_x;
@@ -32,8 +38,9 @@ struct container_t {
     int neighbour_count;
 };
 
-struct all_containers{
-    // !!! ON HEAP !!!
+struct all_containers
+{
+    // on heap
     struct container_t *containers;
     int amount;
 
@@ -42,7 +49,8 @@ struct all_containers{
     int group_amount;
 };
 
-struct group{
+struct group
+{
     int id;
     double coordinates_x;
     double coordinates_y;

@@ -1,21 +1,21 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "printing_tools.h"
 #include "stdbool.h"
 
-#include "printing_tools.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-int main(int argc, char *argv[]) {
-
-    const char* cont_path_test = argv[argc - 2];
-    const char* road_path_test = argv[argc - 1];
+int main(int argc, char *argv[])
+{
+    const char *cont_path_test = argv[argc - 2];
+    const char *road_path_test = argv[argc - 1];
 
     struct all_containers all_containers;
-    if (!parse_input(&all_containers, cont_path_test, road_path_test)){
+    if (!parse_input(&all_containers, cont_path_test, road_path_test)) {
         return EXIT_FAILURE;
     }
 
-    if (argc < 3){
+    if (argc < 3) {
         fprintf(stderr, "Not Enough Arguments\n");
         deep_free_all_containers(&all_containers);
         return EXIT_FAILURE;
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         return EXIT_SUCCESS;
     }
     if (argc == 4 && strcmp(argv[1], "-s") == 0) {
-        if (!groupify(&all_containers)){
+        if (!groupify(&all_containers)) {
             fprintf(stderr, "Grouping containers failed\n");
             deep_free_all_containers(&all_containers);
             return EXIT_FAILURE;
@@ -48,13 +48,11 @@ int main(int argc, char *argv[]) {
                     deep_free_all_containers(&all_containers);
                     return EXIT_FAILURE;
                 }
-            }
-            else if (strcmp(argv[i], "-c") == 0) {
+            } else if (strcmp(argv[i], "-c") == 0) {
                 parse_interval(argv[i + 1], &low, &high);
                 use_capacity = true;
-            }
-            else if (strcmp(argv[i], "-p") == 0) {
-                if (!(private_filter(argv[i + 1], &want_private))){
+            } else if (strcmp(argv[i], "-p") == 0) {
+                if (!(private_filter(argv[i + 1], &want_private))) {
                     fprintf(stderr, "Invalid filter option\n");
                     deep_free_all_containers(&all_containers);
                     return EXIT_FAILURE;
@@ -66,7 +64,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        if (!filter_containers(type_filter, use_capacity, low, high, want_private, &all_containers)){
+        if (!filter_containers(type_filter, use_capacity, low, high, want_private, &all_containers)) {
             fprintf(stderr, "Data filtering failed\n");
             deep_free_all_containers(&all_containers);
             return EXIT_FAILURE;

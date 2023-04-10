@@ -9,9 +9,11 @@
 
 #endif //HW03_CONTAINERS_H
 #include "stdbool.h"
-#include "printing_tools.h"
+#include "general_structs.h"
 
 int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour);
+
+int compare_unsigned_ints(const void *a, const void *b);
 
 int compare_ints(const void* a, const void* b);
 
@@ -38,3 +40,9 @@ bool make_new_group(struct group *pointer_group, int id, double x, double y, uns
 bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbage);
 
 bool groupify(struct all_containers *all_conts);
+
+bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container);
+
+bool id_in_group(int group, const int *pInt, int index);
+
+bool fill_neighbouring_groups(const struct all_containers *all_conts, struct group current_group, int **result, int *size);

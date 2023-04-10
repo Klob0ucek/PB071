@@ -6,7 +6,7 @@
 #define HW03_PRINTING_TOOLS_H
 
 #endif //HW03_PRINTING_TOOLS_H
-#include "general_structs.h"
+#include "filtering.h"
 
 void print_garb_type(enum garbage_type garb);
 
@@ -20,6 +20,8 @@ void print_int_to_type(int type);
 
 void print_group_type(const int *types);
 
-void print_group(struct group current_group);
+void print_group(struct group current_group, int *group_neighbours, int size);
 
 void print_groups(struct all_containers *all_containers);
+
+void print_group_neighbours(const int *groups_neighbours, int size);

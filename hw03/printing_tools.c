@@ -102,16 +102,35 @@ void print_group_type(const int *types) {
     }
 }
 
-void print_group(struct group current_group){
+
+
+void print_group(struct group current_group, int *group_neighbours, int size) {
     printf("%d;", current_group.id);
     print_group_type(current_group.garbage_types);
     printf(";");
-    printf("Neighbouring groups");
+    print_group_neighbours(group_neighbours, size);
     printf("\n");
 }
 
-void print_groups(struct all_containers *all_containers){
+void print_groups(struct all_containers *all_containers) {
+    int *groups_neighbours = NULL;
+    int group_size = 0;
     for (int i = 0; i < all_containers->group_amount;  i++){
-        print_group(all_containers->groups[i]);
+        if (!fill_neighbouring_groups(all_containers,all_containers->groups[i], &groups_neighbours, &group_size)){
+            fprintf(stderr, "Group printing stopped");
+            return;
+        }
+        print_group(all_containers->groups[i], groups_neighbours, group_size);
     }
 }
+
+
+void print_group_neighbours(const int *groups_neighbours, int size) {
+    for (int i = 0; i < size; i++){
+        printf("%d", groups_neighbours[i]);
+        if (i != size - 1){
+            printf(",");
+        }
+    }
+}
+

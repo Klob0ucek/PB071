@@ -11,6 +11,8 @@
 // Created by Jan on 07.04.2023.
 //
 
+
+
 int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour) {
     if (get_path_a_id(index) == NULL){
         return -1;
@@ -31,10 +33,20 @@ int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour) {
     return 0;
 }
 
-int compare_ints(const void *a, const void *b) {
+int compare_unsigned_ints(const void *a, const void *b) {
     // copied from cppreference
     unsigned int arg1 = *(const unsigned int*)a;
     unsigned int arg2 = *(const unsigned int*)b;
+
+    if (arg1 < arg2) return -1;
+    if (arg1 > arg2) return 1;
+    return 0;
+}
+
+int compare_ints(const void *a, const void *b) {
+    // copied from cppreference
+    int arg1 = *(const int*)a;
+    int arg2 = *(const int*)b;
 
     if (arg1 < arg2) return -1;
     if (arg1 > arg2) return 1;
@@ -84,7 +96,7 @@ bool fill_neighbours(struct container_t *container) {
     neighbours = neighbours_new;
 
     // qsort - list of elements, amount of elements, size of element, function that compares two elements
-    qsort(neighbours, neighbour_count, sizeof(unsigned int), compare_ints);
+    qsort(neighbours, neighbour_count, sizeof(unsigned int), compare_unsigned_ints);
 
     container->neighbours = neighbours;
     container->neighbour_count = neighbour_count;
@@ -375,6 +387,7 @@ bool groupify(struct all_containers *all_conts) {
                     free_groups(all_conts);
                     return false;
                 }
+                all_conts->containers[i].group = groups[j].id;
                 current_container.group = groups[j].id;
                 break;
             }
@@ -386,11 +399,87 @@ bool groupify(struct all_containers *all_conts) {
                 free_groups(all_conts);
                 return false;
             }
+            all_conts->containers[i].group = new_group.id;
             groups[group_index] = new_group;
             group_index++;
         }
     }
     all_conts->groups = groups;
     all_conts->group_amount = group_index;
+    return true;
+}
+
+bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container) {
+    for (int i = 0; i < all_conts->amount; ++i) {
+        if (all_conts->containers[i].id == wanted_id){
+            *container = all_conts->containers[i];
+            return true;
+        }
+    }
+    return false;
+}
+
+bool id_in_group(int searched, const int *group_neighbours, int size) {
+    for (int i = 0; i < size; ++i) {
+        if (group_neighbours[i] == searched){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool fill_neighbouring_groups(const struct all_containers *all_conts, struct group current_group, int **result, int *result_size) {
+    int size = 10;
+    int index = 0;
+    int *groups_neighbours = calloc(size, sizeof(int));
+    if (groups_neighbours == NULL) {
+        perror("Malloc Failre");
+        return false;
+    }
+
+    struct container_t outer_container;
+    struct container_t inner_container;
+    for (int i = 0; i < current_group.container_count; i++){
+        if (!find_container_by_id(current_group.containers[i], all_conts, &outer_container)){
+            free(groups_neighbours);
+            perror("Container not found!");
+            return false;
+        }
+        for (int j = 0; j < outer_container.neighbour_count; ++j) {
+            if (!find_container_by_id(outer_container.neighbours[j], all_conts, &inner_container)){
+                free(groups_neighbours);
+                perror("Container not found!");
+                return false;
+            }
+            if (index == size) {
+                size *= 2;
+                int *new_groups = realloc(groups_neighbours, sizeof(int) * size);
+                if (new_groups == NULL) {
+                    perror("Realloc Failure");
+                    free(groups_neighbours);
+                    return false;
+                }
+                groups_neighbours = new_groups;
+            }
+            if (!id_in_group(inner_container.group, groups_neighbours, index)){
+                groups_neighbours[index] = inner_container.group;
+                index++;
+            }
+        }
+    }
+    int *new_group = realloc(groups_neighbours, sizeof(int) * index);
+    if (new_group == NULL){
+        perror("Realloc failure");
+        free(groups_neighbours);
+        return false;
+    }
+    groups_neighbours = new_group;
+
+    qsort(groups_neighbours, index, sizeof(int), compare_ints);
+
+    *result = groups_neighbours;
+    *result_size = index;
+
+    free(groups_neighbours);
     return true;
 }

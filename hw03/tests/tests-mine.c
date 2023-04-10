@@ -35,18 +35,16 @@ TEST(my_test_1)
             "9;APGC;1,2,3,5,10\n"
             "10;APGCT;1,2,3,5,9\n"
             "11;B;1,2,4,6,7\n"
-    ;
+            ;
 
     ASSERT_FILE(stdout, correct_output);
-    CHECK_FILE(stderr, "" /* STDERR is empty*/);
+    CHECK_IS_EMPTY(stderr);
 }
 
 TEST(my_test_2)
 {
     int rv = 0; /* return value of main()*/
     CHECK(app_main_args("-t" "BT" "-c" "500-2000" "-p" "Y" "data/Brno-BosonohyContainers.csv" "data/Brno-BosonohyPaths.csv") == rv);
-
-    /* TIP: Use ‹app_main()› to test the program without arguments. */
 
     const char *correct_output =
             "ID: 22164, Type: Textile, Capacity: 1000, Address: Bosonozske namesti 669, Neighbors: 4135 4477 22119 22698 23952\n"
@@ -56,7 +54,7 @@ TEST(my_test_2)
     ;
 
     ASSERT_FILE(stdout, correct_output);
-    CHECK_FILE(stderr, "" /* STDERR is empty*/);
+    CHECK_IS_EMPTY(stderr);
 }
 
 TEST(my_test_empty)
@@ -65,4 +63,3 @@ TEST(my_test_empty)
 
     CHECK_NOT_EMPTY(stderr);
 }
-

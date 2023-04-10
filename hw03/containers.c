@@ -479,7 +479,5 @@ bool fill_neighbouring_groups(const struct all_containers *all_conts, struct gro
 
     *result = groups_neighbours;
     *result_size = index;
-
-    free(groups_neighbours);
     return true;
 }

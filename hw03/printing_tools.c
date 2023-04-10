@@ -5,6 +5,7 @@
 
 #include "stdio.h"
 #include "string.h"
+#include "stdlib.h"
 
 void print_garb_type(enum garbage_type garb) {
     switch (garb) {
@@ -121,6 +122,7 @@ void print_groups(struct all_containers *all_containers) {
             return;
         }
         print_group(all_containers->groups[i], groups_neighbours, group_size);
+        free(groups_neighbours);
     }
 }
 
@@ -133,4 +135,3 @@ void print_group_neighbours(const int *groups_neighbours, int size) {
         }
     }
 }
-

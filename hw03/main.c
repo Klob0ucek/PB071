@@ -8,8 +8,8 @@
 unsigned int UNSIGNED_INT_MAX = 4294967295;
 
 bool check_parameter(const char* arg1, const char* arg2, const char *cont_path_test, const char *road_path_test){
-    if (strcmp(arg1, "-t") != 0 ||
-        strcmp(arg1, "-p") != 0 ||
+    if (strcmp(arg1, "-t") != 0 &&
+        strcmp(arg1, "-p") != 0 &&
         strcmp(arg1, "-c") != 0){
         fprintf(stderr, "Invalid argument\n");
         return false;

@@ -6,11 +6,11 @@
 #include "libs/mainwrap.h"
 #include "libs/utils.h"
 
-#define FIRST_CONT_FILE "data/Brno-BosonohyContainers.csv"
-#define FIRST_PATH_FILE "data/Brno-BosonohyPaths.csv"
+#define FIRST_CONT_FILE "hw03/data/Brno-BosonohyContainers.csv"
+#define FIRST_PATH_FILE "hw03/data/Brno-BosonohyPaths.csv"
 
-#define SECOND_CONT_FILE "data/Brno-IvanoviceContainers.csv"
-#define SECOND_PATH_FILE "data/Brno-IvanovicePaths.csv"
+#define SECOND_CONT_FILE "hw03/data/Brno-IvanoviceContainers.csv"
+#define SECOND_PATH_FILE "hw03/data/Brno-IvanovicePaths.csv"
 
 /* The following “extentions” to CUT are available in this test file:
  *

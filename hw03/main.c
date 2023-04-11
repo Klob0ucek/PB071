@@ -63,16 +63,32 @@ int main(int argc, char *argv[])
                 return EXIT_FAILURE;
             }
             if (strcmp(argv[i], "-t") == 0) {
+                if(type_filter != NULL){
+                    fprintf(stderr, "Filter already used\n");
+                    deep_free_all_containers(&all_containers);
+                    return EXIT_FAILURE;
+                }
                 if (!filter_types(argv[i + 1], &type_filter)) {
                     deep_free_all_containers(&all_containers);
                     return EXIT_FAILURE;
                 }
             } else if (strcmp(argv[i], "-c") == 0) {
+                if(low != UNSIGNED_INT_MAX || high != UNSIGNED_INT_MAX){
+                    fprintf(stderr, "Filter already used\n");
+                    deep_free_all_containers(&all_containers);
+                    return EXIT_FAILURE;
+                }
                 if (!parse_interval(argv[i + 1], &low, &high)){
+                    deep_free_all_containers(&all_containers);
                     return EXIT_FAILURE;
                 }
                 use_capacity = true;
             } else if (strcmp(argv[i], "-p") == 0) {
+                if(want_private != -1){
+                    fprintf(stderr, "Filter already used\n");
+                    deep_free_all_containers(&all_containers);
+                    return EXIT_FAILURE;
+                }
                 if (!(private_filter(argv[i + 1], &want_private))) {
                     fprintf(stderr, "Invalid filter option\n");
                     deep_free_all_containers(&all_containers);

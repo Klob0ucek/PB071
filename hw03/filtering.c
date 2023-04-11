@@ -84,6 +84,7 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
             filter_array[index] = Textile;
         } else {
             fprintf(stderr, "Invalid filter type\n");
+            free(filter_array);
             return false;
         }
         index++;

@@ -226,20 +226,23 @@ TEST(file_one_test_4)
     CHECK(app_main_args("-t", "BT", FIRST_CONT_FILE, FIRST_PATH_FILE) == rv);
 
     const char *correct_output =
+            "ID: 24045, Type: Biodegradable waste, Capacity: 240, Address: Bosonozske namesti 669, Neighbors: 4135 4477 22119 22698 23952\n"
+            "ID: 22164, Type: Textile, Capacity: 1000, Address: Bosonozske namesti 669, Neighbors: 4135 4477 22119 22698 23952\n"
+            "ID: 22119, Type: Textile, Capacity: 1000, Address: Prazska 702, Neighbors: 4135 4136 4481 4482 6198 6199 6297 6298 6719 6720 6723 6724 8300 8301 10440 10660 10879 10882 10897 10974 11119 11612 11613 11844 12090 12094 12095 12096 12109 12189 12346 13657 14376 17490 18509 22164 22212 22698 23200 23201 23947 23948 23949 23951 23952 23953 23954 24045 24048 24053 24054 24055 26115 26242\n"
             "ID: 24051, Type: Biodegradable waste, Capacity: 240, Address: Prazska 174, Neighbors: 6716 14376 22698 23947 23952\n"
             "ID: 24055, Type: Biodegradable waste, Capacity: 240, Address: Vzhledna 108, Neighbors: 13657 14376 22119 23947 23952\n"
             "ID: 24047, Type: Biodegradable waste, Capacity: 240, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
             "ID: 22211, Type: Textile, Capacity: 1000, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
             "ID: 26221, Type: Biodegradable waste, Capacity: 240, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
             "ID: 24046, Type: Biodegradable waste, Capacity: 240, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
-            "ID: 26115, Type: Biodegradable waste, Capacity: 240, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
-            "ID: 24048, Type: Biodegradable waste, Capacity: 240, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 26115, Type: Biodegradable waste, Capacity: 240, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 24048, Type: Biodegradable waste, Capacity: 240, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
             "ID: 26242, Type: Biodegradable waste, Capacity: 240, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 24053, Type: Biodegradable waste, Capacity: 240, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 24054, Type: Biodegradable waste, Capacity: 240, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 22212, Type: Textile, Capacity: 1000, Address: Pracata 783, Neighbors: 4135 13657 22119 23947 23952\n"
-            "ID: 24049, Type: Biodegradable waste, Capacity: 240, Address:, Neighbors: 4477 6715 6716 10614 11800 19762 22211 22698 23947 23952 24046 24047 25733 26221\n"
-    ;
+            "ID: 24049, Type: Biodegradable waste, Capacity: 240, Address: 313, Neighbors: 4477 6715 6716 10614 11800 19762 22211 22698 23947 23952 24046 24047 25733 26221\n"
+            ;
 
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);

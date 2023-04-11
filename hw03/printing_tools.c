@@ -53,10 +53,15 @@ void print_container(const struct container_t container)
     print_garb_type(container.garb_type);
     printf(", ");
     printf("Capacity: %u, ", container.capacity);
-    if ((strcmp(container.street, "") != 0) && container.house_number != 0) {
-        printf("Address: %s %u, ", container.street, container.house_number);
+    printf("Address: ");
+    printf("%s", container.street);
+    if (strcmp(container.street, "") != 0){
+        printf(" ");
+    }
+    if (container.house_number != 0){
+        printf("%d, ", container.house_number);
     } else {
-        printf("Address:, ");
+        printf(", ");
     }
     printf("Neighbors:");
     print_neighbours(container);

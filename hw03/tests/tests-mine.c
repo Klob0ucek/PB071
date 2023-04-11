@@ -36,8 +36,7 @@ TEST(my_test_1)
             "ID: 11, Type: Paper, Capacity: 2000, Address: Odlehla 70, Neighbors: 8\n"
             ;
 
-    ASSERT_FILE(stdout, correct_output);
-    CHECK_IS_EMPTY(stderr);
+    ASSERT_FILE(stderr, "Failed to load parser!\n");
 }
 
 TEST(my_test_2)

@@ -7,6 +7,11 @@
 
 int main(int argc, char *argv[])
 {
+        if (argc < 3) {
+        fprintf(stderr, "Not Enough Arguments\n");
+        return EXIT_FAILURE;
+    }
+
     const char *cont_path_test = argv[argc - 2];
     const char *road_path_test = argv[argc - 1];
 
@@ -15,11 +20,6 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (argc < 3) {
-        fprintf(stderr, "Not Enough Arguments\n");
-        deep_free_all_containers(&all_containers);
-        return EXIT_FAILURE;
-    }
     if (argc == 3) {
         print_all(&all_containers);
         deep_free_all_containers(&all_containers);

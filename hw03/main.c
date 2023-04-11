@@ -7,6 +7,19 @@
 
 unsigned int UNSIGNED_INT_MAX = 4294967295;
 
+bool check_parameter(const char* arg, const char *cont_path_test, const char *road_path_test){
+    if (strcmp(arg, cont_path_test) == 0 ||
+        strcmp(arg, road_path_test) == 0 ||
+        strcmp(arg, "-s") == 0 ||
+        strcmp(arg, "-t") == 0 ||
+        strcmp(arg, "-p") == 0 ||
+        strcmp(arg, "-c") == 0){
+        fprintf(stderr, "Missing argument parameter\n");
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char *argv[])
 {
     if (argc < 3) {
@@ -45,6 +58,10 @@ int main(int argc, char *argv[])
         int want_private = -1;
 
         for (int i = 1; i < (argc - 2); i += 2) {
+            if (!check_parameter(argv[i + 1], cont_path_test, road_path_test)){
+                deep_free_all_containers(&all_containers);
+                return EXIT_FAILURE;
+            }
             if (strcmp(argv[i], "-t") == 0) {
                 if (!filter_types(argv[i + 1], &type_filter)) {
                     deep_free_all_containers(&all_containers);

@@ -12,9 +12,6 @@
 #define SECOND_CONT_FILE "data/Brno-IvanoviceContainers.csv"
 #define SECOND_PATH_FILE "data/Brno-IvanovicePaths.csv"
 
-#define THIRD_CONT_FILE "data/Brno-JehniceContainers.csv"
-#define THIRD_PATH_FILE "data/Brno-JehnicePaths.csv"
-
 /* The following “extentions” to CUT are available in this test file:
  *
  * • ‹CHECK_IS_EMPTY(file)› — test whether the file is empty.
@@ -155,13 +152,13 @@ TEST(file_one_test_1)
             "ID: 24047, Type: Biodegradable waste, Capacity: 240, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
             "ID: 26221, Type: Biodegradable waste, Capacity: 240, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
             "ID: 24046, Type: Biodegradable waste, Capacity: 240, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
-            "ID: 26115, Type: Biodegradable waste, Capacity: 240, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
-            "ID: 24048, Type: Biodegradable waste, Capacity: 240, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 26115, Type: Biodegradable waste, Capacity: 240, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 24048, Type: Biodegradable waste, Capacity: 240, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
             "ID: 26242, Type: Biodegradable waste, Capacity: 240, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 24053, Type: Biodegradable waste, Capacity: 240, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 24054, Type: Biodegradable waste, Capacity: 240, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
-            "ID: 24049, Type: Biodegradable waste, Capacity: 240, Address:, Neighbors: 4477 6715 6716 10614 11800 19762 22211 22698 23947 23952 24046 24047 25733 26221\n"
-    ;
+            "ID: 24049, Type: Biodegradable waste, Capacity: 240, Address: 313, Neighbors: 4477 6715 6716 10614 11800 19762 22211 22698 23947 23952 24046 24047 25733 26221\n"
+            ;
 
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
@@ -207,15 +204,15 @@ TEST(file_one_test_3)
             "ID: 4136, Type: Clear glass, Capacity: 1125, Address: Vzhledna 108, Neighbors: 13657 14376 22119 23947 23952\n"
             "ID: 6716, Type: Clear glass, Capacity: 1125, Address: K Berce 721, Neighbors: 4477 4478 10881 12092 12093 22698 23947 23950 23952 24049 24051\n"
             "ID: 6715, Type: Colored glass, Capacity: 1125, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
-            "ID: 6198, Type: Colored glass, Capacity: 1125, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
-            "ID: 6199, Type: Clear glass, Capacity: 1125, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 6198, Type: Colored glass, Capacity: 1125, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 6199, Type: Clear glass, Capacity: 1125, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
             "ID: 4481, Type: Colored glass, Capacity: 1125, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 4482, Type: Clear glass, Capacity: 1125, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 6720, Type: Clear glass, Capacity: 1125, Address: Prima 331, Neighbors: 4135 6724 22119 23947 23952\n"
             "ID: 6719, Type: Colored glass, Capacity: 1125, Address: Prima 331, Neighbors: 4135 6724 22119 23947 23952\n"
             "ID: 6724, Type: Clear glass, Capacity: 1125, Address: Pracata 783, Neighbors: 4135 6719 6720 10897 12109 13657 18509 22119 23947 23952\n"
             "ID: 6723, Type: Colored glass, Capacity: 1125, Address: Pracata 783, Neighbors: 4135 13657 22119 23947 23952\n"
-    ;
+            ;
 
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
@@ -304,13 +301,13 @@ TEST(file_one_test_9)
             "ID: 23200, Type: Paper, Capacity: 1100, Address: Vzhledna 108, Neighbors: 13657 14376 22119 23947 23952\n"
             "ID: 11800, Type: Paper, Capacity: 1100, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
             "ID: 25733, Type: Paper, Capacity: 1100, Address: K Berce 721, Neighbors: 4477 22698 23947 23952 24049\n"
-            "ID: 11844, Type: Paper, Capacity: 1100, Address:, Neighbors: 4477 14376 22119 23947 23952\n"
+            "ID: 11844, Type: Paper, Capacity: 1100, Address: 466, Neighbors: 4477 14376 22119 23947 23952\n"
             "ID: 14376, Type: Paper, Capacity: 1100, Address: Sevcenkova 572, Neighbors: 4135 4136 4477 4478 6198 6199 6297 6298 7677 7678 10660 10881 10882 10883 11119 11844 12092 12093 12094 12095 12096 12346 22119 22698 23200 23201 23947 23950 23951 23952 23954 24048 24051 24055 26115\n"
             "ID: 12189, Type: Paper, Capacity: 1100, Address: Sevcenkova 572, Neighbors: 4135 22119 22698 23947 23952\n"
             "ID: 13657, Type: Paper, Capacity: 1100, Address: Prima 331, Neighbors: 4135 4136 6723 6724 10879 11119 12090 12346 22119 22212 23200 23947 23952 23954 24055\n"
             "ID: 12109, Type: Paper, Capacity: 1100, Address: Prima 331, Neighbors: 4135 6724 22119 23947 23952\n"
             "ID: 12090, Type: Paper, Capacity: 1100, Address: Pracata 783, Neighbors: 4135 13657 22119 23947 23952\n"
-    ;
+            ;
 
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
@@ -322,7 +319,7 @@ TEST(file_one_test_9)
 TEST(file_two_test_1)
 {
     int rv = 0;
-    CHECK(app_main_args("-t", "B", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-t", "B", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             "ID: 24169, Type: Biodegradable waste, Capacity: 240, Address: Cerna 161, Neighbors: 8043 8044 8716 8717 10407 10546 11569 11570 11571 13376 13377 13418 21702 21703 21704 21705 22131 24013 24014 24027 24028 24029 24030 24031 24032 24033 24034 24925 24926 25098 25867 25868 25869 25870 25871 25872 25994\n"
@@ -343,7 +340,7 @@ TEST(file_two_test_1)
 TEST(file_two_test_2)
 {
     int rv = 0;
-    CHECK(app_main_args("-s", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-s", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             "1;APBC;2,3,4,5,6,7,8\n"
@@ -362,7 +359,7 @@ TEST(file_two_test_2)
 TEST(file_two_test_3)
 {
     int rv = 0;
-    CHECK(app_main_args("-t", "GC", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-t", "GC", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             ""
@@ -374,7 +371,7 @@ TEST(file_two_test_3)
 TEST(file_two_test_4)
 {
     int rv = 0;
-    CHECK(app_main_args("-t", "BT", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-t", "BT", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             "ID: 26185, Type: Colored glass, Capacity: 1660, Address: Cerna 161, Neighbors: 8043 8717 24925 25868 25872\n"
@@ -395,7 +392,7 @@ TEST(file_two_test_4)
 TEST(file_two_test_6)
 {
     int rv = 0;
-    CHECK(app_main_args("-p", "N", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-p", "N", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     CHECK_IS_EMPTY(stdout);
 }
@@ -403,7 +400,7 @@ TEST(file_two_test_6)
 TEST(file_two_test_7)
 {
     int rv = 0;
-    CHECK(app_main_args("-c", "1000-2000", "-t", "T", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-c", "1000-2000", "-t", "T", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             "ID: 22131, Type: Textile, Capacity: 1000, Address: Atriova 559, Neighbors: 8043 24169 24925 25868 25872\n"
@@ -416,7 +413,7 @@ TEST(file_two_test_7)
 TEST(file_two_test_8)
 {
     int rv = 0;
-    CHECK(app_main_args("-c", "400-1000", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-c", "400-1000", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             "ID: 22131, Type: Textile, Capacity: 1000, Address: Atriova 559, Neighbors: 8043 24169 24925 25868 25872\n"
@@ -429,7 +426,7 @@ TEST(file_two_test_8)
 TEST(file_two_test_9)
 {
     int rv = 0;
-    CHECK(app_main_args("-t", "P", "-c", "1000-1100", "-p", "Y", SECOND_CONT_FILE, SECOND_CONT_FILE) == rv);
+    CHECK(app_main_args("-t", "P", "-c", "1000-1100", "-p", "Y", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
             "ID: 13377, Type: Paper, Capacity: 1100, Address:, Neighbors: 8717 24032 24169 24925 25872\n"

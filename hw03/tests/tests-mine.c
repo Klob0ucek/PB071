@@ -6,8 +6,6 @@
 #include "libs/mainwrap.h"
 #include "libs/utils.h"
 
-#include <stdlib.h>
-
 /* The following “extentions” to CUT are available in this test file:
  *
  * • ‹CHECK_IS_EMPTY(file)› — test whether the file is empty.
@@ -19,7 +17,7 @@
 TEST(my_test_1)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-t" "APBGC" "tests/data/example-containers.csv" "tests/data/example-paths.csv") != rv);
+    CHECK(app_main_args("-t" "APBGC" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
 
     /* TIP: Use ‹app_main()› to test the program without arguments. */
 
@@ -36,7 +34,8 @@ TEST(my_test_1)
             "ID: 11, Type: Paper, Capacity: 2000, Address: Odlehla 70, Neighbors: 8\n"
             ;
 
-    ASSERT_FILE(stderr, "Failed to load parser!\n");
+    ASSERT_FILE(stdout, correct_output);
+    CHECK_IS_EMPTY(stderr);
 }
 
 TEST(my_test_2)
@@ -118,9 +117,29 @@ TEST(my_test_6)
     CHECK_IS_EMPTY(stderr);
 }
 
+TEST(test_filter_copied)
+{
+    CHECK(app_main_args("-t", "PA", "-c", "1000-2000", "tests/data/example-containers.csv" "tests/data/example-paths.csv") == 0);
+
+    const char *correct_output =
+            "ID: 3, Type: Plastics and Aluminium, Capacity: 1100, Address: Drozdi 55, Neighbors: 4\n"
+            "ID: 11, Type: Paper, Capacity: 2000, Address: Odlehla 70, Neighbors: 8\n"
+    ;
+
+    ASSERT_FILE(stdout, correct_output);
+    CHECK_IS_EMPTY(stderr);
+}
+
 TEST(my_test_empty)
 {
     CHECK(app_main_args("") != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(my_test_empty_2)
+{
+    CHECK(app_main() != 0);
 
     CHECK_NOT_EMPTY(stderr);
 }

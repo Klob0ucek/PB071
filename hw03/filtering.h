@@ -12,7 +12,7 @@
 
 bool filter_types(const char *filter_str, enum garbage_type **filters);
 
-void parse_interval(char *s, unsigned int *x, unsigned int *y);
+bool parse_interval(char *s, unsigned int *x, unsigned int *y);
 
 bool private_filter(char *input, int *want_private);
 

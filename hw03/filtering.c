@@ -49,9 +49,13 @@ bool private_filter(char *input, int *want_private)
     return true;
 }
 
-void parse_interval(char *s, unsigned int *x, unsigned int *y)
-{
+bool parse_interval(char *s, unsigned int *x, unsigned int *y) {
     sscanf(s, "%u-%u", x, y);
+    if (*x == 4294967295 || *y == 4294967295) {
+        fprintf(stderr, "Invalid capacity value\n");
+        return false;
+    }
+    return true;
 }
 
 bool filter_types(const char *filter_str, enum garbage_type **filters)

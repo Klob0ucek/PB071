@@ -55,10 +55,10 @@ void print_container(const struct container_t container)
     printf("Capacity: %u, ", container.capacity);
     printf("Address: ");
     printf("%s", container.street);
-    if (strcmp(container.street, "") != 0){
+    if (strcmp(container.street, "") != 0) {
         printf(" ");
     }
-    if (container.house_number != 0){
+    if (container.house_number != 0) {
         printf("%d, ", container.house_number);
     } else {
         printf(", ");
@@ -144,4 +144,3 @@ void print_group_neighbours(const int *groups_neighbours, int size)
         }
     }
 }
-

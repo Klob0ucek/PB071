@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+unsigned int UNSIGNED_INT_MAX = 4294967295;
+
 int main(int argc, char *argv[])
 {
-        if (argc < 3) {
+    if (argc < 3) {
         fprintf(stderr, "Not Enough Arguments\n");
         return EXIT_FAILURE;
     }
@@ -37,8 +39,8 @@ int main(int argc, char *argv[])
 
     } else {
         enum garbage_type *type_filter = NULL;
-        unsigned int low = 0;
-        unsigned int high = 0;
+        unsigned int low = UNSIGNED_INT_MAX;
+        unsigned int high = UNSIGNED_INT_MAX;
         bool use_capacity = false;
         int want_private = -1;
 
@@ -49,7 +51,9 @@ int main(int argc, char *argv[])
                     return EXIT_FAILURE;
                 }
             } else if (strcmp(argv[i], "-c") == 0) {
-                parse_interval(argv[i + 1], &low, &high);
+                if (!parse_interval(argv[i + 1], &low, &high)){
+                    return EXIT_FAILURE;
+                }
                 use_capacity = true;
             } else if (strcmp(argv[i], "-p") == 0) {
                 if (!(private_filter(argv[i + 1], &want_private))) {

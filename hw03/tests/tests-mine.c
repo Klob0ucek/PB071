@@ -450,3 +450,59 @@ TEST(file_two_test_9)
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
 }
+
+TEST(test_error)
+{
+    CHECK(app_main_args(FIRST_PATH_FILE, FIRST_CONT_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+
+TEST(test_error_2)
+{
+    CHECK(app_main_args("-t", FIRST_CONT_FILE, FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(test_error_3)
+{
+    CHECK(app_main_args("-t", "-p", "APB", "Y", FIRST_CONT_FILE, FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(test_error_4)
+{
+    CHECK(app_main_args("-t", "AP", "-s", FIRST_CONT_FILE, FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(test_error_5)
+{
+    CHECK(app_main_args("-t", "AP", "-t", "B", FIRST_CONT_FILE, FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(test_error_6)
+{
+    CHECK(app_main_args("-t", "apT", FIRST_CONT_FILE, FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(test_error_7)
+{
+    CHECK(app_main_args("-t", "AP", FIRST_CONT_FILE, "-c", "500-1000", FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}
+TEST(test_error_8)
+{
+    CHECK(app_main_args("-c", "ahoj-500", FIRST_CONT_FILE, FIRST_PATH_FILE) != 0);
+
+    CHECK_NOT_EMPTY(stderr);
+}

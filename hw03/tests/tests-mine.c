@@ -362,7 +362,15 @@ TEST(file_two_test_3)
     CHECK(app_main_args("-t", "GC", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
-            ""
+            "ID: 26185, Type: Colored glass, Capacity: 1660, Address: Cerna 161, Neighbors: 8043 8717 24925 25868 25872\n"
+            "ID: 21704, Type: Clear glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
+            "ID: 21703, Type: Colored glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
+            "ID: 21705, Type: Colored glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
+            "ID: 21702, Type: Clear glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
+            "ID: 8717, Type: Colored glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8044 10407 10546 11569 11570 11571 13376 13377 13418 21702 21703 21704 21705 24013 24014 24027 24028 24029 24030 24031 24032 24033 24034 24169 24925 24926 25098 25867 25868 25869 25870 25871 25872 25873 25874 25994 26183 26184 26185\n"
+            "ID: 8716, Type: Clear glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 24169 24925 25868 25872\n"
+            "ID: 8043, Type: Colored glass, Capacity: 2500, Address: Macova 4, Neighbors: 8716 8717 10407 10546 11569 11570 11571 13418 21702 21703 21704 21705 22131 24013 24014 24027 24028 24029 24030 24031 24032 24033 24034 24169 24925 24926 25098 25867 25868 25869 25870 25871 25872 25873 25874 25994 26183 26184 26185\n"
+            "ID: 8044, Type: Clear glass, Capacity: 2500, Address: Macova 4, Neighbors: 8717 24169 24925 25868 25872\n"
     ;
 
     ASSERT_FILE(stdout, correct_output);
@@ -374,16 +382,17 @@ TEST(file_two_test_4)
     CHECK(app_main_args("-t", "BT", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
-            "ID: 26185, Type: Colored glass, Capacity: 1660, Address: Cerna 161, Neighbors: 8043 8717 24925 25868 25872\n"
-            "ID: 21704, Type: Clear glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
-            "ID: 21703, Type: Colored glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
-            "ID: 21705, Type: Colored glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
-            "ID: 21702, Type: Clear glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
-            "ID: 8717, Type: Colored glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 8044 10407 10546 11569 11570 11571 13376 13377 13418 21702 21703 21704 21705 24013 24014 24027 24028 24029 24030 24031 24032 24033 24034 24169 24925 24926 25098 25867 25868 25869 25870 25871 25872 25873 25874 25994 26183 26184 26185\n"
-            "ID: 8716, Type: Clear glass, Capacity: 1125, Address: Atriova 559, Neighbors: 8043 24169 24925 25868 25872\n"
-            "ID: 8043, Type: Colored glass, Capacity: 2500, Address: Macova 4, Neighbors: 8716 8717 10407 10546 11569 11570 11571 13418 21702 21703 21704 21705 22131 24013 24014 24027 24028 24029 24030 24031 24032 24033 24034 24169 24925 24926 25098 25867 25868 25869 25870 25871 25872 25873 25874 25994 26183 26184 26185\n"
-            "ID: 8044, Type: Clear glass, Capacity: 2500, Address: Macova 4, Neighbors: 8717 24169 24925 25868 25872\n"
-    ;
+            "ID: 24169, Type: Biodegradable waste, Capacity: 240, Address: Cerna 161, Neighbors: 8043 8044 8716 8717 10407 10546 11569 11570 11571 13376 13377 13418 21702 21703 21704 21705 22131 24013 24014 24027 24028 24029 24030 24031 24032 24033 24034 24925 24926 25098 25867 25868 25869 25870 25871 25872 25994\n"
+            "ID: 25873, Type: Biodegradable waste, Capacity: 240, Address: Cerna 161, Neighbors: 8043 8717 24925 25868 25872\n"
+            "ID: 25874, Type: Biodegradable waste, Capacity: 240, Address: Cerna 161, Neighbors: 8043 8717 24925 25868 25872\n"
+            "ID: 25872, Type: Biodegradable waste, Capacity: 240, Address: Atriova 559, Neighbors: 8043 8044 8716 8717 10546 13376 13377 22131 24027 24028 24029 24030 24031 24032 24033 24034 24169 24925 24926 25098 25867 25868 25869 25870 25873 25874 25994 26183 26184 26185\n"
+            "ID: 25871, Type: Biodegradable waste, Capacity: 240, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
+            "ID: 22131, Type: Textile, Capacity: 1000, Address: Atriova 559, Neighbors: 8043 24169 24925 25868 25872\n"
+            "ID: 25868, Type: Biodegradable waste, Capacity: 240, Address: Macova 37, Neighbors: 8043 8044 8716 8717 10407 11569 11570 11571 13418 21702 21703 21704 21705 22131 24013 24014 24169 24925 24926 25869 25870 25871 25872 25873 25874 26183 26184 26185\n"
+            "ID: 25867, Type: Biodegradable waste, Capacity: 240, Address: Macova 37, Neighbors: 8043 8717 24169 24925 25872\n"
+            "ID: 25869, Type: Biodegradable waste, Capacity: 240, Address: Na Nivach 333, Neighbors: 8043 8717 24169 25868 25872\n"
+            "ID: 25870, Type: Biodegradable waste, Capacity: 240, Address: Na Nivach 333, Neighbors: 8043 8717 24169 25868 25872\n"
+            ;
 
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
@@ -429,7 +438,7 @@ TEST(file_two_test_9)
     CHECK(app_main_args("-t", "P", "-c", "1000-1100", "-p", "Y", SECOND_CONT_FILE, SECOND_PATH_FILE) == rv);
 
     const char *correct_output =
-            "ID: 13377, Type: Paper, Capacity: 1100, Address:, Neighbors: 8717 24032 24169 24925 25872\n"
+            "ID: 13377, Type: Paper, Capacity: 1100, Address: 454, Neighbors: 8717 24032 24169 24925 25872\n"
             "ID: 13418, Type: Paper, Capacity: 1100, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
             "ID: 11570, Type: Paper, Capacity: 1100, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"
             "ID: 11569, Type: Paper, Capacity: 1100, Address: Atriova 559, Neighbors: 8043 8717 24169 24925 25868\n"

@@ -66,6 +66,9 @@ int main(int argc, char *argv[])
         for (int i = 1; i < (argc - 2); i += 2) {
             if (!check_parameter(argv[i], argv[i + 1], cont_path_test, road_path_test)){
                 deep_free_all_containers(&all_containers);
+                if (type_filter != NULL){
+                    free(type_filter);
+                }
                 return EXIT_FAILURE;
             }
             if (strcmp(argv[i], "-t") == 0) {

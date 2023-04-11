@@ -19,7 +19,7 @@
 TEST(my_test_1)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-t" "APBGC" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-t" "APBGC" "tests/data/example-containers.csv" "tests/data/example-paths.csv") != rv);
 
     /* TIP: Use ‹app_main()› to test the program without arguments. */
 

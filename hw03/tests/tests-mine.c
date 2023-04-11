@@ -6,6 +6,9 @@
 #include "libs/mainwrap.h"
 #include "libs/utils.h"
 
+#define CONTAINERS_FILE "tests/data/example-containers.csv"
+#define PATHS_FILE "tests/data/example-paths.csv"
+
 /* The following “extentions” to CUT are available in this test file:
  *
  * • ‹CHECK_IS_EMPTY(file)› — test whether the file is empty.
@@ -17,7 +20,7 @@
 TEST(my_test_1)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-t" "APBGC" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-t", "APBGC", CONTAINERS_FILE, PATHS_FILE) == rv);
 
     /* TIP: Use ‹app_main()› to test the program without arguments. */
 
@@ -41,7 +44,7 @@ TEST(my_test_1)
 TEST(my_test_2)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-c" "5000-5000" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-c", "5000-5000", "tests/data/example-containers.csv", "tests/data/example-paths.csv") == rv);
 
     const char *correct_output =
             "ID: 5, Type: Paper, Capacity: 5000, Address: Klimesova 60, Neighbors: 4 8\n"
@@ -55,7 +58,7 @@ TEST(my_test_2)
 TEST(my_test_3)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-t" "APBGC" "-c" "500-1600" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-t", "APBGC", "-c", "500-1600", "tests/data/example-containers.csv", "tests/data/example-paths.csv") == rv);
 
     const char *correct_output =
             "ID: 1, Type: Colored glass, Capacity: 1550, Address: Drozdi 55, Neighbors: 4\n"
@@ -72,7 +75,7 @@ TEST(my_test_3)
 TEST(my_test_4)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-p" "Y" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-p", "Y", "tests/data/example-containers.csv", "tests/data/example-paths.csv") == rv);
 
     const char *correct_output =
             "ID: 1, Type: Colored glass, Capacity: 1550, Address: Drozdi 55, Neighbors: 4\n"
@@ -92,7 +95,7 @@ TEST(my_test_4)
 TEST(my_test_5)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-p" "Y" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-p", "N", "tests/data/example-containers.csv", "tests/data/example-paths.csv") == rv);
 
     const char *correct_output =
             "ID: 5, Type: Paper, Capacity: 5000, Address: Klimesova 60, Neighbors: 4 8\n"
@@ -107,7 +110,7 @@ TEST(my_test_5)
 TEST(my_test_6)
 {
     int rv = 0; /* return value of main()*/
-    CHECK(app_main_args("-t" "C" "-p" "Y" "tests/data/example-containers.csv" "tests/data/example-paths.csv") == rv);
+    CHECK(app_main_args("-t", "C", "-p", "N", "tests/data/example-containers.csv", "tests/data/example-paths.csv") == rv);
 
     const char *correct_output =
             "ID: 6, Type: Colored glass, Capacity: 3000, Address: Klimesova 60, Neighbors: 8\n"
@@ -117,18 +120,6 @@ TEST(my_test_6)
     CHECK_IS_EMPTY(stderr);
 }
 
-TEST(test_filter_copied)
-{
-    CHECK(app_main_args("-t", "PA", "-c", "1000-2000", "tests/data/example-containers.csv" "tests/data/example-paths.csv") == 0);
-
-    const char *correct_output =
-            "ID: 3, Type: Plastics and Aluminium, Capacity: 1100, Address: Drozdi 55, Neighbors: 4\n"
-            "ID: 11, Type: Paper, Capacity: 2000, Address: Odlehla 70, Neighbors: 8\n"
-    ;
-
-    ASSERT_FILE(stdout, correct_output);
-    CHECK_IS_EMPTY(stderr);
-}
 
 TEST(my_test_empty)
 {

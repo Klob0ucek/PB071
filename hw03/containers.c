@@ -35,7 +35,6 @@ int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour)
     sscanf(get_path_a_id(index), "%u", &a);
     sscanf(get_path_b_id(index), "%u", &b);
 
-
     if (a == wanted_id) {
         *neighbour = b;
         return 1;
@@ -107,6 +106,13 @@ bool fill_neighbours(struct container_t *container)
         }
         index++;
     }
+    if (index == 0) {
+        free(neighbours);
+        container->neighbours = NULL;
+        container->neighbour_count = 0;
+        return true;
+    }
+
     // remalloc to correct size
     unsigned int *neighbours_new = realloc(neighbours, sizeof(unsigned int) * neighbour_count);
     if (neighbours_new == NULL) {
@@ -134,7 +140,7 @@ int load_container(int line_index, struct container_t *container)
     // loading container id - !!! doesnt check if id is unique !!!
     unsigned int id = MY_INT_MAX;
     sscanf(id_str, "%u", &id);
-    if (id < 0 || id > UINT_MAX || id == MY_INT_MAX) {
+    if (id <= 0 || id > UINT_MAX || id == MY_INT_MAX) {
         fprintf(stderr, "Invalid ID - ");
         return 0;
     }
@@ -287,6 +293,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
                 for(int j = 0; j < index; j++){
                     free_container(containers[j]);
                 }
+                free_container(container);
                 free(containers);
                 fprintf(stderr, "ID not unique\n");
                 destroy_data_source();
@@ -526,6 +533,13 @@ bool fill_neighbouring_groups(const struct all_containers *all_conts, struct gro
             }
         }
     }
+    if (index == 0) {
+        *result = NULL;
+        *result_size = 0;
+        free(groups_neighbours);
+        return true;
+    }
+
     int *new_group = realloc(groups_neighbours, sizeof(int) * index);
     if (new_group == NULL) {
         perror("Realloc failure");

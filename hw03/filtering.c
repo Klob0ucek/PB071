@@ -49,9 +49,10 @@ bool private_filter(char *input, int *want_private)
     return true;
 }
 
-bool parse_interval(char *s, unsigned int *x, unsigned int *y) {
+bool parse_interval(char *s, unsigned int *x, unsigned int *y)
+{
     sscanf(s, "%u-%u", x, y);
-    if (*x == 4294967294 || *y == 4294967294 || *x > *y) {
+    if (*x == 4294967294 || *y == 4294967294) {
         fprintf(stderr, "Invalid capacity value\n");
         return false;
     }
@@ -71,17 +72,17 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
         if (filter_str[index] == '\0') {
             break;
         } else if (filter_str[index] == 'A') {
-            filter_array[0] = Plastic;
+            filter_array[index] = Plastic;
         } else if (filter_str[index] == 'P') {
-            filter_array[1] = Paper;
+            filter_array[index] = Paper;
         } else if (filter_str[index] == 'B') {
-            filter_array[2] = Bio;
+            filter_array[index] = Bio;
         } else if (filter_str[index] == 'G') {
-            filter_array[3] = Clear;
+            filter_array[index] = Clear;
         } else if (filter_str[index] == 'C') {
-            filter_array[4] = Colored;
+            filter_array[index] = Colored;
         } else if (filter_str[index] == 'T') {
-            filter_array[5] = Textile;
+            filter_array[index] = Textile;
         } else {
             fprintf(stderr, "Invalid filter type\n");
             free(filter_array);

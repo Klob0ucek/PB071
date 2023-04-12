@@ -218,11 +218,11 @@ int load_container(int line_index, struct container_t *container)
     bool public;
     const char *public_garb = get_container_public(line_index);
     if (strcmp(public_garb, "Y") == 0) {
-      public
-        = true;
+        public
+                = true;
     } else if (strcmp(public_garb, "N") == 0) {
-      public
-        = false;
+        public
+                = false;
     } else {
         free(name);
         free(street);
@@ -266,7 +266,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
         }
         if (cont_load_success == 0) {
             fprintf(stderr, "Invalid input file with containers\n");
-            for(int i = 0; i < index; i++){
+            for (int i = 0; i < index; i++) {
                 free_container(containers[i]);
             }
             free(containers);
@@ -279,7 +279,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
             struct container_t *new_containers = realloc(containers, sizeof(struct container_t) * cont_size);
             if (new_containers == NULL) {
                 perror("Realloc Failure");
-                for(int i = 0; i < index; i++){
+                for (int i = 0; i < index; i++) {
                     free_container(containers[i]);
                 }
                 free(containers);
@@ -288,12 +288,11 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
             }
             containers = new_containers;
         }
-        for (int i = 0; i < index; i++){
-            if (containers[i].id == container.id){
-                for(int j = 0; j < index; j++){
+        for (int i = 0; i < index; i++) {
+            if (containers[i].id == container.id) {
+                for (int j = 0; j < index; j++) {
                     free_container(containers[j]);
                 }
-                free_container(container);
                 free(containers);
                 fprintf(stderr, "ID not unique\n");
                 destroy_data_source();
@@ -370,21 +369,21 @@ void free_groups(struct all_containers *all_conts)
 int garb_to_int(enum garbage_type type)
 {
     switch (type) {
-    case Plastic:
-        return 0;
-    case Paper:
-        return 1;
-    case Bio:
-        return 2;
-    case Clear:
-        return 3;
-    case Colored:
-        return 4;
-    case Textile:
-        return 5;
-    default:
-        fprintf(stderr, "Incorrect enum type\n");
-        return -1;
+        case Plastic:
+            return 0;
+        case Paper:
+            return 1;
+        case Bio:
+            return 2;
+        case Clear:
+            return 3;
+        case Colored:
+            return 4;
+        case Textile:
+            return 5;
+        default:
+            fprintf(stderr, "Incorrect enum type\n");
+            return -1;
     }
 }
 

@@ -51,7 +51,7 @@ bool private_filter(char *input, int *want_private)
 
 bool parse_interval(char *s, unsigned int *x, unsigned int *y) {
     sscanf(s, "%u-%u", x, y);
-    if (*x == 4294967295 || *y == 4294967295) {
+    if (*x == 4294967294 || *y == 4294967294) {
         fprintf(stderr, "Invalid capacity value\n");
         return false;
     }

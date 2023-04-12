@@ -12,6 +12,19 @@
 // Created by Jan on 07.04.2023.
 //
 
+unsigned int MY_INT_MAX = 4294967294;
+
+bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container)
+{
+    for (int i = 0; i < all_conts->amount; ++i) {
+        if (all_conts->containers[i].id == wanted_id) {
+            *container = all_conts->containers[i];
+            return true;
+        }
+    }
+    return false;
+}
+
 int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour)
 {
     if (get_path_a_id(index) == NULL) {
@@ -21,6 +34,7 @@ int try_neighbour(int index, unsigned int wanted_id, unsigned int *neighbour)
     unsigned int b;
     sscanf(get_path_a_id(index), "%u", &a);
     sscanf(get_path_b_id(index), "%u", &b);
+
 
     if (a == wanted_id) {
         *neighbour = b;
@@ -118,9 +132,10 @@ int load_container(int line_index, struct container_t *container)
     }
 
     // loading container id - !!! doesnt check if id is unique !!!
-    unsigned int id;
+    unsigned int id = MY_INT_MAX;
     sscanf(id_str, "%u", &id);
-    if (id <= 0 || id > UINT_MAX) {
+    if (id < 0 || id > UINT_MAX || id == MY_INT_MAX) {
+        fprintf(stderr, "Invalid ID - ");
         return 0;
     }
 
@@ -128,6 +143,7 @@ int load_container(int line_index, struct container_t *container)
     double x_coords;
     sscanf(get_container_x(line_index), "%lf", &x_coords);
     if (x_coords == 0.0) {
+        fprintf(stderr, "Invalid X coordinated - ");
         return 0;
     }
 
@@ -135,6 +151,7 @@ int load_container(int line_index, struct container_t *container)
     double y_coords;
     sscanf(get_container_x(line_index), "%lf", &y_coords);
     if (y_coords == 0.0) {
+        fprintf(stderr, "Invalid Y coordinates - ");
         return 0;
     }
 
@@ -154,13 +171,15 @@ int load_container(int line_index, struct container_t *container)
     } else if (strcmp(garb_str, "Textile") == 0) {
         garb = Textile;
     } else {
+        fprintf(stderr, "Invalid Garbage type - ");
         return 0;
     }
 
     // loading capacity
-    unsigned int capacity;
+    unsigned int capacity = MY_INT_MAX;
     sscanf(get_container_capacity(line_index), "%u", &capacity);
-    if (capacity <= 0 || capacity > UINT_MAX) {
+    if (capacity <= 0 || capacity > UINT_MAX || capacity == MY_INT_MAX) {
+        fprintf(stderr, "Invalid capacity - ");
         return 0;
     }
 
@@ -176,12 +195,15 @@ int load_container(int line_index, struct container_t *container)
 
     // loading container house number
     const char *house_number = get_container_number(line_index);
-    unsigned int house_num;
+    unsigned int house_num = MY_INT_MAX;
     if (strcmp(house_number, "") == 0) {
         house_num = 0;
     } else {
         sscanf(house_number, "%u", &house_num);
-        if (house_num <= 0 || house_num > UINT_MAX) {
+        if (house_num <= 0 || house_num > UINT_MAX || house_num == MY_INT_MAX) {
+            free(name);
+            free(street);
+            fprintf(stderr, "Invalid house number - ");
             return 0;
         }
     }
@@ -196,12 +218,17 @@ int load_container(int line_index, struct container_t *container)
       public
         = false;
     } else {
+        free(name);
+        free(street);
+        fprintf(stderr, "Invalid value of public/private flag - ");
         return 0;
     }
 
     struct container_t new_container = { id, x_coords, y_coords, 0, garb, capacity, name, street, house_num, public, NULL, 0 };
 
     if (!fill_neighbours(&new_container)) {
+        free(name);
+        free(street);
         return 0;
     }
     *container = new_container;
@@ -220,6 +247,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
     containers = malloc(sizeof(struct container_t) * cont_size);
     if (containers == NULL) {
         perror("Malloc Failre");
+        destroy_data_source();
         return false;
     }
 
@@ -232,7 +260,11 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
         }
         if (cont_load_success == 0) {
             fprintf(stderr, "Invalid input file with containers\n");
+            for(int i = 0; i < index; i++){
+                free_container(containers[i]);
+            }
             free(containers);
+            destroy_data_source();
             return false;
         }
 
@@ -241,11 +273,27 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
             struct container_t *new_containers = realloc(containers, sizeof(struct container_t) * cont_size);
             if (new_containers == NULL) {
                 perror("Realloc Failure");
+                for(int i = 0; i < index; i++){
+                    free_container(containers[i]);
+                }
                 free(containers);
+                destroy_data_source();
                 return false;
             }
             containers = new_containers;
         }
+        for (int i = 0; i < index; i++){
+            if (containers[i].id == container.id){
+                for(int j = 0; j < index; j++){
+                    free_container(containers[j]);
+                }
+                free(containers);
+                fprintf(stderr, "ID not unique\n");
+                destroy_data_source();
+                return false;
+            }
+        }
+
         containers[index] = container;
         index++;
     }
@@ -403,6 +451,7 @@ bool groupify(struct all_containers *all_conts)
             if (groups[j].coordinates_x == current_container.coordinates_x && groups[j].coordinates_y == current_container.coordinates_y) {
                 if (!add_to_group(&groups[j], current_container.id, current_container.garb_type)) {
                     free_groups(all_conts);
+                    free(groups);
                     return false;
                 }
                 all_conts->containers[i].group = groups[j].id;
@@ -414,6 +463,7 @@ bool groupify(struct all_containers *all_conts)
             struct group new_group;
             if (!make_new_group(&new_group, group_index + 1, current_container.coordinates_x, current_container.coordinates_y, current_container.id, current_container.garb_type)) {
                 free_groups(all_conts);
+                free(groups);
                 return false;
             }
             all_conts->containers[i].group = new_group.id;
@@ -424,17 +474,6 @@ bool groupify(struct all_containers *all_conts)
     all_conts->groups = groups;
     all_conts->group_amount = group_index;
     return true;
-}
-
-bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container)
-{
-    for (int i = 0; i < all_conts->amount; ++i) {
-        if (all_conts->containers[i].id == wanted_id) {
-            *container = all_conts->containers[i];
-            return true;
-        }
-    }
-    return false;
 }
 
 bool id_in_group(int searched, const int *group_neighbours, int size)

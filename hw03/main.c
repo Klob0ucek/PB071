@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-unsigned int UNSIGNED_INT_MAX = 4294967295;
+unsigned int UNSIGNED_INT_MAX = 4294967294;
 
 bool check_parameter(const char* arg1, const char* arg2, const char *cont_path_test, const char *road_path_test){
     if (strcmp(arg1, "-t") != 0 &&

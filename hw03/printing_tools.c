@@ -144,3 +144,4 @@ void print_group_neighbours(const int *groups_neighbours, int size)
         }
     }
 }
+

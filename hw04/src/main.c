@@ -3,8 +3,11 @@
 #include "load.h"
 #include "persons.h"
 #include "structures.h"
+#include "decimals.h"
+#include "constants.h"
 
 #include <string.h>
+#include <stdbool.h>
 
 struct person *find_extreme(struct persons *persons, int sign)
 {
@@ -12,17 +15,53 @@ struct person *find_extreme(struct persons *persons, int sign)
         return NULL;
     struct person *extreme = &persons->persons[0];
     for (int i = 1; i < persons->size; ++i) {
-        if (persons->persons[i].amount * sign > extreme->amount)
+        if (sign == -1 && (persons->persons[i].amount) < extreme->amount) {
             extreme = &persons->persons[i];
+        }
+        if (sign == 1 && (persons->persons[i].amount) > extreme->amount){
+            extreme = &persons->persons[i];
+        }
+
     }
     return extreme;
 }
 
-void settle_debt(struct persons *persons)
+void print_amount(int amount)
 {
-    while (1) {
+    int pre_amount = amount / decimals_to_base(RATING_DECIMALS);
+    int post_amount = amount % decimals_to_base(RATING_DECIMALS);
+
+    if (post_amount == 0){
+        printf("%d", pre_amount);
+    } else {
+        while (post_amount % 10 == 0) {
+            post_amount /= 10;
+        }
+        printf("%d.%d", pre_amount, post_amount);
+    }
+}
+
+bool all_payments_covered(struct persons *persons){
+    for (int i = 0; i < persons->size; i ++){
+        if (persons->persons[i].amount != 0){
+            return false;
+        }
+    }
+    return true;
+}
+
+
+void settle_debt(struct persons *persons, struct currency_table *currency_table)
+{
+    while (!all_payments_covered(persons)) {
         struct person *debtor = find_extreme(persons, -1);
-        struct person *creditor = find_extreme(persons, 1);
+        struct person *creditor = find_extreme(persons,  1);
+
+        if (debtor->amount == 0 || creditor->amount == 0){
+            fprintf(stderr, "Rounding error");
+            break;
+        }
+
 
         int amount = -debtor->amount;
         if (amount > creditor->amount)
@@ -30,7 +69,10 @@ void settle_debt(struct persons *persons)
 
         debtor->amount += amount;
         creditor->amount -= amount;
-        printf("%s -> %s %d\n", debtor->id, creditor->id, amount);
+
+        printf("%s (%s) -> %s (%s): ", debtor->name, debtor->id, creditor->name, creditor->id);
+        print_amount(amount);
+        printf(" %s\n", currency_table->main_currency);
     }
 }
 
@@ -58,21 +100,32 @@ int main(int argc, char **argv)
 
         return return_code(error_code);
     }
-    OP(argc == 3, INVALID_ARGUMENTS);
+    OP(argc == 4, INVALID_ARGUMENTS);
 
     init_currency_table(&currency_table);
     init_persons(&persons);
 
-    person_file = fopen(argv[1], "r");
+    if ((person_file = fopen(argv[1], "r")) == NULL){
+        fprintf(stderr, "Unable to open persons file!\n");
+        return 1;
+    }
     load_persons(&persons, person_file);
+    fclose(person_file);
 
-    currency_file = fopen(argv[2], "r");
+    if ((currency_file = fopen(argv[2], "r")) == NULL) {
+        fprintf(stderr, "Unable to open file with currency!\n");
+        return 1;
+    }
     load_currency_table(&currency_table, currency_file);
 
-    payment_file = fopen(argv[3], "r");
+    if ((payment_file = fopen(argv[3], "r")) == NULL) {
+        fprintf(stderr, "Unable to open file with payments!\n");
+        return 1;
+    }
     load_payments(&persons, &currency_table, payment_file);
 
-    settle_debt(&persons);
+    settle_debt(&persons, &currency_table);
+
 
     exit_success();
 }

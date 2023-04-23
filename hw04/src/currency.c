@@ -40,7 +40,14 @@ static int currency_cmp(const void *_name, const void *_currency)
 
 struct currency *find_currency(struct currency_table *table, const char *name)
 {
-    return (struct currency *) bsearch(name, table->currencies, table->size, sizeof(struct currency), currency_cmp);
+    for (int i = 0; i < table->size; i++){
+        if (strcmp(table->currencies[i].name, name) == 0){
+            return &table->currencies[i];
+        }
+    }
+    return NULL;
+
+//    return (struct currency *) bsearch(name, table->currencies, table->size, sizeof(struct currency), currency_cmp);
 }
 
 static void destroy_currency_table(void *t)
@@ -89,7 +96,9 @@ int convert_currency(struct currency_table *table, int amount, const char *curre
 {
     struct currency *found;
     OP(found = find_currency(table, currency), CURRENCY_NOT_FOUND);
-    if (!found->rating)
+    if (found->rating == 0){
         return amount;
-    return amount * found->rating / decimals_to_base(RATING_DECIMALS);
+    }
+    amount = (amount / decimals_to_base(RATING_DECIMALS)) * found->rating ;
+    return amount;
 }

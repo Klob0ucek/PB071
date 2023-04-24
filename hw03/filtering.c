@@ -41,6 +41,12 @@ bool keep_container(const struct filter *filter, struct container_t *container)
 
 bool private_filter(char *input, struct filter *filter)
 {
+    if (filter->want_private != -1) {
+        fprintf(stderr, "Filter already used\n");
+        free(filter->type_filter);
+        return false;
+    }
+
     if (strcmp(input, "Y") == 0) {
         filter->want_private = 1;
     } else if (strcmp(input, "N") == 0) {
@@ -53,16 +59,30 @@ bool private_filter(char *input, struct filter *filter)
 
 bool parse_interval(char *s, struct filter *filter)
 {
+    if (filter->low != UINT_MAX || filter->high != UINT_MAX) {
+        fprintf(stderr, "Filter already used\n");
+        if(filter->type_filter != NULL){
+            free(filter->type_filter);
+            filter->type_filter = NULL;
+        }
+        return false;
+    }
     sscanf(s, "%u-%u", &filter->low, &filter->high);
     if (filter->high == UINT_MAX || filter->low == UINT_MAX) {
         fprintf(stderr, "Invalid capacity value\n");
         return false;
     }
+    filter->use_capacity = true;
     return true;
 }
 
-bool filter_types(const char *filter_str, enum garbage_type **filters)
+bool filter_types(char *filter_str, struct filter *filter)
 {
+    if (filter->type_filter != NULL) {
+        fprintf(stderr, "Filter already used\n");
+        free(filter->type_filter);
+        return false;
+    }
     enum garbage_type *filter_array = calloc(6, sizeof(enum garbage_type));
     if (filter_array == NULL) {
         perror("Malloc Failure");
@@ -92,7 +112,7 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
             return false;
         }
     }
-    *filters = filter_array;
+    filter->type_filter = filter_array;
 
     return true;
 }

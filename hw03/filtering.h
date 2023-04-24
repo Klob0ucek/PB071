@@ -10,7 +10,7 @@
 #include "containers.h"
 #include "stdbool.h"
 
-bool filter_types(const char *filter_str, enum garbage_type **filters);
+bool filter_types(char *filter_str, struct filter *filter);
 
 bool parse_interval(char *s, struct filter *filter);
 

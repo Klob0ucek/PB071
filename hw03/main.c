@@ -70,7 +70,17 @@ bool process_data(const char *cont_path_test, const char *road_path_test, struct
         free_structure(&all_containers, filter->type_filter);
         return EXIT_FAILURE;
     }
+}
 
+bool filtering_options(char *filter_str, struct filter *filter, bool operation(char*, struct filter*)){
+    if (!operation(filter_str, filter)) {
+        if (filter->type_filter != NULL){
+            free(filter->type_filter);
+            filter->type_filter = NULL;
+        }
+        return false;
+    }
+    return true;
 }
 
 int main(int argc, char *argv[])
@@ -91,53 +101,38 @@ int main(int argc, char *argv[])
         return process_data(cont_path_test, road_path_test, NULL, true);
     } else {
         struct filter filter = { NULL, UINT_MAX, UINT_MAX, false, -1 };
-        enum garbage_type *type_filter = NULL;
 
         for (int i = 1; i < (argc - 2); i += 2) {
             if (!check_parameter(argv[i], argv[i + 1], cont_path_test, road_path_test)) {
-                free(type_filter);
+                if (filter.type_filter != NULL){
+                    free(filter.type_filter);
+                    filter.type_filter = NULL;
+                };
                 return EXIT_FAILURE;
             }
 
             if (strcmp(argv[i], "-t") == 0) {
-                if (type_filter != NULL) {
-                    fprintf(stderr, "Filter already used\n");
-                    free(type_filter);
+                if (!filtering_options(argv[i + 1], &filter, filter_types)) {
                     return EXIT_FAILURE;
                 }
-                if (!filter_types(argv[i + 1], &type_filter)) {
-                    free(type_filter);
-                    return EXIT_FAILURE;
-                }
-                filter.type_filter = type_filter;
 
             } else if (strcmp(argv[i], "-c") == 0) {
-                if (filter.low != UINT_MAX || filter.high != UINT_MAX) {
-                    fprintf(stderr, "Filter already used\n");
-                    free(type_filter);
+                if (!filtering_options(argv[i + 1], &filter, parse_interval)) {
                     return EXIT_FAILURE;
                 }
-                if (!parse_interval(argv[i + 1], &filter)) {
-                    free(type_filter);
-                    return EXIT_FAILURE;
-                }
-                filter.use_capacity = true;
 
             } else if (strcmp(argv[i], "-p") == 0) {
-                if (filter.want_private != -1) {
-                    fprintf(stderr, "Filter already used\n");
-                    free(type_filter);
-                    return EXIT_FAILURE;
-                }
-                if (!(private_filter(argv[i + 1], &filter))) {
+                if (!filtering_options(argv[i + 1], &filter, private_filter)) {
                     fprintf(stderr, "Invalid filter option\n");
-                    free(type_filter);
                     return EXIT_FAILURE;
                 }
 
             } else {
                 fprintf(stderr, "Unknown argument: Use -t, -c or -p\n");
-                free(type_filter);
+                if (filter.type_filter != NULL){
+                    free(filter.type_filter);
+                    filter.type_filter = NULL;
+                }
                 return EXIT_FAILURE;
             }
         }

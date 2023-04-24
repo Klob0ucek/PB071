@@ -40,7 +40,7 @@ TEST(currency_add_find) {
     SUBTEST(add only main currency) {
         add_currency(&table, "CZK", 0);
 
-        ASSERT(10 == convert_currency(&table, "CZK", 10));
+        ASSERT(10 == convert_currency(&table, 10, "CZK"));
     }
     SUBTEST(convert with empty table) {
         expected_code = CURRENCY_NOT_FOUND;
@@ -48,7 +48,7 @@ TEST(currency_add_find) {
     }
     SUBTEST(simple convert ) {
         add_currency(&table, "A", load_decimal("2", RATING_DECIMALS));
-        ASSERT(20 == convert_currency(&table, 10, "A"));
+        ASSERT(20000 == convert_currency(&table, 10, "A"));
     }
     SUBTEST(duplicit currency) {
         expected_code = CURRENCY_ALREADY_PRESENT;
@@ -65,8 +65,8 @@ TEST(currency_add_find) {
         CHECK(table.size == 40);
         CHECK(table.capacity == 64);
 
-        CHECK(20 == convert_currency(&table, 10, "c06c"));
-        CHECK(20 == convert_currency(&table, 10, "c39c"));
+        CHECK(20000 == convert_currency(&table, 10, "c06c"));
+        CHECK(20000 == convert_currency(&table, 10, "c39c"));
     }
 
     exit_success();

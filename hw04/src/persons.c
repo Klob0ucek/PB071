@@ -29,12 +29,14 @@ static void ensort(struct persons *persons)
     }
 }
 
+/*
 static int person_cmp(const void *_id, const void *_person)
 {
     const char *id = (const char *) _id;
     const struct person *person = (const struct person *) _person;
     return strcmp(id, person->id);
 }
+*/
 
 struct person *find_person(const struct persons *persons, const char *id)
 {
@@ -44,6 +46,7 @@ struct person *find_person(const struct persons *persons, const char *id)
         }
     }
     return NULL;
+//    return (struct person *) bsearch(id, persons->size, persons->persons, sizeof(struct person), person_cmp);
 }
 
 static void destroy_persons(void *p)

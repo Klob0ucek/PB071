@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 static int normalize(int number, int upper)
 {
     int lower = upper / 10;

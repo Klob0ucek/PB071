@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void swap(struct currency *lhs, struct currency *rhs)
+/*static void swap(struct currency *lhs, struct currency *rhs)
 {
     char *name = lhs->name;
     int rating = lhs->rating;
@@ -36,7 +36,7 @@ static int currency_cmp(const void *_name, const void *_currency)
     const char *name = (const char *) _name;
     const struct currency *currency = (const struct currency *) _currency;
     return strcmp(name, currency->name);
-}
+}*/
 
 struct currency *find_currency(struct currency_table *table, const char *name)
 {

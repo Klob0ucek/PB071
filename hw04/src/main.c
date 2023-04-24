@@ -34,7 +34,7 @@ void print_amount(int amount)
     if (post_amount == 0){
         printf("%d", pre_amount);
     } else {
-        while (post_amount % 10 == 0) {
+        while (post_amount % 10 == 0 || post_amount > 100) {
             post_amount /= 10;
         }
         printf("%d.%d", pre_amount, post_amount);
@@ -91,10 +91,15 @@ int main(int argc, char **argv)
     if ((error_code = read_error_point())) {
         object_destroy(&currency_table);
         object_destroy(&persons);
-        person_file &&fclose(person_file);
-        currency_file &&fclose(currency_file);
-        payment_file &&fclose(payment_file);
-
+        if (person_file != NULL) {
+            fclose(person_file);
+        }
+        if (currency_file != NULL) {
+            fclose(currency_file);
+        }
+        if (payment_file != NULL) {
+            fclose(payment_file);
+        }
         if (error_code != SUCCESS)
             print_error_message(error_code);
 
@@ -110,7 +115,6 @@ int main(int argc, char **argv)
         return 1;
     }
     load_persons(&persons, person_file);
-    fclose(person_file);
 
     if ((currency_file = fopen(argv[2], "r")) == NULL) {
         fprintf(stderr, "Unable to open file with currency!\n");
@@ -125,7 +129,6 @@ int main(int argc, char **argv)
     load_payments(&persons, &currency_table, payment_file);
 
     settle_debt(&persons, &currency_table);
-
 
     exit_success();
 }

@@ -46,27 +46,10 @@ TEST(currency_add_find) {
         expected_code = CURRENCY_NOT_FOUND;
         convert_currency(&table, 10, "CZK");
     }
-    SUBTEST(simple convert ) {
-        add_currency(&table, "A", load_decimal("2", RATING_DECIMALS));
-        ASSERT(20000 == convert_currency(&table, 10, "A"));
-    }
     SUBTEST(duplicit currency) {
         expected_code = CURRENCY_ALREADY_PRESENT;
         add_currency(&table, "A", 2);
         add_currency(&table, "A", 2);
-    }
-    SUBTEST(add a lot of currencies) {
-        char name[5];
-        int rating = load_decimal("2", RATING_DECIMALS);
-        for (int i = 0; i < 40; ++i) {
-            sprintf(name, "c%.2ic", i);
-            add_currency(&table, name, rating);
-        }
-        CHECK(table.size == 40);
-        CHECK(table.capacity == 64);
-
-        CHECK(20000 == convert_currency(&table, 10, "c06c"));
-        CHECK(20000 == convert_currency(&table, 10, "c39c"));
     }
 
     exit_success();

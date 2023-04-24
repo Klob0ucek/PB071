@@ -81,6 +81,7 @@ bool filter_types(char *filter_str, struct filter *filter)
     if (filter->type_filter != NULL) {
         fprintf(stderr, "Filter already used\n");
         free(filter->type_filter);
+        filter->type_filter = NULL;
         return false;
     }
     enum garbage_type *filter_array = calloc(6, sizeof(enum garbage_type));

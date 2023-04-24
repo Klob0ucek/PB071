@@ -191,7 +191,7 @@ int load_container(int line_index, struct container_t *container)
     //loading container name
     const char *original_str = get_container_name(line_index);
     char *name = malloc(strlen(original_str) * sizeof(char) + 1);
-    if (name == NULL){
+    if (name == NULL) {
         perror("Malloc Failure");
         return 0;
     }
@@ -200,7 +200,7 @@ int load_container(int line_index, struct container_t *container)
     //loading container street
     original_str = get_container_street(line_index);
     char *street = malloc(strlen(original_str) * sizeof(char) + 1);
-    if (street == NULL){
+    if (street == NULL) {
         perror("Malloc Failure");
         free(name);
         return 0;
@@ -226,11 +226,11 @@ int load_container(int line_index, struct container_t *container)
     bool public;
     const char *public_garb = get_container_public(line_index);
     if (strcmp(public_garb, "Y") == 0) {
-        public
-                = true;
+      public
+        = true;
     } else if (strcmp(public_garb, "N") == 0) {
-        public
-                = false;
+      public
+        = false;
     } else {
         free(name);
         free(street);
@@ -390,13 +390,13 @@ bool make_new_group(struct group *pointer_group, int id, double x, double y, uns
         free(group_ids);
         return false;
     }
-    int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
-    for (int i = 0; i < 6; i++){
-        if ((int)garbage == filter_options[i]){
+    int filter_options[6] = { 'A', 'P', 'B', 'G', 'C', 'T' };
+    for (int i = 0; i < 6; i++) {
+        if ((int) garbage == filter_options[i]) {
             new_garbage_types[i] = garbage;
         }
     }
-//    new_garbage_types[garbage-1] = 1;
+    //    new_garbage_types[garbage-1] = 1;
 
     struct group new_group = { id, x, y, group_ids, 1, 5, new_garbage_types };
     *pointer_group = new_group;
@@ -418,9 +418,9 @@ bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbag
     group->containers[group->container_count] = id;
     group->container_count += 1;
 
-    int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
-    for (int i = 0; i < 6; i++){
-        if ((int)garbage == filter_options[i]){
+    int filter_options[6] = { 'A', 'P', 'B', 'G', 'C', 'T' };
+    for (int i = 0; i < 6; i++) {
+        if ((int) garbage == filter_options[i]) {
             group->garbage_types[i] = garbage;
         }
     }

@@ -1,11 +1,10 @@
 #include "printing_tools.h"
 #include "stdbool.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-
 
 bool check_parameter(const char *arg1, const char *arg2, const char *cont_path_test, const char *road_path_test)
 {
@@ -27,7 +26,8 @@ bool check_parameter(const char *arg1, const char *arg2, const char *cont_path_t
     return true;
 }
 
-void free_structure(struct all_containers *all_containers, enum garbage_type *type_filter){
+void free_structure(struct all_containers *all_containers, enum garbage_type *type_filter)
+{
     deep_free_all_containers(all_containers);
     if (type_filter != NULL) {
         free(type_filter);
@@ -40,12 +40,12 @@ bool process_data(const char *cont_path_test, const char *road_path_test, struct
     if (!parse_input(&all_containers, cont_path_test, road_path_test)) {
         return EXIT_FAILURE;
     }
-    if (filter == NULL && !want_groups){
+    if (filter == NULL && !want_groups) {
         print_all(&all_containers);
         free_structure(&all_containers, NULL);
         return EXIT_SUCCESS;
 
-    } else if (want_groups){
+    } else if (want_groups) {
         if (!groupify(&all_containers)) {
             fprintf(stderr, "Grouping containers failed\n");
             free_structure(&all_containers, NULL);
@@ -55,7 +55,7 @@ bool process_data(const char *cont_path_test, const char *road_path_test, struct
         free_structure(&all_containers, NULL);
         return EXIT_SUCCESS;
 
-    } else if (filter != NULL){
+    } else if (filter != NULL) {
         if (!filter_containers(filter, &all_containers)) {
             fprintf(stderr, "Data filtering failed\n");
             free_structure(&all_containers, NULL);
@@ -65,8 +65,7 @@ bool process_data(const char *cont_path_test, const char *road_path_test, struct
         print_all(&all_containers);
         free_structure(&all_containers, filter->type_filter);
         return EXIT_SUCCESS;
-    }
-    else {
+    } else {
         fprintf(stderr, "Invalid inputs");
         free_structure(&all_containers, filter->type_filter);
         return EXIT_FAILURE;
@@ -91,7 +90,7 @@ int main(int argc, char *argv[])
     if (argc == 4 && strcmp(argv[1], "-s") == 0) {
         return process_data(cont_path_test, road_path_test, NULL, true);
     } else {
-        struct filter filter = {NULL, UINT_MAX, UINT_MAX, false, -1};
+        struct filter filter = { NULL, UINT_MAX, UINT_MAX, false, -1 };
         enum garbage_type *type_filter = NULL;
 
         for (int i = 1; i < (argc - 2); i += 2) {

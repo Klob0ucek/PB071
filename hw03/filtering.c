@@ -1,13 +1,14 @@
 //
 // Created by Jan on 10.04.2023.
 //
-#include <limits.h>
 #include "filtering.h"
 
 #include "stdbool.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
+
+#include <limits.h>
 
 bool keep_container(const struct filter *filter, struct container_t *container)
 {
@@ -50,7 +51,8 @@ bool private_filter(char *input, struct filter *filter)
     return true;
 }
 
-bool parse_interval(char *s, struct filter *filter) {
+bool parse_interval(char *s, struct filter *filter)
+{
     sscanf(s, "%u-%u", &filter->low, &filter->high);
     if (filter->high == UINT_MAX || filter->low == UINT_MAX) {
         fprintf(stderr, "Invalid capacity value\n");
@@ -67,7 +69,7 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
         return false;
     }
 
-    int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
+    int filter_options[6] = { 'A', 'P', 'B', 'G', 'C', 'T' };
 
     int index = 0;
     while (true) {
@@ -75,16 +77,16 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
             break;
         }
         bool filter_applied;
-        for (int i = 0; i < 6; i++){
+        for (int i = 0; i < 6; i++) {
             filter_applied = false;
-            if (filter_str[index] == filter_options[i]){
+            if (filter_str[index] == filter_options[i]) {
                 filter_array[index] = filter_options[i];
                 index++;
                 filter_applied = true;
                 break;
             }
         }
-        if (!filter_applied){
+        if (!filter_applied) {
             fprintf(stderr, "Invalid filter type\n");
             free(filter_array);
             return false;

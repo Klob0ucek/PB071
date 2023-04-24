@@ -84,8 +84,6 @@ int main(int argc, char *argv[])
     const char *cont_path_test = argv[argc - 2];
     const char *road_path_test = argv[argc - 1];
 
-
-
     if (argc == 3) {
         return process_data(cont_path_test, road_path_test, NULL, false);
     }

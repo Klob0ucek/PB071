@@ -67,28 +67,26 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
         return false;
     }
 
+    int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
+
+
     int index = 0;
     while (true) {
         if (filter_str[index] == '\0') {
             break;
-        } else if (filter_str[index] == 'A') {
-            filter_array[index] = Plastic;
-        } else if (filter_str[index] == 'P') {
-            filter_array[index] = Paper;
-        } else if (filter_str[index] == 'B') {
-            filter_array[index] = Bio;
-        } else if (filter_str[index] == 'G') {
-            filter_array[index] = Clear;
-        } else if (filter_str[index] == 'C') {
-            filter_array[index] = Colored;
-        } else if (filter_str[index] == 'T') {
-            filter_array[index] = Textile;
-        } else {
+        }
+        for (int i = 0; i < 6; i++){
+            if (filter_str[index] == filter_options[i]){
+                filter_array[index] = filter_options[i];
+                index++;
+                break;
+            }
+        }
+        if (filter_array[index - 1] == 0){
             fprintf(stderr, "Invalid filter type\n");
             free(filter_array);
             return false;
         }
-        index++;
     }
     *filters = filter_array;
 

@@ -76,39 +76,13 @@ void print_all(const struct all_containers *all_containers)
     }
 }
 
-void print_int_to_type(const int type)
-{
-    switch (type) {
-    case 0:
-        printf("A");
-        break;
-    case 1:
-        printf("P");
-        break;
-    case 2:
-        printf("B");
-        break;
-    case 3:
-        printf("G");
-        break;
-    case 4:
-        printf("C");
-        break;
-    case 5:
-        printf("T");
-        break;
-    default:
-        fprintf(stderr, "Incorrect value");
-        return;
-    }
-}
-
 void print_group_type(const int *types)
 {
     for (int i = 0; i < 6; i++) {
-        if (types[i] == 1) {
-            print_int_to_type(i);
+        if (types[i] == 0) {
+            continue;
         }
+        printf("%c", types[i]);
     }
 }
 

@@ -8,12 +8,12 @@
 
 enum garbage_type
 {
-    Plastic = 1,
-    Paper = 2,
-    Bio = 3,
-    Clear = 4,
-    Colored = 5,
-    Textile = 6
+    Plastic = 'A',
+    Paper = 'P',
+    Bio = 'B',
+    Clear = 'G',
+    Colored = 'C',
+    Textile = 'T'
 };
 
 struct container_t

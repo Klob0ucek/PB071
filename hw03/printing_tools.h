@@ -16,8 +16,6 @@ void print_container(struct container_t container);
 
 void print_all(const struct all_containers *all_containers);
 
-void print_int_to_type(int type);
-
 void print_group_type(const int *types);
 
 void print_group(struct group current_group, int *group_neighbours, int size);

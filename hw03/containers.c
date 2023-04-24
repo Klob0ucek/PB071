@@ -390,7 +390,13 @@ bool make_new_group(struct group *pointer_group, int id, double x, double y, uns
         free(group_ids);
         return false;
     }
-    new_garbage_types[garbage-1] = 1;
+    int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
+    for (int i = 0; i < 6; i++){
+        if ((int)garbage == filter_options[i]){
+            new_garbage_types[i] = garbage;
+        }
+    }
+//    new_garbage_types[garbage-1] = 1;
 
     struct group new_group = { id, x, y, group_ids, 1, 5, new_garbage_types };
     *pointer_group = new_group;
@@ -412,8 +418,12 @@ bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbag
     group->containers[group->container_count] = id;
     group->container_count += 1;
 
-
-    group->garbage_types[garbage - 1] = 1;
+    int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
+    for (int i = 0; i < 6; i++){
+        if ((int)garbage == filter_options[i]){
+            group->garbage_types[i] = garbage;
+        }
+    }
     return true;
 }
 

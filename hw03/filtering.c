@@ -61,7 +61,7 @@ bool parse_interval(char *s, struct filter *filter)
 {
     if (filter->low != UINT_MAX || filter->high != UINT_MAX) {
         fprintf(stderr, "Filter already used\n");
-        if(filter->type_filter != NULL){
+        if (filter->type_filter != NULL) {
             free(filter->type_filter);
             filter->type_filter = NULL;
         }

@@ -72,9 +72,10 @@ bool process_data(const char *cont_path_test, const char *road_path_test, struct
     }
 }
 
-bool filtering_options(char *filter_str, struct filter *filter, bool operation(char*, struct filter*)){
+bool filtering_options(char *filter_str, struct filter *filter, bool operation(char *, struct filter *))
+{
     if (!operation(filter_str, filter)) {
-        if (filter->type_filter != NULL){
+        if (filter->type_filter != NULL) {
             free(filter->type_filter);
             filter->type_filter = NULL;
         }
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
 
         for (int i = 1; i < (argc - 2); i += 2) {
             if (!check_parameter(argv[i], argv[i + 1], cont_path_test, road_path_test)) {
-                if (filter.type_filter != NULL){
+                if (filter.type_filter != NULL) {
                     free(filter.type_filter);
                     filter.type_filter = NULL;
                 };
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
 
             } else {
                 fprintf(stderr, "Unknown argument: Use -t, -c or -p\n");
-                if (filter.type_filter != NULL){
+                if (filter.type_filter != NULL) {
                     free(filter.type_filter);
                     filter.type_filter = NULL;
                 }

@@ -69,20 +69,22 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
 
     int filter_options[6] = {'A', 'P', 'B', 'G', 'C', 'T'};
 
-
     int index = 0;
     while (true) {
         if (filter_str[index] == '\0') {
             break;
         }
+        bool filter_applied;
         for (int i = 0; i < 6; i++){
+            filter_applied = false;
             if (filter_str[index] == filter_options[i]){
                 filter_array[index] = filter_options[i];
                 index++;
+                filter_applied = true;
                 break;
             }
         }
-        if (filter_array[index - 1] == 0){
+        if (!filter_applied){
             fprintf(stderr, "Invalid filter type\n");
             free(filter_array);
             return false;

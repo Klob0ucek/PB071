@@ -12,7 +12,6 @@
 // Created by Jan on 07.04.2023.
 //
 
-unsigned int MY_INT_MAX = 4294967294;
 
 bool find_container_by_id(unsigned int wanted_id, const struct all_containers *all_conts, struct container_t *container)
 {
@@ -138,9 +137,9 @@ int load_container(int line_index, struct container_t *container)
     }
 
     // loading container id - !!! doesnt check if id is unique !!!
-    unsigned int id = MY_INT_MAX;
+    unsigned int id = UINT_MAX;
     sscanf(id_str, "%u", &id);
-    if (id <= 0 || id > UINT_MAX || id == MY_INT_MAX) {
+    if (id <= 0 || id > UINT_MAX) {
         fprintf(stderr, "Invalid ID - ");
         return 0;
     }
@@ -155,7 +154,7 @@ int load_container(int line_index, struct container_t *container)
 
     //loading Y coordinates
     double y_coords;
-    sscanf(get_container_x(line_index), "%lf", &y_coords);
+    sscanf(get_container_y(line_index), "%lf", &y_coords);
     if (y_coords == 0.0) {
         fprintf(stderr, "Invalid Y coordinates - ");
         return 0;
@@ -182,9 +181,9 @@ int load_container(int line_index, struct container_t *container)
     }
 
     // loading capacity
-    unsigned int capacity = MY_INT_MAX;
+    unsigned int capacity = UINT_MAX;
     sscanf(get_container_capacity(line_index), "%u", &capacity);
-    if (capacity <= 0 || capacity > UINT_MAX || capacity == MY_INT_MAX) {
+    if (capacity <= 0 || capacity > UINT_MAX) {
         fprintf(stderr, "Invalid capacity - ");
         return 0;
     }
@@ -192,21 +191,30 @@ int load_container(int line_index, struct container_t *container)
     //loading container name
     const char *original_str = get_container_name(line_index);
     char *name = malloc(strlen(original_str) * sizeof(char) + 1);
+    if (name == NULL){
+        perror("Malloc Failure");
+        return 0;
+    }
     strcpy(name, original_str);
 
     //loading container street
     original_str = get_container_street(line_index);
     char *street = malloc(strlen(original_str) * sizeof(char) + 1);
+    if (street == NULL){
+        perror("Malloc Failure");
+        free(name);
+        return 0;
+    }
     strcpy(street, original_str);
 
     // loading container house number
     const char *house_number = get_container_number(line_index);
-    unsigned int house_num = MY_INT_MAX;
+    unsigned int house_num = UINT_MAX;
     if (strcmp(house_number, "") == 0) {
         house_num = 0;
     } else {
         sscanf(house_number, "%u", &house_num);
-        if (house_num <= 0 || house_num > UINT_MAX || house_num == MY_INT_MAX) {
+        if (house_num <= 0 || house_num > UINT_MAX) {
             free(name);
             free(street);
             fprintf(stderr, "Invalid house number - ");
@@ -252,7 +260,7 @@ bool parse_input(struct all_containers *all_containers, const char *cont_path_te
     struct container_t *containers;
     containers = malloc(sizeof(struct container_t) * cont_size);
     if (containers == NULL) {
-        perror("Malloc Failre");
+        perror("Malloc Failure");
         destroy_data_source();
         return false;
     }
@@ -366,27 +374,6 @@ void free_groups(struct all_containers *all_conts)
     all_conts->group_amount = 0;
 }
 
-int garb_to_int(enum garbage_type type)
-{
-    switch (type) {
-        case Plastic:
-            return 0;
-        case Paper:
-            return 1;
-        case Bio:
-            return 2;
-        case Clear:
-            return 3;
-        case Colored:
-            return 4;
-        case Textile:
-            return 5;
-        default:
-            fprintf(stderr, "Incorrect enum type\n");
-            return -1;
-    }
-}
-
 bool make_new_group(struct group *pointer_group, int id, double x, double y, unsigned int first_id, enum garbage_type garbage)
 {
     int groups_size = 5;
@@ -403,7 +390,7 @@ bool make_new_group(struct group *pointer_group, int id, double x, double y, uns
         free(group_ids);
         return false;
     }
-    new_garbage_types[garb_to_int(garbage)] = 1;
+    new_garbage_types[garbage-1] = 1;
 
     struct group new_group = { id, x, y, group_ids, 1, 5, new_garbage_types };
     *pointer_group = new_group;
@@ -424,7 +411,9 @@ bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbag
 
     group->containers[group->container_count] = id;
     group->container_count += 1;
-    group->garbage_types[garb_to_int(garbage)] = 1;
+
+
+    group->garbage_types[garbage - 1] = 1;
     return true;
 }
 

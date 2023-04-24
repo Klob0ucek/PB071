@@ -1,6 +1,7 @@
 //
 // Created by Jan on 10.04.2023.
 //
+#include <limits.h>
 #include "filtering.h"
 
 #include "stdbool.h"
@@ -8,51 +9,50 @@
 #include "stdlib.h"
 #include "string.h"
 
-bool keep_container(const enum garbage_type *filters, bool use_capacity, const unsigned int min, const unsigned int max, const int want_private, struct container_t *container)
+bool keep_container(const struct filter *filter, struct container_t *container)
 {
     bool keep_type = true;
-    if (filters != NULL) {
+    if (filter->type_filter != NULL) {
         keep_type = false;
         for (int i = 0; i < 6; ++i) {
-            if (container->garb_type == filters[i]) {
+            if (container->garb_type == filter->type_filter[i]) {
                 keep_type = true;
                 break;
             }
         }
     }
     bool keep_capacity = true;
-    if (use_capacity) {
+    if (filter->use_capacity) {
         keep_capacity = false;
-        if (min <= container->capacity && container->capacity <= max) {
+        if (filter->low <= container->capacity && container->capacity <= filter->high) {
             keep_capacity = true;
         }
     }
     bool keep_private = true;
-    if (want_private != -1) {
+    if (filter->want_private != -1) {
         keep_private = false;
-        if ((want_private == 1 && container->public) || (want_private == 0 && !container->public)) {
+        if ((filter->want_private == 1 && container->public) || (filter->want_private == 0 && !container->public)) {
             keep_private = true;
         }
     }
     return keep_type && keep_capacity && keep_private;
 }
 
-bool private_filter(char *input, int *want_private)
+bool private_filter(char *input, struct filter *filter)
 {
     if (strcmp(input, "Y") == 0) {
-        *want_private = 1;
+        filter->want_private = 1;
     } else if (strcmp(input, "N") == 0) {
-        *want_private = 0;
+        filter->want_private = 0;
     } else {
         return false;
     }
     return true;
 }
 
-bool parse_interval(char *s, unsigned int *x, unsigned int *y)
-{
-    sscanf(s, "%u-%u", x, y);
-    if (*x == 4294967294 || *y == 4294967294) {
+bool parse_interval(char *s, struct filter *filter) {
+    sscanf(s, "%u-%u", &filter->low, &filter->high);
+    if (filter->high == UINT_MAX || filter->low == UINT_MAX) {
         fprintf(stderr, "Invalid capacity value\n");
         return false;
     }
@@ -95,7 +95,7 @@ bool filter_types(const char *filter_str, enum garbage_type **filters)
     return true;
 }
 
-bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max, int want_private, struct all_containers *all_conts)
+bool filter_containers(const struct filter *filter, struct all_containers *all_conts)
 {
     int cont_size = 10;
     struct container_t *filtered_containers = malloc(sizeof(struct container_t) * cont_size);
@@ -107,7 +107,7 @@ bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsi
     int index = 0;
     for (int i = 0; i < all_conts->amount; ++i) {
         struct container_t current_container = all_conts->containers[i];
-        if (keep_container(filters, use_capacity, min, max, want_private, &current_container)) {
+        if (keep_container(filter, &current_container)) {
             if (index == cont_size) {
                 cont_size *= 2;
                 struct container_t *new_filtered_containers = realloc(filtered_containers, sizeof(struct container_t) * cont_size);

@@ -9,11 +9,11 @@
 enum garbage_type
 {
     Plastic = 1,
-    Paper,
-    Bio,
-    Clear,
-    Colored,
-    Textile
+    Paper = 2,
+    Bio = 3,
+    Clear = 4,
+    Colored = 5,
+    Textile = 6
 };
 
 struct container_t
@@ -61,6 +61,17 @@ struct group
     int alloc_size;
     // on heap
     int *garbage_types;
+};
+
+struct filter
+{
+    enum garbage_type *type_filter;
+
+    unsigned int low;
+    unsigned int high;
+    bool use_capacity;
+
+    int want_private;
 };
 
 #endif //HW03_GENERAL_STRUCTS_H

@@ -12,10 +12,10 @@
 
 bool filter_types(const char *filter_str, enum garbage_type **filters);
 
-bool parse_interval(char *s, unsigned int *x, unsigned int *y);
+bool parse_interval(char *s, struct filter *filter);
 
-bool private_filter(char *input, int *want_private);
+bool private_filter(char *input, struct filter *filter);
 
-bool keep_container(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max, int want_private, struct container_t *container);
+bool keep_container(const struct filter *filter, struct container_t *container);
 
-bool filter_containers(const enum garbage_type *filters, bool use_capacity, unsigned int min, unsigned int max, int want_private, struct all_containers *all_conts);
+bool filter_containers(const struct filter *filter, struct all_containers *all_conts);

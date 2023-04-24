@@ -31,8 +31,6 @@ void free_struct_all_containers(struct all_containers *all_conts);
 
 void free_groups(struct all_containers *all_conts);
 
-int garb_to_int(enum garbage_type type);
-
 bool make_new_group(struct group *pointer_group, int id, double x, double y, unsigned int first_id, enum garbage_type garbage);
 
 bool add_to_group(struct group *group, unsigned int id, enum garbage_type garbage);

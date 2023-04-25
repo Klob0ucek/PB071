@@ -70,6 +70,9 @@ void init_persons(struct persons *persons)
 
 void new_person(struct person *new, const char *id, const char *name)
 {
+    if (id == NULL || name == NULL){
+        OP(NULL, ALLOCATION_FAILED);
+    }
     char *new_id = malloc(strlen(id) * sizeof(char) + 1);
     if (name == NULL){
         perror("Malloc Failure");

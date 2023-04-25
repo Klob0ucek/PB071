@@ -88,7 +88,10 @@ char *read_line(FILE *input)
 {
     int capacity = 16;
     int size = 0;
-    char *buffer = (char *) malloc(capacity);
+    char *buffer = (char *) calloc(sizeof(char), capacity);
+    if (buffer == NULL){
+        error_happened(ALLOCATION_FAILED);
+    }
     int c;
 
     while ((c = fgetc(input)) != EOF && c != '\n') {
@@ -102,6 +105,15 @@ char *read_line(FILE *input)
             buffer = tmp;
         }
         buffer[size++] = c;
+    }
+    if (size == capacity) {
+        capacity += 1;
+        char *tmp = (char *) realloc(buffer, capacity);
+        if (!tmp) {
+            free(buffer);
+            error_happened(ALLOCATION_FAILED);
+        }
+        buffer = tmp;
     }
     buffer[size] = '\0';
     return buffer;

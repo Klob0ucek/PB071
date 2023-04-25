@@ -58,4 +58,8 @@ CMakeLists.txt.user*
 !.clang-format
 !.clang-tidy
 
-
+# Unignore data files for HW04 tests
+!/hw04/tests/data/extra/simple/*.txt
+!/hw04/tests/data/extra/advanced/*.txt
+!/hw04/tests/data/extra/*.txt
+!/hw04/tests/data/nanecisto/*.txt

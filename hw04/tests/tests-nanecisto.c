@@ -2,7 +2,7 @@
 #include "libs/utils.h"
 #include "libs/mainwrap.h"
 
-#define PERSONS_SIMPLEST "tests/data/nanecisto/persons_simplest.txt" 
+#define PERSONS_SIMPLEST "tests/data/nanecisto/persons_simplest.txt"
 #define CURRENCIES_SIMPLEST "tests/data/nanecisto/currencies_simplest.txt"
 #define PAYMENTS_SIMPLEST "tests/data/nanecisto/payments_simplest.txt"
 

@@ -39,7 +39,7 @@ void load_currency_table(struct currency_table *table, FILE *input)
         end = words_end(rating);
         *end = '\0';
 
-        add_currency(table, name, load_decimal(rating, RATING_DECIMALS));
+        add_currency(table, name, load_decimal(rating, RATING_DECIMALS, RATING));
     }
     leave();
 }
@@ -103,7 +103,7 @@ void load_payments(struct persons *persons, struct currency_table *table, FILE *
         char *currency = trim_string(end + 1, &end);
         *end = '\0';
 
-        int value = convert_currency(table, load_decimal(amount, RATING_DECIMALS), currency);
+        int64_t value = convert_currency(table, load_decimal(amount, RATING_DECIMALS, CURRENCY), currency);
         int from_count = char_count(from, ';') + 1;
         int to_count = char_count(to, ';') + 1;
 

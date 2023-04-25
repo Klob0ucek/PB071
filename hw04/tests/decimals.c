@@ -28,11 +28,11 @@ TEST(decimals_to_base) {
 TEST(load_decimal) {
     int value;
     SUBTEST("1, 2 -> 100") {
-        value = load_decimal("1", 2);
+        value = load_decimal("1", 2, CURRENCY);
         ASSERT(value == 100);
     }
     SUBTEST("1.23, 2 -> 123") {
-        value = load_decimal("1.23", 2);
+        value = load_decimal("1.23", 2, RATING);
         ASSERT(value == 123);
     }
 }

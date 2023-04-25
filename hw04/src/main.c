@@ -4,6 +4,7 @@
 #include "load.h"
 #include "persons.h"
 #include "structures.h"
+#include "constants.h"
 
 #include <inttypes.h>
 #include <stdbool.h>

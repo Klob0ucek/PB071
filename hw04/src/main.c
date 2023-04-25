@@ -1,10 +1,10 @@
+#include "constants.h"
 #include "currency.h"
 #include "decimals.h"
 #include "errors.h"
 #include "load.h"
 #include "persons.h"
 #include "structures.h"
-#include "constants.h"
 
 #include <inttypes.h>
 #include <stdbool.h>

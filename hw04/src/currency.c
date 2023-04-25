@@ -70,7 +70,7 @@ void init_currency_table(struct currency_table *table)
     object_set_destructor(table, destroy_currency_table);
 }
 
-void add_currency(struct currency_table *table, const char *name, int rating)
+void add_currency(struct currency_table *table, const char *name, int64_t rating)
 {
     if (!rating && table->main_currency)
         error_happened(CURRENCY_DUPLICATE_MAIN);
@@ -92,8 +92,7 @@ void add_currency(struct currency_table *table, const char *name, int rating)
     ++table->size;
 }
 
-int convert_currency(struct currency_table *table, int amount, const char *currency)
-{
+int64_t convert_currency(struct currency_table *table, int64_t amount, const char *currency) {
     struct currency *found;
     OP(found = find_currency(table, currency), CURRENCY_NOT_FOUND);
     if (found->rating == 0){

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdint-gcc.h>
 
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
@@ -7,7 +8,7 @@ struct transaction
 {
     struct person *source;
     struct person *target;
-    int amount;
+    int64_t amount;
     char *currency;
 };
 

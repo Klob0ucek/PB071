@@ -12,9 +12,9 @@
 TEST(my_test)
 {
     int rv = 0;
-    CHECK(app_main_args("../tests/data/extra/persons.txt",
-                        "../tests/data/extra/simple/currencies.txt",
-                        "../tests/data/extra/simple/payments-01.txt") == rv);
+    CHECK(app_main_args("tests/data/extra/persons.txt",
+                        "tests/data/extra/simple/currencies.txt",
+                        "tests/data/extra/simple/payments-01.txt") == rv);
     /* use app_main() if you don't want to give any args */
 
     const char *correct_output = "Lydia van Bredevoort (LB) -> Assire var Anahid (AA): 10 BASE\n"
@@ -28,9 +28,9 @@ TEST(my_test)
 TEST(my_test_2)
 {
     int rv = 0;
-    CHECK(app_main_args("../tests/data/extra/persons.txt",
-                        "../tests/data/extra/simple/currencies.txt",
-                        "../tests/data/extra/simple/payments-02.txt") == rv);
+    CHECK(app_main_args("tests/data/extra/persons.txt",
+                        "tests/data/extra/simple/currencies.txt",
+                        "tests/data/extra/simple/payments-02.txt") == rv);
     /* use app_main() if you don't want to give any args */
 
     const char *correct_output = "Francesca Findabair (FF) -> Assire var Anahid (AA): 88.37 BASE\n"
@@ -41,4 +41,25 @@ TEST(my_test_2)
     CHECK_NOT_EMPTY(stdout);
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
+}
+
+TEST(my_test_3)
+{
+    int rv = 0;
+    CHECK(app_main_args("tests/data/extra/persons.txt",
+                        "tests/data/extra/advanced/currencies.txt",
+                        "tests/data/extra/advanced/payments-01.txt") == rv);
+    /* use app_main() if you don't want to give any args */
+    CHECK_NOT_EMPTY(stderr);
+}
+
+TEST(my_test_4)
+{
+    int rv = 0;
+    CHECK(app_main_args("tests/data/extra/persons.txt",
+                        "tests/data/extra/advanced/currencies.txt",
+                        "tests/data/extra/advanced/payments-02.txt") == rv);
+    /* use app_main() if you don't want to give any args */
+    CHECK_NOT_EMPTY(stderr);
+
 }

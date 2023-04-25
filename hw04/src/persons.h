@@ -1,3 +1,4 @@
+#include <stdint-gcc.h>
 #include "utils.h"
 
 #ifndef PERSONS_H
@@ -7,7 +8,7 @@ struct person
 {
     char *id;
     char *name;
-    int amount;
+    int64_t amount;
 };
 
 struct persons

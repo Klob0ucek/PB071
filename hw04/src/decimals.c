@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 
-static int normalize(int number, int upper)
+static int64_t normalize(int64_t number, int upper)
 {
     int lower = upper / 10;
     while (number < lower)
@@ -20,18 +21,18 @@ int decimals_to_base(int decimals)
     return base;
 }
 
-int load_decimal(const char *string, int decimals)
+int64_t load_decimal(const char *string, int decimals)
 {
     int base = decimals_to_base(decimals);
     if (!strchr(string, '.')) {
-        int result;
-        sscanf(string, "%i", &result);
-        return result * base;
+        int64_t result;
+        sscanf(string, "%" PRId64, &result);
+        return (int64_t) result * base;
     }
 
-    int large;
-    int small;
-    sscanf(string, "%i.%i", &large, &small);
+    int64_t large;
+    int64_t small;
+    sscanf(string, "%" PRId64 ".%" PRId64, &large, &small);
 
-    return large * base + normalize(small, base);
+    return (int64_t) large * base + normalize(small, base);
 }

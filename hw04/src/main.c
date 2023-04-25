@@ -5,6 +5,7 @@
 #include "structures.h"
 #include "decimals.h"
 #include "constants.h"
+#include <inttypes.h>
 
 #include <string.h>
 #include <stdbool.h>
@@ -26,18 +27,18 @@ struct person *find_extreme(struct persons *persons, int sign)
     return extreme;
 }
 
-void print_amount(int amount)
+void print_amount(int64_t amount)
 {
-    int pre_amount = amount / decimals_to_base(RATING_DECIMALS);
-    int post_amount = amount % decimals_to_base(RATING_DECIMALS);
+    int64_t pre_amount = amount / decimals_to_base(RATING_DECIMALS);
+    int64_t post_amount = amount % decimals_to_base(RATING_DECIMALS);
 
     if (post_amount == 0){
-        printf("%d", pre_amount);
+        printf("%" PRId64, pre_amount);
     } else {
         while (post_amount % 10 == 0 || post_amount > 100) {
             post_amount /= 10;
         }
-        printf("%d.%d", pre_amount, post_amount);
+        printf("%" PRId64 ".%" PRId64, pre_amount, post_amount);
     }
 }
 
@@ -58,12 +59,12 @@ void settle_debt(struct persons *persons, struct currency_table *currency_table)
         struct person *creditor = find_extreme(persons,  1);
 
         if (debtor->amount == 0 || creditor->amount == 0){
-            fprintf(stderr, "Rounding error");
+            fprintf(stderr, "Rounding error\n");
             break;
         }
 
 
-        int amount = -debtor->amount;
+        int64_t amount = -debtor->amount;
         if (amount > creditor->amount)
             amount = creditor->amount;
 

@@ -1,3 +1,4 @@
+#include <stdint-gcc.h>
 #include "errors.h"
 #include "utils.h"
 
@@ -7,7 +8,7 @@
 struct currency
 {
     char *name;
-    int rating;
+    int64_t rating;
 };
 
 struct currency_table
@@ -20,7 +21,8 @@ struct currency_table
 };
 
 void init_currency_table(struct currency_table *table);
-void add_currency(struct currency_table *table, const char *name, int rating);
-int convert_currency(struct currency_table *table, int amount, const char *currency);
+void add_currency(struct currency_table *table, const char *name, int64_t rating);
+int64_t convert_currency(struct currency_table *table, int64_t amount, const char *currency);
+
 
 #endif

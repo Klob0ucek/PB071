@@ -14,13 +14,11 @@ jmp_buf *get_error_point()
     return point;
 }
 
-__attribute__((noreturn))
 int error_happened(enum error_codes code)
 {
     longjmp(*point, code);
 }
 
-__attribute__((noreturn))
 void exit_success()
 {
     error_happened(SUCCESS);

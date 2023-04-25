@@ -1,14 +1,13 @@
 #include "currency.h"
+#include "decimals.h"
 #include "errors.h"
 #include "load.h"
 #include "persons.h"
 #include "structures.h"
-#include "decimals.h"
-#include "constants.h"
-#include <inttypes.h>
 
-#include <string.h>
+#include <inttypes.h>
 #include <stdbool.h>
+#include <string.h>
 
 struct person *find_extreme(struct persons *persons, int sign)
 {
@@ -19,10 +18,9 @@ struct person *find_extreme(struct persons *persons, int sign)
         if (sign == -1 && (persons->persons[i].amount) < extreme->amount) {
             extreme = &persons->persons[i];
         }
-        if (sign == 1 && (persons->persons[i].amount) > extreme->amount){
+        if (sign == 1 && (persons->persons[i].amount) > extreme->amount) {
             extreme = &persons->persons[i];
         }
-
     }
     return extreme;
 }
@@ -32,7 +30,7 @@ void print_amount(int64_t amount)
     int64_t pre_amount = amount / decimals_to_base(RATING_DECIMALS);
     int64_t post_amount = amount % decimals_to_base(RATING_DECIMALS);
 
-    if (post_amount == 0){
+    if (post_amount == 0) {
         printf("%" PRId64, pre_amount);
     } else {
         while (post_amount % 10 == 0 || post_amount > 100) {
@@ -42,9 +40,10 @@ void print_amount(int64_t amount)
     }
 }
 
-bool all_payments_covered(struct persons *persons){
-    for (int i = 0; i < persons->size; i ++){
-        if (persons->persons[i].amount != 0){
+bool all_payments_covered(struct persons *persons)
+{
+    for (int i = 0; i < persons->size; i++) {
+        if (persons->persons[i].amount != 0) {
             return false;
         }
     }
@@ -56,9 +55,9 @@ void settle_debt(struct persons *persons, struct currency_table *currency_table)
 {
     while (!all_payments_covered(persons)) {
         struct person *debtor = find_extreme(persons, -1);
-        struct person *creditor = find_extreme(persons,  1);
+        struct person *creditor = find_extreme(persons, 1);
 
-        if (debtor->amount == 0 || creditor->amount == 0){
+        if (debtor->amount == 0 || creditor->amount == 0) {
             fprintf(stderr, "Rounding error\n");
             break;
         }
@@ -111,7 +110,7 @@ int main(int argc, char **argv)
     init_currency_table(&currency_table);
     init_persons(&persons);
 
-    if ((person_file = fopen(argv[1], "r")) == NULL){
+    if ((person_file = fopen(argv[1], "r")) == NULL) {
         fprintf(stderr, "Unable to open persons file!\n");
         return 1;
     }
@@ -136,6 +135,6 @@ int main(int argc, char **argv)
     payment_file = NULL;
 
     settle_debt(&persons, &currency_table);
-    
+
     exit_success();
 }

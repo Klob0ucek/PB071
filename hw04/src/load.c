@@ -56,7 +56,7 @@ void load_persons(struct persons *persons, FILE *input)
 
     for (; !feof(input); free(line)) {
         line = read_line(input);
-        if (line == NULL){
+        if (line == NULL) {
             OP(NULL, ALLOCATION_FAILED);
         }
         if (empty_string(line))

@@ -1,6 +1,7 @@
-#include <stdint-gcc.h>
 #include "errors.h"
 #include "utils.h"
+
+#include <stdint-gcc.h>
 
 #ifndef CURRENCY_H
 #define CURRENCY_H

@@ -1,5 +1,6 @@
-#include <stdint-gcc.h>
 #include "utils.h"
+
+#include <stdint-gcc.h>
 
 #ifndef PERSONS_H
 #define PERSONS_H

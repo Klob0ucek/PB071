@@ -89,7 +89,7 @@ char *read_line(FILE *input)
     int capacity = 16;
     int size = 0;
     char *buffer = (char *) calloc(sizeof(char), capacity);
-    if (buffer == NULL){
+    if (buffer == NULL) {
         error_happened(ALLOCATION_FAILED);
     }
     int c;

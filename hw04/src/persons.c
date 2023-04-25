@@ -41,18 +41,18 @@ static int person_cmp(const void *_id, const void *_person)
 struct person *find_person(const struct persons *persons, const char *id)
 {
     for (int i = 0; i < persons->size; ++i) {
-        if (strcmp(id, persons->persons[i].id) == 0){
+        if (strcmp(id, persons->persons[i].id) == 0) {
             return &persons->persons[i];
         }
     }
     return NULL;
-//    return (struct person *) bsearch(id, persons->size, persons->persons, sizeof(struct person), person_cmp);
+    //    return (struct person *) bsearch(id, persons->size, persons->persons, sizeof(struct person), person_cmp);
 }
 
 static void destroy_persons(void *p)
 {
     struct persons *persons = (struct persons *) p;
-    for (int i = 0; i < persons->size; i++){
+    for (int i = 0; i < persons->size; i++) {
         free(persons->persons[i].id);
         free(persons->persons[i].name);
     }
@@ -70,24 +70,24 @@ void init_persons(struct persons *persons)
 
 void new_person(struct person *new, const char *id, const char *name)
 {
-    if (id == NULL || name == NULL){
+    if (id == NULL || name == NULL) {
         OP(NULL, ALLOCATION_FAILED);
     }
     char *new_id = malloc(strlen(id) * sizeof(char) + 1);
-    if (name == NULL){
+    if (name == NULL) {
         perror("Malloc Failure");
         OP(NULL, ALLOCATION_FAILED);
     }
     strcpy(new_id, id);
 
     char *new_name = malloc(strlen(name) * sizeof(char) + 1);
-    if (name == NULL){
+    if (name == NULL) {
         perror("Malloc Failure");
         OP(NULL, ALLOCATION_FAILED);
     }
     strcpy(new_name, name);
 
-    struct person new_guy = {new_id, new_name, 0};
+    struct person new_guy = { new_id, new_name, 0 };
     *new = new_guy;
 }
 
@@ -98,16 +98,16 @@ void add_person(struct persons *persons, const char *id, const char *name)
     struct person person_new;
     new_person(&person_new, id, name);
 
-    if (persons->persons == NULL){
+    if (persons->persons == NULL) {
         struct person *people = malloc(sizeof(struct person) * persons->capacity);
-        if (people == NULL){
+        if (people == NULL) {
             OP(NULL, ALLOCATION_FAILED);
         }
         people[persons->size] = person_new;
         persons->size++;
         persons->persons = people;
     } else {
-        if(persons->capacity == persons->size){
+        if (persons->capacity == persons->size) {
             persons->capacity *= 2;
             struct person *tmp;
             OP(tmp = (struct person *) realloc(persons->persons, persons->capacity * sizeof(struct person)), ALLOCATION_FAILED);

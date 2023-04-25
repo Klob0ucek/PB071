@@ -44,7 +44,7 @@ void print_error_message(enum error_codes code);
 int return_code(enum error_codes code);
 void set_error_point(jmp_buf *point);
 jmp_buf *get_error_point();
-__attribute__((noreturn)) int error_happened(enum error_codes code);
-__attribute__((noreturn)) void exit_success();
+int error_happened(enum error_codes code);
+void exit_success();
 
 #endif

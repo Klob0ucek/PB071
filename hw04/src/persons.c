@@ -52,6 +52,10 @@ struct person *find_person(const struct persons *persons, const char *id)
 static void destroy_persons(void *p)
 {
     struct persons *persons = (struct persons *) p;
+    for (int i = 0; i < persons->size; i++){
+        free(persons->persons[i].id);
+        free(persons->persons[i].name);
+    }
     free(persons->persons);
 }
 

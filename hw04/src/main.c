@@ -116,20 +116,26 @@ int main(int argc, char **argv)
         return 1;
     }
     load_persons(&persons, person_file);
+    fclose(person_file);
+    person_file = NULL;
 
     if ((currency_file = fopen(argv[2], "r")) == NULL) {
         fprintf(stderr, "Unable to open file with currency!\n");
         return 1;
     }
     load_currency_table(&currency_table, currency_file);
+    fclose(currency_file);
+    currency_file = NULL;
 
     if ((payment_file = fopen(argv[3], "r")) == NULL) {
         fprintf(stderr, "Unable to open file with payments!\n");
         return 1;
     }
     load_payments(&persons, &currency_table, payment_file);
+    fclose(payment_file);
+    payment_file = NULL;
 
     settle_debt(&persons, &currency_table);
-
+    
     exit_success();
 }

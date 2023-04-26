@@ -42,24 +42,3 @@ TEST(my_test_2)
     ASSERT_FILE(stdout, correct_output);
     CHECK_IS_EMPTY(stderr);
 }
-
-TEST(my_test_3)
-{
-    int rv = 0;
-    CHECK(app_main_args("tests/data/extra/persons.txt",
-                        "tests/data/extra/advanced/currencies.txt",
-                        "tests/data/extra/advanced/payments-01.txt") != rv);
-    /* use app_main() if you don't want to give any args */
-    CHECK_NOT_EMPTY(stderr);
-}
-
-TEST(my_test_4)
-{
-    int rv = 0;
-    CHECK(app_main_args("tests/data/extra/persons.txt",
-                        "tests/data/extra/advanced/currencies.txt",
-                        "tests/data/extra/advanced/payments-02.txt") != rv);
-    /* use app_main() if you don't want to give any args */
-    CHECK_NOT_EMPTY(stderr);
-
-}

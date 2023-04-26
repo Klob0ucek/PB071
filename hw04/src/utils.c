@@ -125,6 +125,7 @@ bool is_correct_number(const char *str, int pre_dot, int post_dot)
     if (str == NULL) {
         return false;
     }
+    
     bool dot = false;
     while(str[0] != '\0'){
         if (str[0] == '.') {

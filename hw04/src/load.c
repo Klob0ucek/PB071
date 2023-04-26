@@ -5,10 +5,11 @@
 #include "persons.h"
 #include "utils.h"
 
-#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
 
 int semicolon(int letter)
 {
@@ -39,7 +40,16 @@ void load_currency_table(struct currency_table *table, FILE *input)
         end = words_end(rating);
         *end = '\0';
 
-        add_currency(table, name, load_decimal(rating, RATING_DECIMALS, RATING));
+        if (!is_correct_number(rating, PRE_DOT_RATING, RATING_DECIMALS)){
+            fclose(input);
+            free(line);
+            error_happened(INVALID_NUMERIC_INPUT);
+        }
+        add_currency(table, name, load_decimal(rating, RATING_DECIMALS));
+    }
+    if (table->main_currency == NULL) {
+        fclose(input);
+        error_happened(NO_BASE_VALUE);
     }
     leave();
 }
@@ -103,10 +113,16 @@ void load_payments(struct persons *persons, struct currency_table *table, FILE *
         end = words_end(amount);
         *end = '\0';
 
+        if (!is_correct_number(amount, PRE_DOT_PAYMENT, PAYMENT_DECIMALS)){
+            fclose(input);
+            free(line);
+            error_happened(INVALID_NUMERIC_INPUT);
+        }
+
         char *currency = trim_string(end + 1, &end);
         *end = '\0';
 
-        int64_t value = convert_currency(table, load_decimal(amount, RATING_DECIMALS, CURRENCY), currency);
+        int64_t value = convert_currency(table, load_decimal(amount, RATING_DECIMALS), currency);
         int from_count = char_count(from, ';') + 1;
         int to_count = char_count(to, ';') + 1;
 

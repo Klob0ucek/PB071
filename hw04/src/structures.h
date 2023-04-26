@@ -19,10 +19,4 @@ struct transactions
     int capacity;
 };
 
-enum load_type
-{
-    CURRENCY,
-    RATING
-};
-
 #endif

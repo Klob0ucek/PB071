@@ -23,7 +23,7 @@ int decimals_to_base(int decimals)
     return base;
 }
 
-int64_t load_decimal(const char *string, int decimals, enum load_type load)
+int64_t load_decimal(const char *string, int decimals)
 {
     int base = decimals_to_base(decimals);
     if (!strchr(string, '.')) {
@@ -35,13 +35,6 @@ int64_t load_decimal(const char *string, int decimals, enum load_type load)
     int64_t large;
     int64_t small;
     sscanf(string, "%" PRId64 ".%" PRId64, &large, &small);
-
-    if (load == CURRENCY) {
-        OP(large < 100000 && small < 10000, CURRENCY_WRONG_INPUT);
-    }
-    if (load == RATING) {
-        OP(large < 10000000 && small < 100, CURRENCY_WRONG_INPUT);
-    }
 
     return (int64_t) large * base + normalize(small, base);
 }

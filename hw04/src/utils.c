@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 void object_destroy(void *o)
 {
@@ -117,4 +118,33 @@ char *read_line(FILE *input)
     }
     buffer[size] = '\0';
     return buffer;
+}
+
+bool is_correct_number(const char *str, int pre_dot, int post_dot)
+{
+    if (str == NULL) {
+        return false;
+    }
+    bool dot = false;
+    while(str[0] != '\0'){
+        if (str[0] == '.') {
+            dot = true;
+            ++str;
+            continue;
+        }
+        if (!isdigit(*str)){
+            return false;
+        } else {
+            if (!dot){
+                pre_dot--;
+            } else {
+                post_dot--;
+            }
+        }
+        if (pre_dot < 0 || post_dot < 0){
+            return false;
+        }
+        ++str;
+    }
+    return true;
 }

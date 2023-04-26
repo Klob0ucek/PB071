@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     init_persons(&persons);
 
     if ((person_file = fopen(argv[1], "r")) == NULL) {
-        fprintf(stderr, "Unable to open persons file!\n");
+        error_happened(INVALID_ARGUMENTS);
         return 1;
     }
     load_persons(&persons, person_file);
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
     person_file = NULL;
 
     if ((currency_file = fopen(argv[2], "r")) == NULL) {
-        fprintf(stderr, "Unable to open file with currency!\n");
+        error_happened(INVALID_ARGUMENTS);
         return 1;
     }
     load_currency_table(&currency_table, currency_file);
@@ -128,8 +128,7 @@ int main(int argc, char **argv)
     currency_file = NULL;
 
     if ((payment_file = fopen(argv[3], "r")) == NULL) {
-        fprintf(stderr, "Unable to open file with payments!\n");
-        return 1;
+        error_happened(INVALID_ARGUMENTS);
     }
     load_payments(&persons, &currency_table, payment_file);
     fclose(payment_file);

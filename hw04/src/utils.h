@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifndef UTILS_H
 #define UTILS_H
@@ -20,5 +21,6 @@ int char_count(const char *str, char letter);
 char *words_end(char *word);
 char *get_token(char *string, int (*condition)(int));
 char *read_line(FILE *input);
+bool is_correct_number(const char *str, int pre_dot, int post_dot);
 
 #endif

@@ -40,17 +40,12 @@ void load_currency_table(struct currency_table *table, FILE *input)
         end = words_end(rating);
         *end = '\0';
 
-        if (!is_correct_number(rating, PRE_DOT_RATING, RATING_DECIMALS)){
-            fclose(input);
-            free(line);
+        if (!is_correct_number(rating, PRE_DOT_RATING, RATING_DECIMALS)) {
             error_happened(INVALID_NUMERIC_INPUT);
         }
         add_currency(table, name, load_decimal(rating, RATING_DECIMALS));
     }
-    if (table->main_currency == NULL) {
-        fclose(input);
-        error_happened(NO_BASE_VALUE);
-    }
+    OP(table->main_currency != NULL, NO_BASE_VALUE);
     leave();
 }
 
@@ -113,9 +108,7 @@ void load_payments(struct persons *persons, struct currency_table *table, FILE *
         end = words_end(amount);
         *end = '\0';
 
-        if (!is_correct_number(amount, PRE_DOT_PAYMENT, PAYMENT_DECIMALS)){
-            fclose(input);
-            free(line);
+        if (!is_correct_number(amount, PRE_DOT_PAYMENT, PAYMENT_DECIMALS)) {
             error_happened(INVALID_NUMERIC_INPUT);
         }
 

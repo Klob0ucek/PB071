@@ -125,8 +125,8 @@ bool is_correct_number(const char *str, int pre_dot, int post_dot)
     if (str == NULL) {
         return false;
     }
-    
     bool dot = false;
+    bool post_dot_decimal = false;
     while(str[0] != '\0'){
         if (str[0] == '.') {
             dot = true;
@@ -140,12 +140,16 @@ bool is_correct_number(const char *str, int pre_dot, int post_dot)
                 pre_dot--;
             } else {
                 post_dot--;
+                post_dot_decimal = true;
             }
         }
         if (pre_dot < 0 || post_dot < 0){
             return false;
         }
         ++str;
+    }
+    if (dot && !post_dot_decimal){
+        return false;
     }
     return true;
 }

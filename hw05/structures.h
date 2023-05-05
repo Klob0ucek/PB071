@@ -30,6 +30,7 @@ struct file{
 
 struct folder{
     size_t size;
+    size_t blocks;
     bool error_flag;
     char *name; // on heap
     struct item *children; // on heap
@@ -50,8 +51,8 @@ struct item {
     union item_holder item_pointer;
 };
 
-struct tree_structure {
-    char *root_str;
-    int total_size;
-    struct item root;
+struct prefix{
+    char *prefix;
+    bool error;
+    int depth;
 };

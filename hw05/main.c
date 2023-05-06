@@ -145,9 +145,16 @@ void print_dir(struct item *dir,  struct prefix *prefix, struct options *options
 
     char *dir_prefix = prefix->prefix + (4 * prefix->depth);
     strcpy(dir_prefix, "|-- ");
+    if (prefix->depth > 0 && *(dir_prefix - 4) != '\\'){
+        memset(dir_prefix - 4, '|',1);
+        memset(dir_prefix - 3, ' ',3);
+    }
     if (prefix->depth > 0 && *(dir_prefix - 4) == '\\'){
         memset(dir_prefix - 4, ' ', 4);
+
     }
+
+    //TODO printing broken - or loading. I Dont know anymore
 
     for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++){
         print_item(&dir->item_pointer.folder.children[i], prefix, options, max);
@@ -186,7 +193,7 @@ void print_tree(struct item *item, struct options *options){
  ********/
 
 
-struct item load_item(char *path);
+bool load_item(char *path, struct item *item);
 
 char *find_name_from_path(char *path) {
     char *result;
@@ -226,17 +233,20 @@ void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks){
 }
 
 
-struct item load_file(char *path) {
+bool load_file(char *path, struct item *item) {
     struct stat st;
-    stat(path, &st);
+    if (stat(path, &st)){
+        return false;
+    }
 
     struct file this = {st.st_size, st.st_blksize, find_name_from_path(path)};
     union item_holder holder = {this};
     struct item result = {NORM_FILE, holder};
-    return result;
+    *item = result;
+    return true;
 }
 
-struct item load_dir(char *path) {
+bool load_dir(char *path, struct item *result_dir) {
     struct folder folder = {0, 0, false, find_name_from_path(path), NULL, 0};
     union item_holder holder;
     holder.folder = folder;
@@ -249,12 +259,10 @@ struct item load_dir(char *path) {
     int index = 0;
     struct item *children = malloc(sizeof(struct item) * size);
     if (children == NULL){
-        fprintf(stderr, "Dir malloc failed");
-        item.item_pointer.folder.error_flag = true;
-        return item;
+        fprintf(stderr, "Dir malloc failed\n");
+        return false;
     }
 
-    struct item loaded;
     DIR *dir = NULL;
     if ((dir = opendir(path)) != NULL) {
         struct dirent *dir_entry = NULL;
@@ -267,13 +275,18 @@ struct item load_dir(char *path) {
                 size *= 2;
                 struct item *new = realloc(children, sizeof(struct item) * size);
                 if (new == NULL){
-                    perror("Realloc failed");
+                    perror("Realloc failed\n");
                     free(children);
-                    item.item_pointer.folder.error_flag = true;
-                    return item;
+                    return false;
                 }
+                children = new;
             }
-            loaded = load_item(path);
+            struct item loaded;
+            if (!load_item(path, &loaded)){
+                item.item_pointer.folder.error_flag = true;
+                remove_name_from_path(path);
+                continue;
+            }
             add_sum(&loaded, &dir_size, &dir_blocks);
             children[index] = loaded;
             ++index;
@@ -287,22 +300,22 @@ struct item load_dir(char *path) {
     item.item_pointer.folder.blocks = dir_blocks;
     item.item_pointer.folder.children = children;
     item.item_pointer.folder.amount_of_items = index;
-
-    return item;
+    *result_dir = item;
+    return true;
 }
 
-struct item load_item(char *path) {
+bool load_item(char *path, struct item *item) {
     struct stat file_stats;
     stat(path, &file_stats);
 
     if (S_ISDIR(file_stats.st_mode)){
-        return load_dir(path);
+        return load_dir(path, item);
     } else if (S_ISREG(file_stats.st_mode)){
-        return load_file(path);
+        return load_file(path, item);
+    } else {
+        return false;
     }
-    else if (file_stats.st_mode == DT_UNKNOWN){
-        // TODO unknown file finish here
-    }
+
 }
 
 void free_item(struct item *item){
@@ -428,7 +441,8 @@ int main(int argc, char **argv)
     char *root_path = argv[argc-1];
     char *long_path = max_path(root_path);
 
-    struct item item = load_item(long_path);
+    struct item item;
+    load_item(long_path, &item);
     sort_tree(&item, &options);
     print_tree(&item, &options);
 

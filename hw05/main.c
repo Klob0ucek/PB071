@@ -1,5 +1,5 @@
-#include "files.h"
-
+//#include "files.h"
+#include "structures.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,9 +12,9 @@
  * SORTING *
  **********/
 
+typedef int (*sorting_fn)(const void*, const void *);
 
-
-void *choose_sort_function(struct options *options);
+sorting_fn choose_sort_function(struct options *options);
 
 void sort(struct item *item, int (*op)(const void*, const void*)){
     if (item->item_type == FOLDER){
@@ -77,7 +77,7 @@ int compare_blocks(const void* a, const void* b) {
     return 0;
 }
 
-void *choose_sort_function(struct options *options) {
+sorting_fn choose_sort_function(struct options *options) {
     if (options->size_sorted == DEFAULT){
         return &compare_names;
     }
@@ -85,40 +85,61 @@ void *choose_sort_function(struct options *options) {
         return &compare_blocks;
     }
     return &compare_actual;
-};
+}
 
 /************
  * PRINTING *
  ***********/
 
-void print_item(struct item *item, struct prefix *prefix, struct options *options);
+void print_item(struct item *item, struct prefix *prefix, struct options *options, size_t max);
 
-const char* print_size(size_t size) {
+void print_size(size_t size) {
     static const char* units[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB"};
-    int unitIndex = 0;
+    int unit_index = 0;
     double d_size = (double)size;
 
-    while (d_size >= 1024 && unitIndex < 5) {
+    while (d_size >= 1024 && unit_index < 5) {
         d_size /= 1024;
-        unitIndex++;
+        unit_index++;
     }
-    printf("%6.2f %s ", d_size, units[unitIndex]);
+    printf("%6.1f %s ", d_size, units[unit_index]);
 }
 
-void print_file(struct item *file,  struct prefix *prefix, struct options *options){
-    if (options->block_size == DEFAULT){
-        print_size(file->item_pointer.file.blocks);
+void print_percentage(size_t num, size_t max) {
+    double percentage = (num / (double)max) * 100;
+    printf("%5.1f%% ", percentage);
+}
+
+void print_file(struct item *file,  struct prefix *prefix, struct options *options, size_t max){
+    if (options->percent == DEFAULT){
+        if (options->block_size == DEFAULT){
+            print_size(file->item_pointer.file.blocks);
+        } else {
+            print_size(file->item_pointer.file.size);
+        }
     } else {
-        print_size(file->item_pointer.file.size);
+        if (options->block_size == DEFAULT){
+            print_percentage(file->item_pointer.file.blocks, max);
+        } else {
+            print_percentage(file->item_pointer.file.size, max);
+        }
     }
     printf("%s%s\n", prefix->prefix, file->item_pointer.file.name);
 }
 
-void print_dir(struct item *dir,  struct prefix *prefix, struct options *options){
-    if (options->block_size == DEFAULT){
-        print_size(dir->item_pointer.folder.blocks);
+void print_dir(struct item *dir,  struct prefix *prefix, struct options *options, size_t max){
+    if (options->percent == DEFAULT){
+        if (options->block_size == DEFAULT){
+            print_size(dir->item_pointer.folder.blocks);
+        } else {
+            print_size(dir->item_pointer.folder.size);
+        }
     } else {
-        print_size(dir->item_pointer.folder.size);
+        if (options->block_size == DEFAULT){
+            print_percentage(dir->item_pointer.folder.blocks, max);
+        } else {
+            print_percentage(dir->item_pointer.folder.size, max);
+        }
     }
     printf("%s%s\n", prefix->prefix, dir->item_pointer.folder.name);
 
@@ -129,20 +150,26 @@ void print_dir(struct item *dir,  struct prefix *prefix, struct options *options
     }
 
     for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++){
-        print_item(&dir->item_pointer.folder.children[i], prefix, options);
+        print_item(&dir->item_pointer.folder.children[i], prefix, options, max);
     }
     strcpy(dir_prefix, "\\-- ");
-    print_item(&dir->item_pointer.folder.children[dir->item_pointer.folder.amount_of_items - 1], prefix, options);
+    print_item(&dir->item_pointer.folder.children[dir->item_pointer.folder.amount_of_items - 1], prefix, options, max);
 }
 
-void print_item(struct item *item, struct prefix *prefix, struct options *options) {
+void print_item(struct item *item, struct prefix *prefix, struct options *options, size_t max) {
     prefix->depth++;
     if (item->item_type == FOLDER){
-        print_dir(item, prefix, options);
+        print_dir(item, prefix, options, max);
     } else if (item->item_type == NORM_FILE){
-        print_file(item, prefix, options);
+        print_file(item, prefix, options, max);
     }
     prefix->depth--;
+}
+size_t get_max(struct item *item, struct options *options){
+    if (options->block_size == DEFAULT){
+        return item->item_type == FOLDER ? item->item_pointer.folder.blocks : item->item_pointer.file.blocks;
+    }
+    return item->item_type == FOLDER ? item->item_pointer.folder.size : item->item_pointer.file.size;
 }
 
 void print_tree(struct item *item, struct options *options){
@@ -150,7 +177,8 @@ void print_tree(struct item *item, struct options *options){
     memset(prefix_str, '\0', sizeof(char) * 512);
     char *p = (char *) &prefix_str;
     struct prefix prefix = {p, item->item_type == FOLDER ? item->item_pointer.folder.error_flag : false, -1};
-    print_item(item, &prefix, options);
+    size_t max = get_max(item, options);
+    print_item(item, &prefix, options, max);
 }
 
 /*********
@@ -187,7 +215,7 @@ char *remove_name_from_path(char *path) {
     return path;
 }
 
-size_t add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks){
+void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks){
     if (item->item_type == FOLDER){
         *dir_blocks += item->item_pointer.folder.blocks;
         *dir_size += item->item_pointer.folder.size;
@@ -209,7 +237,7 @@ struct item load_file(char *path) {
 }
 
 struct item load_dir(char *path) {
-    struct folder folder = {0, 0, false, find_name_from_path(path), NULL};
+    struct folder folder = {0, 0, false, find_name_from_path(path), NULL, 0};
     union item_holder holder;
     holder.folder = folder;
     struct item item = {FOLDER, holder};
@@ -217,7 +245,7 @@ struct item load_dir(char *path) {
     size_t dir_size = 0;
     size_t dir_blocks = 0;
 
-    size_t size = 10;
+    int size = 10;
     int index = 0;
     struct item *children = malloc(sizeof(struct item) * size);
     if (children == NULL){
@@ -310,7 +338,7 @@ void close_options(struct options *options) {
     if (options->percent == UNSET){
         options->percent = DEFAULT;
     }
-};
+}
 
 bool parse_depth(struct options *options, const char *num_str){
     int num = -1;

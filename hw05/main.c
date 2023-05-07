@@ -144,7 +144,6 @@ void print_dir(struct item *dir,  struct prefix *prefix, struct options *options
     printf("%s%s\n", prefix->prefix, dir->item_pointer.folder.name);
 
     char *dir_prefix = prefix->prefix + (4 * prefix->depth);
-    strcpy(dir_prefix, "|-- ");
     if (prefix->depth > 0 && *(dir_prefix - 4) != '\\'){
         memset(dir_prefix - 4, '|',1);
         memset(dir_prefix - 3, ' ',3);
@@ -154,9 +153,8 @@ void print_dir(struct item *dir,  struct prefix *prefix, struct options *options
 
     }
 
-    //TODO printing broken - or loading. I Dont know anymore
-
     for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++){
+        strcpy(dir_prefix, "|-- ");
         print_item(&dir->item_pointer.folder.children[i], prefix, options, max);
     }
     strcpy(dir_prefix, "\\-- ");

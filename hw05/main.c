@@ -1,4 +1,3 @@
-//#include "files.h"
 #include "structures.h"
 #include <stdio.h>
 #include <string.h>
@@ -6,7 +5,6 @@
 #include <limits.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <ctype.h>
 
 /***********
  * SORTING *
@@ -111,7 +109,11 @@ void print_percentage(size_t num, size_t max) {
 }
 
 void print_file(struct item *file,  struct prefix *prefix, struct options *options, size_t max){
-    if (options->percent == DEFAULT){
+    if(prefix->error){ // {ERROR}
+        printf("  ");
+    }
+
+    if (options->percent == DEFAULT){ // {SIZE}
         if (options->block_size == DEFAULT){
             print_size(file->item_pointer.file.blocks);
         } else {
@@ -124,11 +126,20 @@ void print_file(struct item *file,  struct prefix *prefix, struct options *optio
             print_percentage(file->item_pointer.file.size, max);
         }
     }
+    // {PREFIX + NAME}
     printf("%s%s\n", prefix->prefix, file->item_pointer.file.name);
 }
 
 void print_dir(struct item *dir,  struct prefix *prefix, struct options *options, size_t max){
-    if (options->percent == DEFAULT){
+    if(prefix->error){ // {ERROR}
+        if (dir->item_pointer.folder.error_flag){
+            printf("? ");
+        } else {
+            printf("  ");
+        }
+    }
+
+    if (options->percent == DEFAULT){ // {SIZE}
         if (options->block_size == DEFAULT){
             print_size(dir->item_pointer.folder.blocks);
         } else {
@@ -143,6 +154,7 @@ void print_dir(struct item *dir,  struct prefix *prefix, struct options *options
     }
     printf("%s%s\n", prefix->prefix, dir->item_pointer.folder.name);
 
+    // {PREFIX + NAME}
     char *dir_prefix = prefix->prefix + (4 * prefix->depth);
     if (prefix->depth > 0 && *(dir_prefix - 4) != '\\'){
         memset(dir_prefix - 4, '|',1);
@@ -163,6 +175,10 @@ void print_dir(struct item *dir,  struct prefix *prefix, struct options *options
 
 void print_item(struct item *item, struct prefix *prefix, struct options *options, size_t max) {
     prefix->depth++;
+    if (prefix->depth - 1 >= options->depth){
+        prefix->depth--;
+        return;
+    }
     if (item->item_type == FOLDER){
         print_dir(item, prefix, options, max);
     } else if (item->item_type == NORM_FILE){
@@ -189,7 +205,6 @@ void print_tree(struct item *item, struct options *options){
 /*********
  * FILES *
  ********/
-
 
 bool load_item(char *path, struct item *item);
 

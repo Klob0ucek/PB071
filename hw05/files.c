@@ -9,6 +9,16 @@
 #include <dirent.h>
 #include "files.h"
 
+char *make_path(char *path, char *name){
+    char *new = malloc((strlen(path) + strlen(name) + 2) * sizeof(char));
+    if (new == NULL) {
+        fprintf(stderr, "Name malloc failure\n");
+        return NULL;
+    }
+    sprintf(new, "%s/%s", path, name);
+    return new;
+}
+
 char *find_name_from_path(char *path) {
     char *result;
     char *name_start = strrchr(path, '/');
@@ -83,7 +93,7 @@ bool load_dir(char *path, struct item *result_dir) {
             if (*dir_entry->d_name == '.') {
                 continue;
             }
-            add_name_to_path(path, dir_entry->d_name);
+            char *new_name = make_path(path, dir_entry->d_name);
             if (index == size) {
                 size *= 2;
                 struct item *new = realloc(children, sizeof(struct item) * size);
@@ -94,17 +104,33 @@ bool load_dir(char *path, struct item *result_dir) {
                 }
                 children = new;
             }
+
             struct item loaded;
-            if (!load_item(path, &loaded)) {
-                item.item_pointer.folder.error_flag = true;
-                remove_name_from_path(path);
-                continue;
+            if (dir_entry->d_type == DT_REG){
+                if (!load_file(new_name, &loaded)){
+                    item.item_pointer.folder.error_flag = true;
+                    free(new_name);
+                    continue;
+                }
+            } else if (dir_entry->d_type == DT_DIR){
+                if (!load_dir(new_name, &loaded)){
+                    item.item_pointer.folder.error_flag = true;
+                    free(new_name);
+                    continue;
+                }
+            } else {
+                if (!load_dir(new_name, &loaded)){
+                    item.item_pointer.folder.error_flag = true;
+                    free(new_name);
+                    continue;
+                }
             }
+
+            free(new_name);
+
             add_sum(&loaded, &dir_size, &dir_blocks);
             children[index] = loaded;
             ++index;
-
-            remove_name_from_path(path);
         }
         closedir(dir);
     }
@@ -120,7 +146,9 @@ bool load_dir(char *path, struct item *result_dir) {
 bool load_item(char *path, struct item *item)
 {
     struct stat file_stats;
-    stat(path, &file_stats);
+    if (lstat(path, &file_stats)) {
+        return false;
+    };
 
     if (S_ISDIR(file_stats.st_mode)) {
         return load_dir(path, item);

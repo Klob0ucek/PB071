@@ -47,11 +47,9 @@ bool parse_depth(struct options *options, const char *num_str)
 
 char *max_path(char *original)
 {
-    char path[4096];
-    memset(path, '0', sizeof(char) * 4096);
+    char *path = calloc(4096, sizeof(char));
     strcpy(path, original);
-    char *p = (char *) &path;
-    return p;
+    return path;
 }
 
 int main(int argc, char **argv)

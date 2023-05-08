@@ -10,12 +10,7 @@
 #include "stdbool.h"
 #include "structures.h"
 
-
 char *find_name_from_path(char *path);
-
-char *add_name_to_path(char *path, char *name);
-
-char *remove_name_from_path(char *path);
 
 void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks);
 

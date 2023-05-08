@@ -2,13 +2,13 @@
 // Created by Jan on 08.05.2023.
 //
 
-#include <string.h>
 #include "sorting.h"
+
+#include <string.h>
 
 /***********
  * SORTING *
  **********/
-
 
 sorting_fn choose_sort_function(struct options *options)
 {
@@ -21,24 +21,27 @@ sorting_fn choose_sort_function(struct options *options)
     return &compare_actual;
 }
 
-void sort(struct item *item, int (*op)(const void *, const void *)) {
+void sort(struct item *item, int (*op)(const void *, const void *))
+{
     if (item->item_type == FOLDER) {
         qsort(item->item_pointer.folder.children,
-              item->item_pointer.folder.amount_of_items,
-              sizeof(struct item),
-              op);
+                item->item_pointer.folder.amount_of_items,
+                sizeof(struct item),
+                op);
         for (int i = 0; i < item->item_pointer.folder.amount_of_items; ++i) {
             sort(&item->item_pointer.folder.children[i], op);
         }
     }
 }
 
-void sort_tree(struct item *item, struct options *options) {
+void sort_tree(struct item *item, struct options *options)
+{
     int (*op)(const void *, const void *) = choose_sort_function(options);
     sort(item, op);
 }
 
-int compare_names(const void *a, const void *b) {
+int compare_names(const void *a, const void *b)
+{
     struct item item1 = *(const struct item *) a;
     struct item item2 = *(const struct item *) b;
 
@@ -60,7 +63,8 @@ int compare_names(const void *a, const void *b) {
     return result;
 }
 
-int compare_actual(const void *a, const void *b) {
+int compare_actual(const void *a, const void *b)
+{
     struct item item1 = *(const struct item *) a;
     struct item item2 = *(const struct item *) b;
 
@@ -74,7 +78,8 @@ int compare_actual(const void *a, const void *b) {
     return 0;
 }
 
-int compare_blocks(const void *a, const void *b) {
+int compare_blocks(const void *a, const void *b)
+{
     struct item item1 = *(const struct item *) a;
     struct item item2 = *(const struct item *) b;
 

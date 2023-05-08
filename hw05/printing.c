@@ -2,16 +2,19 @@
 // Created by Jan on 08.05.2023.
 //
 
+#include "printing.h"
+
+#include "math.h"
+
 #include <stdio.h>
 #include <string.h>
-#include "math.h"
-#include "printing.h"
 
 /************
  * PRINTING *
  ***********/
 
-void print_size(size_t size) {
+void print_size(size_t size)
+{
     static const char *units[] = { "B  ", "KiB", "MiB", "GiB", "TiB", "PiB" };
     int unit_index = 0;
     double d_size = (double) size;
@@ -24,12 +27,14 @@ void print_size(size_t size) {
     printf("%6.1f %s ", rounded, units[unit_index]);
 }
 
-void print_percentage(size_t num, size_t max) {
+void print_percentage(size_t num, size_t max)
+{
     double percentage = (num / (double) max) * 100;
     printf("%5.1f%% ", percentage);
 }
 
-void print_file(struct item *file, struct prefix *prefix, struct options *options, size_t max) {
+void print_file(struct item *file, struct prefix *prefix, struct options *options, size_t max)
+{
     if (prefix->error) { // {ERROR}
         printf("  ");
     }
@@ -51,7 +56,8 @@ void print_file(struct item *file, struct prefix *prefix, struct options *option
     printf("%s%s\n", prefix->prefix, file->item_pointer.file.name);
 }
 
-void print_dir(struct item *dir, struct prefix *prefix, struct options *options, size_t max) {
+void print_dir(struct item *dir, struct prefix *prefix, struct options *options, size_t max)
+{
     if (prefix->error) { // {ERROR}
         if (dir->item_pointer.folder.error_flag) {
             printf("? ");
@@ -85,7 +91,7 @@ void print_dir(struct item *dir, struct prefix *prefix, struct options *options,
         memset(dir_prefix - 4, ' ', 4);
     }
 
-    if (dir->item_pointer.folder.error_flag && dir->item_pointer.folder.children == NULL){
+    if (dir->item_pointer.folder.error_flag && dir->item_pointer.folder.children == NULL) {
         return;
     }
 
@@ -105,8 +111,8 @@ size_t get_max(struct item *item, struct options *options)
     return item->item_type == FOLDER ? item->item_pointer.folder.size : item->item_pointer.file.size;
 }
 
-
-void print_tree(struct item *item, struct options *options) {
+void print_tree(struct item *item, struct options *options)
+{
     char prefix_str[512];
     memset(prefix_str, '\0', sizeof(char) * 512);
     char *p = (char *) &prefix_str;

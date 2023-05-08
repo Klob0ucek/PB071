@@ -2,14 +2,16 @@
 // Created by Jan on 08.05.2023.
 //
 
-#include <string.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <sys/stat.h>
-#include <dirent.h>
 #include "files.h"
 
-char *make_path(char *path, char *name){
+#include <dirent.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+
+char *make_path(char *path, char *name)
+{
     char *new = malloc((strlen(path) + strlen(name) + 2) * sizeof(char));
     if (new == NULL) {
         fprintf(stderr, "Name malloc failure\n");
@@ -19,9 +21,10 @@ char *make_path(char *path, char *name){
     return new;
 }
 
-char *copy_name(char dir_name[256]){
+char *copy_name(char dir_name[256])
+{
     char *new = calloc(strlen(dir_name) + 1, sizeof(char));
-    if (new == NULL){
+    if (new == NULL) {
         fprintf(stderr, "Malloc failed in name_copy\n");
         return NULL;
     }
@@ -29,7 +32,8 @@ char *copy_name(char dir_name[256]){
     return new;
 }
 
-char *find_name_from_path(char *path) {
+char *find_name_from_path(char *path)
+{
     char *result;
     char *name_start = strrchr(path, '/');
     if (name_start == NULL) {
@@ -44,7 +48,8 @@ char *find_name_from_path(char *path) {
     return result;
 }
 
-void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks) {
+void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
+{
     if (item->item_type == FOLDER) {
         *dir_blocks += item->item_pointer.folder.blocks;
         *dir_size += item->item_pointer.folder.size;
@@ -54,7 +59,8 @@ void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks) {
     }
 }
 
-bool load_file(char *path, char *name, struct item *item) {
+bool load_file(char *path, char *name, struct item *item)
+{
     struct stat st;
     if (stat(path, &st)) {
         fprintf(stderr, "Unable to load: %s\n", path);
@@ -68,7 +74,8 @@ bool load_file(char *path, char *name, struct item *item) {
     return true;
 }
 
-bool load_dir(char *path, char *name, struct item *result_dir) {
+bool load_dir(char *path, char *name, struct item *result_dir)
+{
     struct folder folder = { 0, 0, false, name, NULL, 0 };
     union item_holder holder;
     holder.folder = folder;
@@ -113,23 +120,23 @@ bool load_dir(char *path, char *name, struct item *result_dir) {
             }
 
             struct item loaded;
-            if (dir_entry->d_type == DT_REG){
-                if (!load_file(new_path, new_name, &loaded)){
+            if (dir_entry->d_type == DT_REG) {
+                if (!load_file(new_path, new_name, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
                     continue;
                 }
-            } else if (dir_entry->d_type == DT_DIR){
-                if (!load_dir(new_path, new_name, &loaded)){
+            } else if (dir_entry->d_type == DT_DIR) {
+                if (!load_dir(new_path, new_name, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
                     continue;
                 }
-                if (loaded.item_pointer.folder.error_flag){
+                if (loaded.item_pointer.folder.error_flag) {
                     item.item_pointer.folder.error_flag = true;
                 }
             } else {
-                if (!load_item(new_path, &loaded)){
+                if (!load_item(new_path, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
                     continue;
@@ -178,7 +185,8 @@ bool load_item(char *path, struct item *item)
     }
 }
 
-void free_item(struct item *item) {
+void free_item(struct item *item)
+{
     if (item->item_type == NORM_FILE) {
         free(item->item_pointer.file.name);
         item->item_pointer.file.name = NULL;
@@ -192,5 +200,3 @@ void free_item(struct item *item) {
         item->item_pointer.folder.name = NULL;
     }
 }
-
-

@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "math.h"
 #include "printing.h"
 
 /************
@@ -11,7 +12,7 @@
  ***********/
 
 void print_size(size_t size) {
-    static const char *units[] = { "B", "KiB", "MiB", "GiB", "TiB", "PiB" };
+    static const char *units[] = { "B  ", "KiB", "MiB", "GiB", "TiB", "PiB" };
     int unit_index = 0;
     double d_size = (double) size;
 
@@ -19,7 +20,8 @@ void print_size(size_t size) {
         d_size /= 1024;
         unit_index++;
     }
-    printf("%6.1f %s ", d_size, units[unit_index]);
+    double rounded = floor(d_size * 10) / 10.0;
+    printf("%6.1f %s ", rounded, units[unit_index]);
 }
 
 void print_percentage(size_t num, size_t max) {
@@ -81,6 +83,10 @@ void print_dir(struct item *dir, struct prefix *prefix, struct options *options,
     }
     if (prefix->depth > 0 && *(dir_prefix - 4) == '\\') {
         memset(dir_prefix - 4, ' ', 4);
+    }
+
+    if (dir->item_pointer.folder.error_flag && dir->item_pointer.folder.children == NULL){
+        return;
     }
 
     for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++) {

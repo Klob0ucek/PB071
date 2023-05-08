@@ -1,10 +1,9 @@
 
-#include <dirent.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
+#include <unistd.h>
 
 #include "sorting.h"
 #
@@ -33,12 +32,12 @@ bool parse_depth(struct options *options, const char *num_str)
 {
     int num = -1;
     if (strchr(num_str, '.') != NULL) {
-        fprintf(stderr, "Depth number %s is decimal", num_str);
+        fprintf(stderr, "Depth number %s is decimal\n", num_str);
         return false;
     }
     sscanf(num_str, "%d", &num);
     if (num < 0) {
-        fprintf(stderr, "Depth number %s is negative", num_str);
+        fprintf(stderr, "Depth number %s is negative\n", num_str);
         return false;
     }
     options->depth = num;
@@ -48,7 +47,11 @@ bool parse_depth(struct options *options, const char *num_str)
 char *max_path(char *original)
 {
     char *path = calloc(4096, sizeof(char));
-    strcpy(path, original);
+    if (strcmp(original, "./") == 0) {
+        getcwd(path, sizeof(char) * 4096);
+    } else {
+        strcpy(path, original);
+    }
     return path;
 }
 
@@ -72,7 +75,7 @@ int main(int argc, char **argv)
                 options.block_size = OPTION_SET;
                 continue;
             } else {
-                fprintf(stderr, "Filter %s used twice", argv[i]);
+                fprintf(stderr, "Filter %s used twice\n", argv[i]);
                 return EXIT_FAILURE;
             }
         } else if (strcmp(argv[i], "-s") == 0) {
@@ -80,7 +83,7 @@ int main(int argc, char **argv)
                 options.size_sorted = OPTION_SET;
                 continue;
             } else {
-                fprintf(stderr, "Filter %s used twice", argv[i]);
+                fprintf(stderr, "Filter %s used twice\n", argv[i]);
                 return EXIT_FAILURE;
             }
         } else if (strcmp(argv[i], "-d") == 0) {
@@ -91,14 +94,14 @@ int main(int argc, char **argv)
                 }
                 continue;
             } else {
-                fprintf(stderr, "Filter %s used twice", argv[i]);
+                fprintf(stderr, "Filter %s used twice\n", argv[i]);
                 return EXIT_FAILURE;
             }
         } else if (strcmp(argv[i], "-p") == 0) {
             if (options.percent == UNSET) {
                 options.percent = OPTION_SET;
             } else {
-                fprintf(stderr, "Filter %s used twice", argv[i]);
+                fprintf(stderr, "Filter %s used twice\n", argv[i]);
                 return EXIT_FAILURE;
             }
         } else {
@@ -115,8 +118,11 @@ int main(int argc, char **argv)
     struct item item;
     if (!load_item(long_path, &item)) {
         fprintf(stderr, "Initial item not loaded\n");
+        free(long_path);
         return false;
     }
+    free(long_path);
+
     sort_tree(&item, &options);
     print_tree(&item, &options);
 

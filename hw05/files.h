@@ -19,9 +19,9 @@ char *remove_name_from_path(char *path);
 
 void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks);
 
-bool load_file(char *path, struct item *item);
+bool load_file(char *path, char *name, struct item *item);
 
-bool load_dir(char *path, struct item *result_dir);
+bool load_dir(char *path, char *name, struct item *result_dir);
 
 bool load_item(char *path, struct item *item);
 

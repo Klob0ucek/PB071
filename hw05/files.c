@@ -105,7 +105,7 @@ struct item *load_dir(char *path, char *name)
     }
 
     size_t dir_size = st.st_size;
-    size_t dir_blocks = 0;
+    size_t dir_blocks = st.st_blocks * 512;
 
     int size = 10;
     int index = 0;

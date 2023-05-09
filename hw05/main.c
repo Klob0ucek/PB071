@@ -47,11 +47,16 @@ bool parse_depth(struct options *options, const char *num_str)
 char *max_path(char *original)
 {
     char *path = calloc(4096, sizeof(char));
-    if (strcmp(original, "./") == 0) {
-        getcwd(path, sizeof(char) * 4096);
-    } else {
-        strcpy(path, original);
+    if (path == NULL) {
+        fprintf(stderr, "Malloc failed\n");
+        return NULL;
     }
+//    if (strcmp(original, "./") == 0) {
+//        getcwd(path, sizeof(char) * 4096);
+//    } else {
+//        strcpy(path, original);
+//    }
+    strcpy(path, original);
     return path;
 }
 
@@ -114,19 +119,19 @@ int main(int argc, char **argv)
 
     char *root_path = argv[argc - 1];
     char *long_path = max_path(root_path);
-
-    struct item *item;
-    char *name = find_name_from_path(long_path);
-    if ((item = load_item(long_path, name)) == NULL) {
-        fprintf(stderr, "Initial item not loaded\n");
-        free(long_path);
+    if (long_path == NULL){
         return EXIT_FAILURE;
     }
-    free(long_path);
+
+    struct item *item;
+    if ((item = load_item(long_path, long_path)) == NULL) {
+        fprintf(stderr, "Initial item not loaded\n");
+        return EXIT_FAILURE;
+    }
 
     sort_tree(item, &options);
     print_tree(item, &options);
 
     free_item(item);
-    return 0;
+    return EXIT_SUCCESS;
 }

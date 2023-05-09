@@ -109,7 +109,7 @@ struct item *load_dir(char *path, char *name)
 
     int size = 10;
     int index = 0;
-    struct item **children = malloc(sizeof(struct item*) * size);
+    struct item **children = malloc(sizeof(struct item *) * size);
     if (children == NULL) {
         fprintf(stderr, "Dir malloc failed\n");
         dir->error = true;
@@ -130,7 +130,7 @@ struct item *load_dir(char *path, char *name)
 
             if (index == size) {
                 size *= 2;
-                struct item **new = realloc(children, sizeof(struct item*) * size);
+                struct item **new = realloc(children, sizeof(struct item *) * size);
                 if (new == NULL) {
                     fprintf(stderr, "Realloc failed\n");
                     free(children);
@@ -145,7 +145,7 @@ struct item *load_dir(char *path, char *name)
                 free(new_path);
                 continue;
             }
-            if (loaded->error){
+            if (loaded->error) {
                 dir->error = true;
             }
 
@@ -194,7 +194,7 @@ void free_item(struct item *item)
         free(item->name);
         item->name = NULL;
     } else {
-        if (item->items != NULL){
+        if (item->items != NULL) {
             for (int i = 0; i < item->items_amount; i++) {
                 free_item(item->items[i]);
             }

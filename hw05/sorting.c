@@ -24,7 +24,7 @@ sorting_fn choose_sort_function(struct options *options)
 void sort(struct item *item, sorting_fn op)
 {
     if (item->type == FOLDER) {
-        qsort(item->items,item->items_amount,sizeof(struct item*),op);
+        qsort(item->items, item->items_amount, sizeof(struct item *), op);
         for (int i = 0; i < item->items_amount; ++i) {
             sort(item->items[i], op);
         }

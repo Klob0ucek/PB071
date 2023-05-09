@@ -34,11 +34,11 @@ enum item_type
 
 struct item
 {
-    char* name;
+    char *name;
     size_t block_size;
     size_t real_size;
     enum item_type type;
-    struct item** items;
+    struct item **items;
     int items_amount;
     bool error;
 };

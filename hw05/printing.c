@@ -56,7 +56,7 @@ void print_file(struct item *file, struct prefix *prefix, struct options *option
         printf("  ");
     }
 
-    print_size_from_options(file, options, max);// {SIZE}
+    print_size_from_options(file, options, max); // {SIZE}
 
     // {PREFIX + NAME}
     printf("%s%s\n", prefix->prefix, file->name);
@@ -72,7 +72,7 @@ void print_dir(struct item *dir, struct prefix *prefix, struct options *options,
         }
     }
 
-    print_size_from_options(dir, options, max);// {SIZE}
+    print_size_from_options(dir, options, max); // {SIZE}
 
     printf("%s%s\n", prefix->prefix, dir->name);
 
@@ -125,7 +125,7 @@ void print_item(struct item *item, struct prefix *prefix, struct options *option
         prefix->depth--;
         return;
     }
-    if (item->type== FOLDER) {
+    if (item->type == FOLDER) {
         print_dir(item, prefix, options, max);
     } else if (item->type == NORM_FILE) {
         print_file(item, prefix, options, max);

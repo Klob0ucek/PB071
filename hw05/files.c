@@ -88,6 +88,7 @@ bool load_dir(char *path, char *name, struct item *result_dir)
     struct stat st;
     if (stat(path, &st)) {
         fprintf(stderr, "Unable to load: %s\n", path);
+        item.item_pointer.folder.error_flag = true;
         *result_dir = item;
         return false;
     }
@@ -100,6 +101,8 @@ bool load_dir(char *path, char *name, struct item *result_dir)
     struct item *children = malloc(sizeof(struct item) * size);
     if (children == NULL) {
         fprintf(stderr, "Dir malloc failed\n");
+        item.item_pointer.folder.error_flag = true;
+        *result_dir = item;
         return false;
     }
 
@@ -119,6 +122,8 @@ bool load_dir(char *path, char *name, struct item *result_dir)
                 if (new == NULL) {
                     perror("Realloc failed\n");
                     free(children);
+                    item.item_pointer.folder.error_flag = true;
+                    *result_dir = item;
                     return false;
                 }
                 children = new;
@@ -129,13 +134,11 @@ bool load_dir(char *path, char *name, struct item *result_dir)
                 if (!load_file(new_path, new_name, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
-//                    continue;
                 }
             } else if (dir_entry->d_type == DT_DIR) {
                 if (!load_dir(new_path, new_name, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
-//                    continue;
                 }
                 if (loaded.item_pointer.folder.error_flag) {
                     item.item_pointer.folder.error_flag = true;
@@ -144,12 +147,11 @@ bool load_dir(char *path, char *name, struct item *result_dir)
                 if (!load_item(new_path, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
-                    continue;
                 }
             } else {
                 free(new_path);
                 free(new_name);
-                fprintf(stderr,  "Unknown file\n");
+                fprintf(stderr,  "Unsupported file\n");
                 continue;
             }
 

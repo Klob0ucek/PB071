@@ -23,7 +23,7 @@ char *make_path(char *path, char *name)
 
 char *copy_name(char dir_name[256])
 {
-    char *new = calloc(strlen(dir_name) + 1, sizeof(char));
+    char *new = calloc(256, sizeof(char));
     if (new == NULL) {
         fprintf(stderr, "Malloc failed in name_copy\n");
         return NULL;
@@ -61,15 +61,19 @@ void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
 
 bool load_file(char *path, char *name, struct item *item)
 {
+    struct file this = { 0, 0, name};
+    union item_holder holder = { this };
+    struct item result = { NORM_FILE, holder };
+
     struct stat st;
     if (stat(path, &st)) {
         fprintf(stderr, "Unable to load: %s\n", path);
+        *item = result;
         return false;
     }
 
-    struct file this = { st.st_size, st.st_blocks * 512, name };
-    union item_holder holder = { this };
-    struct item result = { NORM_FILE, holder };
+    result.item_pointer.file.size = st.st_size;
+    result.item_pointer.file.blocks = st.st_blocks * 512;
     *item = result;
     return true;
 }
@@ -84,6 +88,7 @@ bool load_dir(char *path, char *name, struct item *result_dir)
     struct stat st;
     if (stat(path, &st)) {
         fprintf(stderr, "Unable to load: %s\n", path);
+        *result_dir = item;
         return false;
     }
 
@@ -124,13 +129,13 @@ bool load_dir(char *path, char *name, struct item *result_dir)
                 if (!load_file(new_path, new_name, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
-                    continue;
+//                    continue;
                 }
             } else if (dir_entry->d_type == DT_DIR) {
                 if (!load_dir(new_path, new_name, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
-                    continue;
+//                    continue;
                 }
                 if (loaded.item_pointer.folder.error_flag) {
                     item.item_pointer.folder.error_flag = true;

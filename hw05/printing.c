@@ -95,12 +95,14 @@ void print_dir(struct item *dir, struct prefix *prefix, struct options *options,
         return;
     }
 
-    for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++) {
-        strcpy(dir_prefix, "|-- ");
-        print_item(&dir->item_pointer.folder.children[i], prefix, options, max);
+    if (dir->item_pointer.folder.amount_of_items > 0) {
+        for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++) {
+            strcpy(dir_prefix, "|-- ");
+            print_item(&dir->item_pointer.folder.children[i], prefix, options, max);
+        }
+        strcpy(dir_prefix, "\\-- ");
+        print_item(&dir->item_pointer.folder.children[dir->item_pointer.folder.amount_of_items - 1], prefix, options, max);
     }
-    strcpy(dir_prefix, "\\-- ");
-    print_item(&dir->item_pointer.folder.children[dir->item_pointer.folder.amount_of_items - 1], prefix, options, max);
 }
 
 size_t get_max(struct item *item, struct options *options)

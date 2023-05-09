@@ -99,3 +99,4 @@ run "Mělká struktura s nepřístupným adresářem" test_inaccessible
 # NOTE | See ‹tests-readme.md› on how to add your own tests to this suite or how
 #      | to create your own suite.
 
+

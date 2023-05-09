@@ -140,12 +140,17 @@ bool load_dir(char *path, char *name, struct item *result_dir)
                 if (loaded.item_pointer.folder.error_flag) {
                     item.item_pointer.folder.error_flag = true;
                 }
-            } else {
+            } else if (dir_entry->d_type == DT_UNKNOWN) {
                 if (!load_item(new_path, &loaded)) {
                     item.item_pointer.folder.error_flag = true;
                     free(new_path);
                     continue;
                 }
+            } else {
+                free(new_path);
+                free(new_name);
+                fprintf(stderr,  "Unknown file\n");
+                continue;
             }
 
             free(new_path);

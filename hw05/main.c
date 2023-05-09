@@ -115,17 +115,17 @@ int main(int argc, char **argv)
     char *root_path = argv[argc - 1];
     char *long_path = max_path(root_path);
 
-    struct item item;
-    if (!load_item(long_path, &item)) {
+    struct item *item;
+    if ((item = load_item(long_path)) == NULL) {
         fprintf(stderr, "Initial item not loaded\n");
         free(long_path);
-        return false;
+        return EXIT_FAILURE;
     }
     free(long_path);
 
-    sort_tree(&item, &options);
-    print_tree(&item, &options);
+    sort_tree(item, &options);
+    print_tree(item, &options);
 
-    free_item(&item);
+    free_item(item);
     return 0;
 }

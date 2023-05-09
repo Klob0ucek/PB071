@@ -26,39 +26,21 @@ struct options
     enum option_values percent;
 };
 
-struct file
-{
-    size_t size;
-    size_t blocks;
-    char *name; // on heap
-};
-
-struct folder
-{
-    size_t size;
-    size_t blocks;
-    bool error_flag;
-    char *name;            // on heap
-    struct item *children; // on heap
-    int amount_of_items;
-};
-
 enum item_type
 {
     NORM_FILE,
     FOLDER
 };
 
-union item_holder
-{
-    struct file file;
-    struct folder folder;
-};
-
 struct item
 {
-    enum item_type item_type;
-    union item_holder item_pointer;
+    char* name;
+    size_t block_size;
+    size_t real_size;
+    enum item_type type;
+    struct item** items;
+    int items_amount;
+    bool error;
 };
 
 struct prefix

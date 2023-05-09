@@ -13,7 +13,7 @@ typedef int (*sorting_fn)(const void *, const void *);
 
 sorting_fn choose_sort_function(struct options *options);
 
-void sort(struct item *item, int (*op)(const void *, const void *));
+void sort(struct item *item, sorting_fn op);
 
 void sort_tree(struct item *item, struct options *options);
 

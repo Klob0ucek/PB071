@@ -33,53 +33,48 @@ void print_percentage(size_t num, size_t max)
     printf("%5.1f%% ", percentage);
 }
 
+void print_size_from_options(struct item *item, struct options *options, size_t max)
+{
+    if (options->percent == DEFAULT) {
+        if (options->block_size == DEFAULT) {
+            print_size(item->block_size);
+        } else {
+            print_size(item->real_size);
+        }
+    } else {
+        if (options->block_size == DEFAULT) {
+            print_percentage(item->block_size, max);
+        } else {
+            print_percentage(item->real_size, max);
+        }
+    }
+}
+
 void print_file(struct item *file, struct prefix *prefix, struct options *options, size_t max)
 {
     if (prefix->error) { // {ERROR}
         printf("  ");
     }
 
-    if (options->percent == DEFAULT) { // {SIZE}
-        if (options->block_size == DEFAULT) {
-            print_size(file->item_pointer.file.blocks);
-        } else {
-            print_size(file->item_pointer.file.size);
-        }
-    } else {
-        if (options->block_size == DEFAULT) {
-            print_percentage(file->item_pointer.file.blocks, max);
-        } else {
-            print_percentage(file->item_pointer.file.size, max);
-        }
-    }
+    print_size_from_options(file, options, max);// {SIZE}
+
     // {PREFIX + NAME}
-    printf("%s%s\n", prefix->prefix, file->item_pointer.file.name);
+    printf("%s%s\n", prefix->prefix, file->name);
 }
 
 void print_dir(struct item *dir, struct prefix *prefix, struct options *options, size_t max)
 {
     if (prefix->error) { // {ERROR}
-        if (dir->item_pointer.folder.error_flag) {
+        if (dir->error) {
             printf("? ");
         } else {
             printf("  ");
         }
     }
 
-    if (options->percent == DEFAULT) { // {SIZE}
-        if (options->block_size == DEFAULT) {
-            print_size(dir->item_pointer.folder.blocks);
-        } else {
-            print_size(dir->item_pointer.folder.size);
-        }
-    } else {
-        if (options->block_size == DEFAULT) {
-            print_percentage(dir->item_pointer.folder.blocks, max);
-        } else {
-            print_percentage(dir->item_pointer.folder.size, max);
-        }
-    }
-    printf("%s%s\n", prefix->prefix, dir->item_pointer.folder.name);
+    print_size_from_options(dir, options, max);// {SIZE}
+
+    printf("%s%s\n", prefix->prefix, dir->name);
 
     // {PREFIX + NAME}
     char *dir_prefix = prefix->prefix + (4 * prefix->depth);
@@ -91,26 +86,26 @@ void print_dir(struct item *dir, struct prefix *prefix, struct options *options,
         memset(dir_prefix - 4, ' ', 4);
     }
 
-    if (dir->item_pointer.folder.error_flag && dir->item_pointer.folder.children == NULL) {
+    if (dir->items == NULL) {
         return;
     }
 
-    if (dir->item_pointer.folder.amount_of_items > 0) {
-        for (int i = 0; i < dir->item_pointer.folder.amount_of_items - 1; i++) {
+    if (dir->items_amount > 0) {
+        for (int i = 0; i < dir->items_amount - 1; i++) {
             strcpy(dir_prefix, "|-- ");
-            print_item(&dir->item_pointer.folder.children[i], prefix, options, max);
+            print_item(dir->items[i], prefix, options, max);
         }
         strcpy(dir_prefix, "\\-- ");
-        print_item(&dir->item_pointer.folder.children[dir->item_pointer.folder.amount_of_items - 1], prefix, options, max);
+        print_item(dir->items[dir->items_amount - 1], prefix, options, max);
     }
 }
 
 size_t get_max(struct item *item, struct options *options)
 {
     if (options->block_size == DEFAULT) {
-        return item->item_type == FOLDER ? item->item_pointer.folder.blocks : item->item_pointer.file.blocks;
+        return item->block_size;
     }
-    return item->item_type == FOLDER ? item->item_pointer.folder.size : item->item_pointer.file.size;
+    return item->real_size;
 }
 
 void print_tree(struct item *item, struct options *options)
@@ -118,7 +113,7 @@ void print_tree(struct item *item, struct options *options)
     char prefix_str[512];
     memset(prefix_str, '\0', sizeof(char) * 512);
     char *p = (char *) &prefix_str;
-    struct prefix prefix = { p, item->item_type == FOLDER ? item->item_pointer.folder.error_flag : false, -1 };
+    struct prefix prefix = { p, item->error, -1 };
     size_t max = get_max(item, options);
     print_item(item, &prefix, options, max);
 }
@@ -130,9 +125,9 @@ void print_item(struct item *item, struct prefix *prefix, struct options *option
         prefix->depth--;
         return;
     }
-    if (item->item_type == FOLDER) {
+    if (item->type== FOLDER) {
         print_dir(item, prefix, options, max);
-    } else if (item->item_type == NORM_FILE) {
+    } else if (item->type == NORM_FILE) {
         print_file(item, prefix, options, max);
     }
     prefix->depth--;

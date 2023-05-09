@@ -14,10 +14,10 @@ char *find_name_from_path(char *path);
 
 void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks);
 
-bool load_file(char *path, char *name, struct item *item);
+struct item *load_file(char *path, char *name);
 
-bool load_dir(char *path, char *name, struct item *result_dir);
+struct item *load_dir(char *path, char *name);
 
-bool load_item(char *path, struct item *item);
+struct item *load_item(char *path);
 
 void free_item(struct item *item);

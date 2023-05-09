@@ -50,47 +50,58 @@ char *find_name_from_path(char *path)
 
 void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
 {
-    if (item->item_type == FOLDER) {
-        *dir_blocks += item->item_pointer.folder.blocks;
-        *dir_size += item->item_pointer.folder.size;
-    } else if (item->item_type == NORM_FILE) {
-        *dir_blocks += item->item_pointer.file.blocks;
-        *dir_size += item->item_pointer.file.size;
-    }
+    *dir_blocks += item->block_size;
+    *dir_size += item->real_size;
 }
 
-bool load_file(char *path, char *name, struct item *item)
+struct item *load_file(char *path, char *name)
 {
-    struct file this = { 0, 0, name};
-    union item_holder holder = { this };
-    struct item result = { NORM_FILE, holder };
+    struct item *file = malloc(sizeof(struct item));
+    if (!file) {
+        fprintf(stderr, "Malloc has failed!\n");
+        return NULL;
+    }
 
     struct stat st;
     if (stat(path, &st)) {
         fprintf(stderr, "Unable to load: %s\n", path);
-        *item = result;
-        return false;
+        return NULL;
     }
 
-    result.item_pointer.file.size = st.st_size;
-    result.item_pointer.file.blocks = st.st_blocks * 512;
-    *item = result;
-    return true;
+    file->name = name;
+    file->block_size = st.st_blocks * 512;
+    file->real_size = st.st_size;
+    file->type = NORM_FILE;
+
+    file->items_amount = 0;
+    file->items = NULL;
+    file->error = false;
+
+    return file;
 }
 
-bool load_dir(char *path, char *name, struct item *result_dir)
+struct item *load_dir(char *path, char *name)
 {
-    struct folder folder = { 0, 0, false, name, NULL, 0 };
-    union item_holder holder;
-    holder.folder = folder;
-    struct item item = { FOLDER, holder };
+    struct item *dir = malloc(sizeof(struct item));
+    if (!dir) {
+        fprintf(stderr, "Malloc has failed!\n");
+        return NULL;
+    }
+
+    dir->error = false;
+    dir->name = name;
+    dir->type = FOLDER;
+    dir->real_size = 0;
+    dir->block_size = 0;
+
+    dir->items = NULL;
+    dir->items_amount = 0;
 
     struct stat st;
     if (stat(path, &st)) {
         fprintf(stderr, "Unable to load: %s\n", path);
-        item.item_pointer.folder.error_flag = true;
-        *result_dir = item;
-        return false;
+        dir->error = true;
+        return dir;
     }
 
     size_t dir_size = st.st_size;
@@ -98,55 +109,57 @@ bool load_dir(char *path, char *name, struct item *result_dir)
 
     int size = 10;
     int index = 0;
-    struct item *children = malloc(sizeof(struct item) * size);
+    struct item **children = malloc(sizeof(struct item*) * size);
     if (children == NULL) {
         fprintf(stderr, "Dir malloc failed\n");
-        item.item_pointer.folder.error_flag = true;
-        *result_dir = item;
-        return false;
+        dir->error = true;
+        return dir;
     }
 
-    DIR *dir = NULL;
-    if ((dir = opendir(path)) != NULL) {
+    struct item *loaded;
+    DIR *open_dir = NULL;
+    if ((open_dir = opendir(path)) != NULL) {
         struct dirent *dir_entry = NULL;
-        while ((dir_entry = readdir(dir)) != NULL) {
+        while ((dir_entry = readdir(open_dir)) != NULL) {
             if (strcmp(dir_entry->d_name, ".") == 0 || strcmp(dir_entry->d_name, "..") == 0) {
                 continue;
             }
+
             char *new_path = make_path(path, dir_entry->d_name);
             char *new_name = copy_name(dir_entry->d_name);
 
             if (index == size) {
                 size *= 2;
-                struct item *new = realloc(children, sizeof(struct item) * size);
+                struct item **new = realloc(children, sizeof(struct item*) * size);
                 if (new == NULL) {
-                    perror("Realloc failed\n");
+                    fprintf(stderr, "Realloc failed\n");
                     free(children);
-                    item.item_pointer.folder.error_flag = true;
-                    *result_dir = item;
-                    return false;
+                    dir->error = true;
+                    return dir;
                 }
                 children = new;
             }
 
-            struct item loaded;
             if (dir_entry->d_type == DT_REG) {
-                if (!load_file(new_path, new_name, &loaded)) {
-                    item.item_pointer.folder.error_flag = true;
+                if ((loaded = load_file(new_path, new_name)) == NULL) {
+                    dir->error = true;
                     free(new_path);
+                    continue;
                 }
             } else if (dir_entry->d_type == DT_DIR) {
-                if (!load_dir(new_path, new_name, &loaded)) {
-                    item.item_pointer.folder.error_flag = true;
+                if ((loaded = load_dir(new_path, new_name)) == NULL) {
+                    dir->error = true;
                     free(new_path);
+                    continue;
                 }
-                if (loaded.item_pointer.folder.error_flag) {
-                    item.item_pointer.folder.error_flag = true;
+                if (loaded->error) {
+                    dir->error = true;
                 }
             } else if (dir_entry->d_type == DT_UNKNOWN) {
-                if (!load_item(new_path, &loaded)) {
-                    item.item_pointer.folder.error_flag = true;
+                if ((loaded = load_item(new_path)) == NULL) {
+                    dir->error = true;
                     free(new_path);
+                    continue;
                 }
             } else {
                 free(new_path);
@@ -157,58 +170,59 @@ bool load_dir(char *path, char *name, struct item *result_dir)
 
             free(new_path);
 
-            add_sum(&loaded, &dir_size, &dir_blocks);
+            add_sum(loaded, &dir_size, &dir_blocks);
             children[index] = loaded;
             ++index;
         }
-        closedir(dir);
+        closedir(open_dir);
     } else {
         free(children);
         fprintf(stderr, "Unable to load: %s\n", path);
-        item.item_pointer.folder.error_flag = true;
-        *result_dir = item;
-        return true;
+        dir->error = true;
+        return dir;
     }
 
-    item.item_pointer.folder.size = dir_size;
-    item.item_pointer.folder.blocks = dir_blocks;
-    item.item_pointer.folder.children = children;
-    item.item_pointer.folder.amount_of_items = index;
-    *result_dir = item;
-    return true;
+    dir->real_size = dir_size;
+    dir->block_size = dir_blocks;
+    dir->items = children;
+    dir->items_amount = index;
+    return dir;
 }
 
-bool load_item(char *path, struct item *item)
+struct item *load_item(char *path)
 {
     struct stat file_stats;
     if (stat(path, &file_stats)) {
         fprintf(stderr, "Unable to load: %s\n", path);
-        return false;
+        return NULL;
     };
 
     char *name = find_name_from_path(path);
     if (S_ISDIR(file_stats.st_mode)) {
-        return load_dir(path, name, item);
+        return load_dir(path, name);
     } else if (S_ISREG(file_stats.st_mode)) {
-        return load_file(path, name, item);
+        return load_file(path, name);
     } else {
         free(name);
-        return false;
+        return NULL;
     }
 }
 
 void free_item(struct item *item)
 {
-    if (item->item_type == NORM_FILE) {
-        free(item->item_pointer.file.name);
-        item->item_pointer.file.name = NULL;
+    if (item->type == NORM_FILE) {
+        free(item->name);
+        item->name = NULL;
     } else {
-        for (int i = 0; i < item->item_pointer.folder.amount_of_items; i++) {
-            free_item(&item->item_pointer.folder.children[i]);
+        if (item->items != NULL){
+            for (int i = 0; i < item->items_amount; i++) {
+                free_item(item->items[i]);
+            }
         }
-        free(item->item_pointer.folder.children);
-        item->item_pointer.folder.children = NULL;
-        free(item->item_pointer.folder.name);
-        item->item_pointer.folder.name = NULL;
+        free(item->items);
+        item->items = NULL;
+        free(item->name);
+        item->name = NULL;
     }
+    free(item);
 }

@@ -21,15 +21,12 @@ sorting_fn choose_sort_function(struct options *options)
     return &compare_actual;
 }
 
-void sort(struct item *item, int (*op)(const void *, const void *))
+void sort(struct item *item, sorting_fn op)
 {
-    if (item->item_type == FOLDER) {
-        qsort(item->item_pointer.folder.children,
-                item->item_pointer.folder.amount_of_items,
-                sizeof(struct item),
-                op);
-        for (int i = 0; i < item->item_pointer.folder.amount_of_items; ++i) {
-            sort(&item->item_pointer.folder.children[i], op);
+    if (item->type == FOLDER) {
+        qsort(item->items,item->items_amount,sizeof(struct item*),op);
+        for (int i = 0; i < item->items_amount; ++i) {
+            sort(item->items[i], op);
         }
     }
 }
@@ -42,11 +39,11 @@ void sort_tree(struct item *item, struct options *options)
 
 int compare_names(const void *a, const void *b)
 {
-    struct item item1 = *(const struct item *) a;
-    struct item item2 = *(const struct item *) b;
+    const struct item *item1 = *(const struct item **) a;
+    const struct item *item2 = *(const struct item **) b;
 
-    char *name1 = (item1.item_type == FOLDER) ? item1.item_pointer.folder.name : item1.item_pointer.file.name;
-    char *name2 = (item2.item_type == FOLDER) ? item2.item_pointer.folder.name : item2.item_pointer.file.name;
+    char *name1 = item1->name;
+    char *name2 = item2->name;
 
     int result;
 
@@ -65,11 +62,11 @@ int compare_names(const void *a, const void *b)
 
 int compare_actual(const void *a, const void *b)
 {
-    struct item item1 = *(const struct item *) a;
-    struct item item2 = *(const struct item *) b;
+    const struct item *item1 = *(const struct item **) a;
+    const struct item *item2 = *(const struct item **) b;
 
-    size_t size1 = (item1.item_type == FOLDER) ? item1.item_pointer.folder.size : item1.item_pointer.file.size;
-    size_t size2 = (item2.item_type == FOLDER) ? item2.item_pointer.folder.size : item2.item_pointer.file.size;
+    size_t size1 = item1->real_size;
+    size_t size2 = item2->real_size;
 
     if (size1 < size2)
         return -1;
@@ -80,11 +77,11 @@ int compare_actual(const void *a, const void *b)
 
 int compare_blocks(const void *a, const void *b)
 {
-    struct item item1 = *(const struct item *) a;
-    struct item item2 = *(const struct item *) b;
+    const struct item *item1 = *(const struct item **) a;
+    const struct item *item2 = *(const struct item **) b;
 
-    size_t block1 = (item1.item_type == FOLDER) ? item1.item_pointer.folder.blocks : item1.item_pointer.file.blocks;
-    size_t block2 = (item2.item_type == FOLDER) ? item2.item_pointer.folder.blocks : item2.item_pointer.file.blocks;
+    size_t block1 = item1->block_size;
+    size_t block2 = item2->block_size;
 
     if (block1 < block2)
         return -1;

@@ -140,32 +140,13 @@ struct item *load_dir(char *path, char *name)
                 children = new;
             }
 
-            if (dir_entry->d_type == DT_REG) {
-                if ((loaded = load_file(new_path, new_name)) == NULL) {
-                    dir->error = true;
-                    free(new_path);
-                    continue;
-                }
-            } else if (dir_entry->d_type == DT_DIR) {
-                if ((loaded = load_dir(new_path, new_name)) == NULL) {
-                    dir->error = true;
-                    free(new_path);
-                    continue;
-                }
-                if (loaded->error) {
-                    dir->error = true;
-                }
-            } else if (dir_entry->d_type == DT_UNKNOWN) {
-                if ((loaded = load_item(new_path)) == NULL) {
-                    dir->error = true;
-                    free(new_path);
-                    continue;
-                }
-            } else {
+            if ((loaded = load_item(new_path, new_name)) == NULL) {
+                dir->error = true;
                 free(new_path);
-                free(new_name);
-                fprintf(stderr,  "Unsupported file\n");
                 continue;
+            }
+            if (loaded->error){
+                dir->error = true;
             }
 
             free(new_path);
@@ -189,7 +170,7 @@ struct item *load_dir(char *path, char *name)
     return dir;
 }
 
-struct item *load_item(char *path)
+struct item *load_item(char *path, char *name)
 {
     struct stat file_stats;
     if (stat(path, &file_stats)) {
@@ -197,7 +178,6 @@ struct item *load_item(char *path)
         return NULL;
     };
 
-    char *name = find_name_from_path(path);
     if (S_ISDIR(file_stats.st_mode)) {
         return load_dir(path, name);
     } else if (S_ISREG(file_stats.st_mode)) {

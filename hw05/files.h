@@ -18,6 +18,6 @@ struct item *load_file(char *path, char *name);
 
 struct item *load_dir(char *path, char *name);
 
-struct item *load_item(char *path);
+struct item *load_item(char *path, char *name);
 
 void free_item(struct item *item);

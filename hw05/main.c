@@ -116,7 +116,8 @@ int main(int argc, char **argv)
     char *long_path = max_path(root_path);
 
     struct item *item;
-    if ((item = load_item(long_path)) == NULL) {
+    char *name = find_name_from_path(long_path);
+    if ((item = load_item(long_path, name)) == NULL) {
         fprintf(stderr, "Initial item not loaded\n");
         free(long_path);
         return EXIT_FAILURE;

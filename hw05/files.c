@@ -32,21 +32,6 @@ char *copy_name(char dir_name[256])
     return new;
 }
 
-char *find_name_from_path(char *path)
-{
-    char *result;
-    char *name_start = strrchr(path, '/');
-    if (name_start == NULL) {
-        result = strdup(path);
-    } else {
-        name_start++;
-        result = strdup(name_start);
-    }
-    if (result == NULL) {
-        fprintf(stderr, "Name alloc failed");
-    }
-    return result;
-}
 
 void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
 {
@@ -107,6 +92,9 @@ struct item *load_dir(char *path, char *name)
     size_t dir_size = st.st_size;
     size_t dir_blocks = st.st_blocks * 512;
 
+    dir->block_size = dir_blocks;
+    dir->real_size = dir_size;
+
     int size = 10;
     int index = 0;
     struct item **children = malloc(sizeof(struct item *) * size);
@@ -158,7 +146,7 @@ struct item *load_dir(char *path, char *name)
         closedir(open_dir);
     } else {
         free(children);
-        fprintf(stderr, "Unable to load: %s\n", path);
+        fprintf(stderr, "Unable to open: %s\n", path);
         dir->error = true;
         return dir;
     }

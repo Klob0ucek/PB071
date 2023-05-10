@@ -51,11 +51,11 @@ char *max_path(char *original)
         fprintf(stderr, "Malloc failed\n");
         return NULL;
     }
-//    if (strcmp(original, "./") == 0) {
-//        getcwd(path, sizeof(char) * 4096);
-//    } else {
-//        strcpy(path, original);
-//    }
+    //    if (strcmp(original, "./") == 0) {
+    //        getcwd(path, sizeof(char) * 4096);
+    //    } else {
+    //        strcpy(path, original);
+    //    }
     strcpy(path, original);
     return path;
 }
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
     char *root_path = argv[argc - 1];
     char *long_path = max_path(root_path);
-    if (long_path == NULL){
+    if (long_path == NULL) {
         return EXIT_FAILURE;
     }
 

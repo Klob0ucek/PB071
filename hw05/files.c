@@ -32,7 +32,6 @@ char *copy_name(char dir_name[256])
     return new;
 }
 
-
 void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
 {
     *dir_blocks += item->block_size;

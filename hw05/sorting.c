@@ -69,10 +69,10 @@ int compare_actual(const void *a, const void *b)
     size_t size2 = item2->real_size;
 
     if (size1 < size2)
-        return -1;
-    if (size1 > size2)
         return 1;
-    return 0;
+    if (size1 > size2)
+        return -1;
+    return compare_names(a, b);
 }
 
 int compare_blocks(const void *a, const void *b)
@@ -84,8 +84,8 @@ int compare_blocks(const void *a, const void *b)
     size_t block2 = item2->block_size;
 
     if (block1 < block2)
-        return -1;
-    if (block1 > block2)
         return 1;
-    return 0;
+    if (block1 > block2)
+        return -1;
+    return compare_names(a, b);
 }

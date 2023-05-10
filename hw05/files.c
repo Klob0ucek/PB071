@@ -23,7 +23,7 @@ char *make_path(char *path, char *name)
 
 char *copy_name(char dir_name[256])
 {
-    char *new = calloc(256, sizeof(char));
+    char *new = calloc(NAME_MAX_LEN, sizeof(char));
     if (new == NULL) {
         fprintf(stderr, "Malloc failed in name_copy\n");
         return NULL;

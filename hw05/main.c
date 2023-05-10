@@ -46,16 +46,11 @@ bool parse_depth(struct options *options, const char *num_str)
 
 char *max_path(char *original)
 {
-    char *path = calloc(4096, sizeof(char));
+    char *path = calloc(PATH_MAX_LEN, sizeof(char));
     if (path == NULL) {
         fprintf(stderr, "Malloc failed\n");
         return NULL;
     }
-    //    if (strcmp(original, "./") == 0) {
-    //        getcwd(path, sizeof(char) * 4096);
-    //    } else {
-    //        strcpy(path, original);
-    //    }
     strcpy(path, original);
     return path;
 }
@@ -126,7 +121,8 @@ int main(int argc, char **argv)
     struct item *item;
     if ((item = load_item(long_path, long_path)) == NULL) {
         fprintf(stderr, "Initial item not loaded\n");
-        return EXIT_FAILURE;
+        free(long_path);
+        return EXIT_SUCCESS;
     }
 
     sort_tree(item, &options);

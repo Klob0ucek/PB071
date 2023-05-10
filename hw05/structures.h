@@ -11,6 +11,14 @@
 
 #endif //HW05_STRUCTURES_H
 
+#ifndef PATH_MAX_LEN
+#define PATH_MAX_LEN 4096
+#endif
+
+#ifndef NAME_MAX_LEN
+#define NAME_MAX_LEN 256
+#endif
+
 enum option_values
 {
     UNSET,

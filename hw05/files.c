@@ -165,24 +165,15 @@ struct item *load_item(char *path, char *name)
         return NULL;
     };
 
-//    if (S_ISDIR(file_stats.st_mode)) {
-//        return load_dir(path, name);
-//    } else if (S_ISREG(file_stats.st_mode)) {
-//        return load_file(path, name);
-//    } else {
-//        free(name);
-//        return NULL;
-//    } TODO remove if works, can leave original
-
-    switch (file_stats.st_mode) {
-        case S_IFDIR:
-            return load_dir(path, name);
-        case S_IFREG:
-            return load_file(path, name);
-        default:
-            free(name);
-            return NULL;
+    struct item *loaded = NULL;
+    if (S_ISDIR(file_stats.st_mode)) {
+        loaded = load_dir(path, name);
+    } else if (S_ISREG(file_stats.st_mode)) {
+        loaded = load_file(path, name);
+    } else {
+        free(name);
     }
+    return loaded;
 }
 
 void free_item(struct item *item)

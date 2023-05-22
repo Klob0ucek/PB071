@@ -79,11 +79,10 @@ void print_dir(struct item *dir, struct prefix *prefix, struct options *options,
     // {PREFIX + NAME}
     char *dir_prefix = prefix->prefix + (4 * prefix->depth);
     if (prefix->depth > 0 && *(dir_prefix - 4) != '\\') {
-        memset(dir_prefix - 4, '|', 1);
-        memset(dir_prefix - 3, ' ', 3);
+        strcpy(dir_prefix - 4, "|   ");
     }
     if (prefix->depth > 0 && *(dir_prefix - 4) == '\\') {
-        memset(dir_prefix - 4, ' ', 4);
+        strcpy(dir_prefix - 4, "    ");
     }
 
     if (dir->items == NULL) {

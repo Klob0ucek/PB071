@@ -21,7 +21,7 @@ char *make_path(char *path, char *name)
     return new;
 }
 
-char *copy_name(char dir_name[256])
+char *copy_name(char dir_name[NAME_MAX_LEN])
 {
     char *new = calloc(NAME_MAX_LEN, sizeof(char));
     if (new == NULL) {
@@ -53,7 +53,7 @@ struct item *load_file(char *path, char *name)
     }
 
     file->name = name;
-    file->block_size = st.st_blocks * 512;
+    file->block_size = st.st_blocks * SIZE_OF_BLOCK;
     file->real_size = st.st_size;
     file->type = NORM_FILE;
 

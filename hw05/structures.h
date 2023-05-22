@@ -11,12 +11,24 @@
 
 #endif //HW05_STRUCTURES_H
 
-#ifndef PATH_MAX_LEN
-#define PATH_MAX_LEN 4096
-#endif
-
 #ifndef NAME_MAX_LEN
 #define NAME_MAX_LEN 256
+#endif
+
+#ifndef SIZE_OF_BLOCK
+#define SIZE_OF_BLOCK 512
+#endif
+
+#ifndef PREFIX_SIZE
+#define PREFIX_SIZE 512
+#endif
+
+#ifndef UNIT_RANGE
+#define UNIT_RANGE 1024
+#endif
+
+#ifndef PATH_MAX_LEN
+#define PATH_MAX_LEN 4096
 #endif
 
 enum option_values

@@ -19,8 +19,8 @@ void print_size(size_t size)
     int unit_index = 0;
     double d_size = (double) size;
 
-    while (d_size >= 1024 && unit_index < 5) {
-        d_size /= 1024;
+    while (d_size >= UNIT_RANGE && unit_index < 5) {
+        d_size /= UNIT_RANGE;
         unit_index++;
     }
     double rounded = floor(d_size * 10) / 10.0;
@@ -110,8 +110,8 @@ size_t get_max(struct item *item, struct options *options)
 
 void print_tree(struct item *item, struct options *options)
 {
-    char prefix_str[512];
-    memset(prefix_str, '\0', sizeof(char) * 512);
+    char prefix_str[PREFIX_SIZE];
+    memset(prefix_str, '\0', sizeof(char) * PREFIX_SIZE);
     char *p = (char *) &prefix_str;
     struct prefix prefix = { p, item->error, -1 };
     size_t max = get_max(item, options);

@@ -41,13 +41,13 @@ void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
 struct item *load_file(char *path, char *name)
 {
     struct item *file = malloc(sizeof(struct item));
-    if (!file) {
+    if (file == NULL) {
         fprintf(stderr, "Malloc has failed!\n");
         return NULL;
     }
 
     struct stat st;
-    if (stat(path, &st)) {
+    if (stat(path, &st) == STAT_FAILED) {
         fprintf(stderr, "Unable to load: %s\n", path);
         return NULL;
     }
@@ -67,7 +67,7 @@ struct item *load_file(char *path, char *name)
 struct item *load_dir(char *path, char *name)
 {
     struct item *dir = malloc(sizeof(struct item));
-    if (!dir) {
+    if (dir == NULL) {
         fprintf(stderr, "Malloc has failed!\n");
         return NULL;
     }
@@ -82,7 +82,7 @@ struct item *load_dir(char *path, char *name)
     dir->items_amount = 0;
 
     struct stat st;
-    if (stat(path, &st)) {
+    if (stat(path, &st) == STAT_FAILED) {
         fprintf(stderr, "Unable to load: %s\n", path);
         dir->error = true;
         return dir;
@@ -160,18 +160,28 @@ struct item *load_dir(char *path, char *name)
 struct item *load_item(char *path, char *name)
 {
     struct stat file_stats;
-    if (stat(path, &file_stats)) {
+    if (stat(path, &file_stats) == STAT_FAILED) {
         fprintf(stderr, "Unable to load: %s\n", path);
         return NULL;
     };
 
-    if (S_ISDIR(file_stats.st_mode)) {
-        return load_dir(path, name);
-    } else if (S_ISREG(file_stats.st_mode)) {
-        return load_file(path, name);
-    } else {
-        free(name);
-        return NULL;
+//    if (S_ISDIR(file_stats.st_mode)) {
+//        return load_dir(path, name);
+//    } else if (S_ISREG(file_stats.st_mode)) {
+//        return load_file(path, name);
+//    } else {
+//        free(name);
+//        return NULL;
+//    } TODO remove if works, can leave original
+
+    switch (file_stats.st_mode) {
+        case S_IFDIR:
+            return load_dir(path, name);
+        case S_IFREG:
+            return load_file(path, name);
+        default:
+            free(name);
+            return NULL;
     }
 }
 

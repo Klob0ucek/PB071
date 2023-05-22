@@ -11,6 +11,10 @@
 
 #endif //HW05_STRUCTURES_H
 
+#ifndef STAT_FAILED
+#define STAT_FAILED (-1)
+#endif
+
 #ifndef NAME_MAX_LEN
 #define NAME_MAX_LEN 256
 #endif

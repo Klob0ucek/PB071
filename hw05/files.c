@@ -38,6 +38,69 @@ void add_sum(struct item *item, size_t *dir_size, size_t *dir_blocks)
     *dir_size += item->real_size;
 }
 
+int fill_dir(struct item *dir, char *path, size_t *dir_size, size_t *dir_blocks){
+
+    int size = 10;
+    int index = 0;
+    struct item **children = malloc(sizeof(struct item *) * size);
+    if (children == NULL) {
+        fprintf(stderr, "Dir malloc failed\n");
+        dir->error = true;
+        return false;
+    }
+
+    struct item *loaded;
+    DIR *open_dir = NULL;
+    if ((open_dir = opendir(path)) != NULL) {
+        struct dirent *dir_entry = NULL;
+        while ((dir_entry = readdir(open_dir)) != NULL) {
+            if (strcmp(dir_entry->d_name, ".") == 0 || strcmp(dir_entry->d_name, "..") == 0) {
+                continue;
+            }
+
+            char *new_path = make_path(path, dir_entry->d_name);
+            char *new_name = copy_name(dir_entry->d_name);
+
+            if (index == size) {
+                size *= 2;
+                struct item **new = realloc(children, sizeof(struct item *) * size);
+                if (new == NULL) {
+                    fprintf(stderr, "Realloc failed\n");
+                    free(children);
+                    dir->error = true;
+                    return false;
+                }
+                children = new;
+            }
+
+            if ((loaded = load_item(new_path, new_name)) == NULL) {
+                dir->error = true;
+                free(new_path);
+                continue;
+            }
+            if (loaded->error) {
+                dir->error = true;
+            }
+
+            free(new_path);
+
+            add_sum(loaded, dir_size, dir_blocks);
+            children[index] = loaded;
+            ++index;
+        }
+        closedir(open_dir);
+    } else {
+        free(children);
+        fprintf(stderr, "Unable to open: %s\n", path);
+        dir->error = true;
+        return false;
+    }
+
+    dir->items = children;
+    dir->items_amount = index;
+    return true;
+}
+
 struct item *load_file(char *path, char *name)
 {
     struct item *file = malloc(sizeof(struct item));
@@ -94,66 +157,13 @@ struct item *load_dir(char *path, char *name)
     dir->block_size = dir_blocks;
     dir->real_size = dir_size;
 
-    int size = 10;
-    int index = 0;
-    struct item **children = malloc(sizeof(struct item *) * size);
-    if (children == NULL) {
-        fprintf(stderr, "Dir malloc failed\n");
-        dir->error = true;
-        return dir;
-    }
 
-    struct item *loaded;
-    DIR *open_dir = NULL;
-    if ((open_dir = opendir(path)) != NULL) {
-        struct dirent *dir_entry = NULL;
-        while ((dir_entry = readdir(open_dir)) != NULL) {
-            if (strcmp(dir_entry->d_name, ".") == 0 || strcmp(dir_entry->d_name, "..") == 0) {
-                continue;
-            }
-
-            char *new_path = make_path(path, dir_entry->d_name);
-            char *new_name = copy_name(dir_entry->d_name);
-
-            if (index == size) {
-                size *= 2;
-                struct item **new = realloc(children, sizeof(struct item *) * size);
-                if (new == NULL) {
-                    fprintf(stderr, "Realloc failed\n");
-                    free(children);
-                    dir->error = true;
-                    return dir;
-                }
-                children = new;
-            }
-
-            if ((loaded = load_item(new_path, new_name)) == NULL) {
-                dir->error = true;
-                free(new_path);
-                continue;
-            }
-            if (loaded->error) {
-                dir->error = true;
-            }
-
-            free(new_path);
-
-            add_sum(loaded, &dir_size, &dir_blocks);
-            children[index] = loaded;
-            ++index;
-        }
-        closedir(open_dir);
-    } else {
-        free(children);
-        fprintf(stderr, "Unable to open: %s\n", path);
-        dir->error = true;
+    if (!fill_dir(dir, path, &dir_size, &dir_blocks)) {
         return dir;
     }
 
     dir->real_size = dir_size;
     dir->block_size = dir_blocks;
-    dir->items = children;
-    dir->items_amount = index;
     return dir;
 }
 

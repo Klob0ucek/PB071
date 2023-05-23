@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#
 
 /********
  * MAIN *
@@ -26,6 +24,14 @@ void close_options(struct options *options)
     if (options->percent == UNSET) {
         options->percent = DEFAULT;
     }
+}
+
+void init_options(struct options *options)
+{
+    options->block_size = UNSET;
+    options->percent = UNSET;
+    options->size_sorted = UNSET;
+    options->depth = -1;
 }
 
 bool parse_depth(struct options *options, const char *num_str)
@@ -55,14 +61,15 @@ char *max_path(char *original)
     return path;
 }
 
-int main(int argc, char **argv)
+struct options *parse_options(int argc, char **argv)
 {
-    if (argc < 2) {
-        fprintf(stderr, "Invalid amount of arguments\n");
-        return 1;
+    struct options *options = malloc(sizeof(struct options));
+    if (options == NULL){
+        fprintf(stderr, "Option malloc failed");
+        return NULL;
     }
 
-    struct options options = { UNSET, UNSET, -1, UNSET };
+    init_options(options);
 
     bool skip_next = false;
     for (int i = 1; i < argc - 1; ++i) {
@@ -71,46 +78,67 @@ int main(int argc, char **argv)
             continue;
         }
         if (strcmp(argv[i], "-a") == 0) {
-            if (options.block_size == UNSET) {
-                options.block_size = OPTION_SET;
+            if (options->block_size == UNSET) {
+                options->block_size = OPTION_SET;
                 continue;
             } else {
                 fprintf(stderr, "Filter %s used twice\n", argv[i]);
-                return EXIT_FAILURE;
+                free(options);
+                return NULL;
             }
         } else if (strcmp(argv[i], "-s") == 0) {
-            if (options.size_sorted == UNSET) {
-                options.size_sorted = OPTION_SET;
+            if (options->size_sorted == UNSET) {
+                options->size_sorted = OPTION_SET;
                 continue;
             } else {
                 fprintf(stderr, "Filter %s used twice\n", argv[i]);
-                return EXIT_FAILURE;
+                free(options);
+                return NULL;
             }
         } else if (strcmp(argv[i], "-d") == 0) {
-            if (options.depth == -1) {
+            if (options->depth == -1) {
                 skip_next = true;
-                if (!parse_depth(&options, argv[i + 1])) {
-                    return EXIT_FAILURE;
+                if (!parse_depth(options, argv[i + 1])) {
+                    free(options);
+                    return NULL;
                 }
                 continue;
             } else {
                 fprintf(stderr, "Filter %s used twice\n", argv[i]);
-                return EXIT_FAILURE;
+                free(options);
+                return NULL;
             }
         } else if (strcmp(argv[i], "-p") == 0) {
-            if (options.percent == UNSET) {
-                options.percent = OPTION_SET;
+            if (options->percent == UNSET) {
+                options->percent = OPTION_SET;
             } else {
                 fprintf(stderr, "Filter %s used twice\n", argv[i]);
-                return EXIT_FAILURE;
+                free(options);
+                return NULL;
             }
         } else {
             fprintf(stderr, "Invalid argument\n");
-            return EXIT_FAILURE;
+            free(options);
+            return NULL;
         }
         skip_next = false;
     }
-    close_options(&options);
+
+    close_options(options);
+    return options;
+}
+
+int main(int argc, char **argv)
+{
+    if (argc < 2) {
+        fprintf(stderr, "Invalid amount of arguments\n");
+        return EXIT_FAILURE;
+    }
+
+    struct options *options = parse_options(argc, argv);
+    if (options == NULL) {
+        return EXIT_FAILURE;
+    }
 
     char *root_path = argv[argc - 1];
     char *long_path = max_path(root_path);
@@ -125,9 +153,10 @@ int main(int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
-    sort_tree(item, &options);
-    print_tree(item, &options);
+    sort_tree(item, options);
+    print_tree(item, options);
 
+    free(options);
     free_item(item);
     return EXIT_SUCCESS;
 }

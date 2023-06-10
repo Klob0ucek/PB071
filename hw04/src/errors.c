@@ -14,13 +14,11 @@ jmp_buf *get_error_point()
     return point;
 }
 
-__attribute__((noreturn))
 int error_happened(enum error_codes code)
 {
     longjmp(*point, code);
 }
 
-__attribute__((noreturn))
 void exit_success()
 {
     error_happened(SUCCESS);
@@ -35,6 +33,8 @@ static const char *resolve_message(enum error_codes code)
         return "OK";
     case DUPLICIT_INITIALIZATION:
         return "duplicit initialization";
+    case NO_BASE_VALUE:
+        return "no base currency set or too many base currencies";
     case ALLOCATION_FAILED:
         return "allocation failed";
     case CURRENCY_ALREADY_PRESENT:
@@ -47,6 +47,12 @@ static const char *resolve_message(enum error_codes code)
         return "person already present";
     case INVALID_ARGUMENTS:
         return "invalid arguments; use <program> <person-file> <currency-file> <payments-file>";
+    case CURRENCY_WRONG_INPUT:
+        return "incorrect value of a currency";
+    case RATING_WRONG_INPUT:
+        return "incorrect value of a rating";
+    case INVALID_NUMERIC_INPUT:
+        return "incorrect value of numeric input";
     default:
         sprintf(unknownError, "unknown error (%u)", code);
         return unknownError;
@@ -62,5 +68,5 @@ int return_code(enum error_codes code)
 
 void print_error_message(enum error_codes code)
 {
-    fprintf(stderr, "Error happened: %s", resolve_message(code));
+    fprintf(stderr, "Error happened: %s\n", resolve_message(code));
 }

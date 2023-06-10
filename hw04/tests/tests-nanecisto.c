@@ -2,7 +2,7 @@
 #include "libs/utils.h"
 #include "libs/mainwrap.h"
 
-#define PERSONS_SIMPLEST "tests/data/nanecisto/persons_simplest.txt" 
+#define PERSONS_SIMPLEST "tests/data/nanecisto/persons_simplest.txt"
 #define CURRENCIES_SIMPLEST "tests/data/nanecisto/currencies_simplest.txt"
 #define PAYMENTS_SIMPLEST "tests/data/nanecisto/payments_simplest.txt"
 
@@ -26,9 +26,10 @@
 
 TEST(simplest_transaction)
 {
-    CHECK(app_main_args(PERSONS_SIMPLEST, 
-                        CURRENCIES_SIMPLEST, 
-                        PAYMENTS_SIMPLEST) == 0);
+    int ret = app_main_args(PERSONS_SIMPLEST,
+                            CURRENCIES_SIMPLEST,
+                            PAYMENTS_SIMPLEST);
+    CHECK(ret == 0);
 
     const char *correct_output = "Bob (BB) -> Alice (AA): 1 CZK\n";
 

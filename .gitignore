@@ -58,4 +58,5 @@ CMakeLists.txt.user*
 !.clang-format
 !.clang-tidy
 
-
+# Unignore data files for HW03 tests
+!/hw03/tests/data/*.csv
